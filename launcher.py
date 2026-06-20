@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Content App Launcher — persistent taskbar window to control server + open Chrome."""
+"""Content App Launcher — persistent taskbar window to control server + open Firefox."""
 
-import os, sys, subprocess, time, threading, json, urllib.request, socket, signal
+import os, sys, subprocess, time, threading, urllib.request
 import tkinter as tk
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 SERVER_URL = 'http://localhost:8080'
-CHROME = '/usr/bin/google-chrome-stable'
+FIREFOX = '/usr/bin/firefox'
 W, H = 340, 220
 BG = '#0a0a0a'
 BG2 = '#151515'
@@ -23,7 +23,6 @@ class Launcher:
         self.root.resizable(False, False)
         self.root.protocol('WM_DELETE_WINDOW', self.on_close)
 
-        # centre window
         sw = self.root.winfo_screenwidth()
         sh = self.root.winfo_screenheight()
         self.root.geometry(f'{W}x{H}+{(sw-W)//2}+{(sh-H)//2}')
@@ -33,24 +32,17 @@ class Launcher:
         self._build_ui()
         self.start_server()
 
-    # ── UI ──
-
     def _build_ui(self):
-        # header
         hdr = tk.Frame(self.root, bg=BG)
         hdr.pack(fill='x', padx=20, pady=(18, 0))
-        dot = tk.Label(hdr, text='●', fg=RED, bg=BG, font=('Segoe UI', 10))
-        dot.pack(side='left')
-        tt = tk.Label(hdr, text='  Content App', fg=FG, bg=BG,
-                      font=('Segoe UI', 14, 'bold'))
-        tt.pack(side='left')
+        tk.Label(hdr, text='●', fg=RED, bg=BG, font=('Segoe UI', 10)).pack(side='left')
+        tk.Label(hdr, text='  Content App', fg=FG, bg=BG,
+                 font=('Segoe UI', 14, 'bold')).pack(side='left')
 
-        # open button
         btn_frame = tk.Frame(self.root, bg=BG)
         btn_frame.pack(expand=True)
-
         self.open_btn = tk.Button(
-            btn_frame, text='🎬  Open Content App',
+            btn_frame, text='🦊  Open Content App',
             font=('Segoe UI', 13, 'bold'),
             bg=RED, fg='#fff', activebackground='#ef4444', activeforeground='#fff',
             bd=0, padx=24, pady=10, cursor='hand2',
@@ -58,17 +50,13 @@ class Launcher:
         )
         self.open_btn.pack()
 
-        # status bar
         sbar = tk.Frame(self.root, bg=BG)
         sbar.pack(fill='x', padx=20, pady=(0, 14))
-
-        self.status_dot = tk.Label(sbar, text='○', fg=DIM, bg=BG,
-                                   font=('Segoe UI', 10))
+        self.status_dot = tk.Label(sbar, text='○', fg=DIM, bg=BG, font=('Segoe UI', 10))
         self.status_dot.pack(side='left')
         self.status_lbl = tk.Label(sbar, text='  Starting server…', fg=DIM, bg=BG,
                                    font=('Segoe UI', 10))
         self.status_lbl.pack(side='left')
-
         self.stop_btn = tk.Button(
             sbar, text='⏹ Stop Server',
             font=('Segoe UI', 9),
@@ -81,8 +69,6 @@ class Launcher:
     def _set_status(self, text, ok=False):
         self.status_dot.configure(fg=RED if ok else DIM, text='●' if ok else '○')
         self.status_lbl.configure(text='  ' + text, fg=FG if ok else DIM)
-
-    # ── Server ──
 
     def start_server(self):
         self._set_status('Starting server…')
@@ -115,6 +101,7 @@ class Launcher:
         self._set_status('Running', ok=True)
         self.open_btn.configure(state='normal')
         self.stop_btn.configure(state='normal', fg=RED, activeforeground=RED)
+        self.open_app()
 
     def _server_failed(self, msg):
         self.running = False
@@ -127,19 +114,17 @@ class Launcher:
             except Exception:
                 pass
 
-    # ── Actions ──
-
     def open_app(self):
         if not self.running:
             return
         try:
             subprocess.Popen(
-                [CHROME, f'--app={SERVER_URL}'],
+                [FIREFOX, '--new-window', SERVER_URL],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )
         except FileNotFoundError:
-            self._set_status('Chrome not found at ' + CHROME)
+            self._set_status('Firefox not found at ' + FIREFOX)
 
     def stop_server(self):
         try:

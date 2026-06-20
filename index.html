@@ -31,7 +31,7 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:-apple-system,system-ui,'Segoe
 }
 
 /* ── Layout ── */
-.app{display:flex;flex-direction:column;height:100dvh;max-width:480px;margin:0 auto;position:relative}
+.app{display:flex;flex-direction:column;height:100dvh;width:100%;position:relative}
 .header{height:var(--header-h);display:flex;align-items:center;padding:0 12px;gap:8px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .header h1{font-size:15px;font-weight:700;letter-spacing:-0.3px;flex:1;display:flex;align-items:center;gap:8px}
 .header h1 .dot{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block}
@@ -202,6 +202,25 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .gen-grid img{width:100%;border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;transition:all .12s}
 .gen-grid img:hover{border-color:var(--red)}
 
+/* ── Live posting toggle ── */
+.live-bar{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;transition:border-color .2s,background .2s}
+.live-bar.active{border-color:var(--red);background:rgba(220,38,38,.08)}
+.live-toggle{width:52px;height:28px;border-radius:14px;background:var(--border2);border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.live-toggle::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.live-toggle.on{background:var(--red)}
+.live-toggle.on::after{transform:translateX(24px)}
+.pub-target{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer}
+.pub-target:last-child{border-bottom:none}
+.pub-target input{accent-color:var(--red);flex-shrink:0}
+/* ── Settings tabs ── */
+.stab-bar{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto}
+.stab{padding:8px 14px;border:none;background:none;color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;border-radius:var(--radius-sm) var(--radius-sm) 0 0;white-space:nowrap;transition:all .12s;flex-shrink:0}
+.stab.active{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-bottom-color:var(--bg3);margin-bottom:-1px}
+.stab-panel{display:none}
+.stab-panel.active{display:block}
+/* ── Settings helpers ── */
+.settings-sub-heading{font-size:11px;font-weight:600;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.04em}
+.settings-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
 /* ── Venice / API Settings ── */
 .api-field{margin-bottom:10px}
 .api-field label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);margin-bottom:4px}
@@ -255,22 +274,34 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .tele-stage.mirror .tele-text{transform-origin:center}
 .tele-stage.mirror{transform:scaleX(-1)}
 
+/* ── Settings modal always centered ── */
+#settingsModal{align-items:center}
+.settings-modal{max-width:700px;border-radius:var(--radius);margin:auto;max-height:88vh}
+
+/* ── Responsive: Wide (>700px) ── */
+@media (min-width: 700px) {
+  .content{max-width:1600px;margin:0 auto;padding:16px 28px 8px}
+  .header{padding:0 28px}
+  .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .home-left .hero-rec{padding:32px 16px}
+  .home-left .hero-rec .big-btn{width:96px;height:96px;font-size:40px}
+  .stat-grid{grid-template-columns:repeat(4,1fr)}
+  .post-aspects{grid-template-columns:repeat(4,1fr)}
+  .gen-grid{grid-template-columns:repeat(4,1fr)}
+}
+
 /* ── Responsive: Desktop (>1024px) ── */
 @media (min-width: 1024px) {
-  .app{max-width:100%;height:100vh}
-  .content{max-width:1600px;margin:0 auto;padding:20px 32px 8px}
-  .header{padding:0 32px}
+  .content{padding:20px 40px 8px}
+  .header{padding:0 40px}
   .header h1{font-size:18px}
   .nav{height:calc(var(--nav-h) + 4px)}
   .nav-btn{padding:6px 0;gap:3px}
   .nav-btn .nav-icon{font-size:22px}
   .nav-btn{font-size:11px}
-  .stat-grid{grid-template-columns:repeat(4,1fr)}
-  .post-aspects{grid-template-columns:repeat(4,1fr)}
-  .gen-grid{grid-template-columns:repeat(4,1fr)}
   .brand-bar{flex-wrap:wrap}
   .tele-stage{height:500px}
-  .hero-rec .big-btn{width:96px;height:96px;font-size:40px}
+  .hero-rec .big-btn{width:110px;height:110px;font-size:48px}
   .section-title{font-size:12px;letter-spacing:.08em;margin-bottom:12px}
   .rec-item{padding:14px 18px}
   .card-pad{padding:16px 20px}
@@ -279,7 +310,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
   .form-group{margin-bottom:14px}
   .post-canvas-wrap canvas{max-height:500px}
   .edit-timeline{height:48px}
-  .hero-rec{padding:32px 16px}
+  .hero-rec{padding:40px 16px}
   .empty{padding:48px 16px}
   .edit-load-zone{padding:48px 24px}
   .section{margin-bottom:20px}
@@ -291,7 +322,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
   .tele-controls{gap:8px}
   textarea{font-size:15px}
   input,select{font-size:15px}
-  .tab-panel{padding:16px 16px 8px}
+  .tab-panel{padding:20px 20px 8px}
 }
 @media(max-width:360px){.rec-mode-tab{font-size:11px;padding:6px 0}}
 </style>
@@ -310,55 +341,62 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 
     <!-- ═══════ HOME ═══════ -->
     <section class="tab-panel active" id="tabHome">
-      <div class="hero-rec">
-        <button class="big-btn" onclick="switchTab(2)" title="Start Recording">🎙</button>
-        <div style="margin-top:8px;font-size:12px;color:var(--muted)">Tap to record</div>
-      </div>
-
-      <!-- Server Status Bar -->
-      <div class="section" id="serverStatusSection" style="display:none">
-        <div class="card card-pad" id="serverStatusCard">
-          <div class="row">
-            <div style="display:flex;align-items:center;gap:8px;flex:1">
-              <span id="serverDot" style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block"></span>
-              <span id="serverLabel" style="font-size:13px;font-weight:500">Running</span>
-            </div>
-            <span id="serverIP" style="font-size:11px;color:var(--muted);font-family:monospace"></span>
-            <button class="btn btn-sm btn-danger" onclick="stopServer()">⏹ Stop</button>
+      <div class="home-grid">
+        <div class="home-left">
+          <div class="hero-rec">
+            <button class="big-btn" onclick="switchTab(2)" title="Start Recording">🎙</button>
+            <div style="margin-top:8px;font-size:12px;color:var(--muted)">Tap to record</div>
+          </div>
+          <div class="section">
+            <div class="section-title">Recent Recordings</div>
+            <div class="card" id="recentList"><div class="empty"><span class="icon">🎙</span><span class="text">No recordings yet</span></div></div>
           </div>
         </div>
-      </div>
+        <div class="home-right">
+          <!-- Server Status Bar -->
+          <div class="section" id="serverStatusSection" style="display:none">
+            <div class="card card-pad" id="serverStatusCard">
+              <div class="row">
+                <div style="display:flex;align-items:center;gap:8px;flex:1">
+                  <span id="serverDot" style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block"></span>
+                  <span id="serverLabel" style="font-size:13px;font-weight:500">Running</span>
+                </div>
+                <span id="serverIP" style="font-size:11px;color:var(--muted);font-family:monospace"></span>
+                <button class="btn btn-sm btn-danger" onclick="stopServer()">⏹ Stop</button>
+              </div>
+            </div>
+          </div>
 
-      <!-- API Config Status -->
-      <div class="section">
-        <div class="section-title">API Configuration</div>
-        <div class="stat-grid" id="apiStatusGrid">
-          <div class="stat-card" id="apiVeniceCard"><div class="stat-num" id="apiVeniceStatus">❌</div><div class="stat-label">Venice AI</div></div>
-          <div class="stat-card" id="apiYTCard"><div class="stat-num" id="apiYTStatus">❌</div><div class="stat-label">YouTube</div></div>
-          <div class="stat-card" id="apiBSCard"><div class="stat-num" id="apiBSStatus">❌</div><div class="stat-label">Buzzsprout</div></div>
-        </div>
-        <button class="btn btn-sm btn-ghost mt-8" onclick="showSettings()" style="width:100%">⚙ Configure in Settings</button>
-      </div>
+          <div class="section">
+            <div class="section-title">Brand</div>
+            <div class="brand-bar" id="brandBar"></div>
+          </div>
+          <div class="section" id="statsSection">
+            <div class="section-title">Platform Stats</div>
+            <div class="stat-grid" id="statGrid">
+              <div class="stat-card"><div class="stat-num" id="statVideos">-</div><div class="stat-label">YouTube</div></div>
+              <div class="stat-card"><div class="stat-num" id="statEpisodes">-</div><div class="stat-label">Buzzsprout</div></div>
+              <div class="stat-card"><div class="stat-num" id="statLocal">0</div><div class="stat-label">Local</div></div>
+            </div>
+            <div class="btn-group mt-8">
+              <button class="btn btn-sm btn-outline" onclick="fetchYouTubeStats()">↻ YouTube</button>
+              <button class="btn btn-sm btn-outline" onclick="fetchBuzzsproutStats()">↻ Buzzsprout</button>
+            </div>
+          </div>
 
-      <div class="section">
-        <div class="section-title">Brand</div>
-        <div class="brand-bar" id="brandBar"></div>
-      </div>
-      <div class="section" id="statsSection">
-        <div class="section-title">Platform Stats</div>
-        <div class="stat-grid" id="statGrid">
-          <div class="stat-card"><div class="stat-num" id="statVideos">-</div><div class="stat-label">YouTube</div></div>
-          <div class="stat-card"><div class="stat-num" id="statEpisodes">-</div><div class="stat-label">Buzzsprout</div></div>
-          <div class="stat-card"><div class="stat-num" id="statLocal">0</div><div class="stat-label">Local</div></div>
+          <!-- API Config Status -->
+          <div class="section">
+            <div class="section-title">API Configuration</div>
+            <div class="stat-grid" id="apiStatusGrid">
+              <div class="stat-card" id="apiVeniceCard"><div class="stat-num" id="apiVeniceStatus">❌</div><div class="stat-label">Venice AI</div></div>
+              <div class="stat-card" id="apiYTCard"><div class="stat-num" id="apiYTStatus">❌</div><div class="stat-label">YouTube</div></div>
+              <div class="stat-card" id="apiMetaCard"><div class="stat-num" id="apiMetaStatus">❌</div><div class="stat-label">Meta</div></div>
+              <div class="stat-card" id="apiBSCard"><div class="stat-num" id="apiBSStatus">❌</div><div class="stat-label">Buzzsprout</div></div>
+              <div class="stat-card" id="apiBlogCard"><div class="stat-num" id="apiBlogStatus">❌</div><div class="stat-label">Blog</div></div>
+            </div>
+            <button class="btn btn-sm btn-ghost mt-8" onclick="showSettings()" style="width:100%">⚙ Configure in Settings</button>
+          </div>
         </div>
-        <div class="btn-group mt-8">
-          <button class="btn btn-sm btn-outline" onclick="fetchYouTubeStats()">↻ YouTube</button>
-          <button class="btn btn-sm btn-outline" onclick="fetchBuzzsproutStats()">↻ Buzzsprout</button>
-        </div>
-      </div>
-      <div class="section">
-        <div class="section-title">Recent Recordings</div>
-        <div class="card" id="recentList"><div class="empty"><span class="icon">🎙</span><span class="text">No recordings yet</span></div></div>
       </div>
     </section>
 
@@ -565,6 +603,27 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
         </div>
         <div id="veniceResults" class="gen-grid"></div>
       </div>
+
+      <!-- ── Publish ── -->
+      <div class="section">
+        <div class="section-title">Publish</div>
+        <div class="live-bar" id="liveBar">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">⚡ Live Posting</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">OFF by default — flip ON to post to real accounts</div>
+          </div>
+          <button class="live-toggle" id="liveToggle" onclick="toggleLivePosting()" aria-label="Toggle live posting"></button>
+        </div>
+        <div class="form-group mt-8">
+          <label>Caption / Post Text</label>
+          <textarea id="postCaption" placeholder="Write your caption..." style="min-height:80px"></textarea>
+        </div>
+        <div class="section-title" style="margin-top:12px">Post to</div>
+        <div class="card card-pad" id="publishTargets" style="padding:8px 16px;min-height:48px"></div>
+        <button class="btn btn-block mt-8" id="publishBtn" onclick="publishToAll()" disabled style="opacity:.4">
+          🚫 Live Posting is OFF
+        </button>
+      </div>
     </section>
 
   </main>
@@ -581,47 +640,117 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 
 <!-- ═══════ SETTINGS MODAL ═══════ -->
 <div class="modal-overlay" id="settingsModal">
-  <div class="modal">
+  <div class="modal settings-modal">
     <div class="modal-handle"></div>
     <div class="modal-title">Settings</div>
-    <div class="section">
-      <div class="section-title">Venice AI (image + text generation)</div>
-      <div class="api-field">
-        <label>API Key</label>
-        <input id="settingVeniceKey" type="password" placeholder="sk-..." oninput="saveSettingsDebounced()">
-        <div class="api-status" id="veniceStatus"></div>
+
+    <div class="stab-bar">
+      <button class="stab active"  onclick="showSettingsTab(this,'creative')">🎨 Creative</button>
+      <button class="stab"         onclick="showSettingsTab(this,'social')">📱 Social</button>
+      <button class="stab"         onclick="showSettingsTab(this,'publish')">🚀 Publish</button>
+      <button class="stab"         onclick="showSettingsTab(this,'brands')">🏷 Brands</button>
+    </div>
+
+    <!-- ── Creative ── -->
+    <div class="stab-panel active" id="sp-creative">
+      <div class="section">
+        <div class="section-title">Venice AI — image &amp; text generation</div>
+        <div class="api-field">
+          <label>API Key</label>
+          <input id="settingVeniceKey" type="password" placeholder="sk-..." oninput="saveSettingsDebounced()">
+          <div class="api-status" id="veniceStatus"></div>
+        </div>
       </div>
     </div>
-    <div class="section">
-      <div class="section-title">YouTube Stats</div>
-      <div class="api-field">
-        <label>Channel ID</label>
-        <input id="settingYTChannel" type="text" placeholder="UC..." oninput="saveSettingsDebounced()">
+
+    <!-- ── Social ── -->
+    <div class="stab-panel" id="sp-social">
+      <div class="section">
+        <div class="section-title">YouTube</div>
+        <div class="api-field">
+          <label>Google API Key (shared across both channels)</label>
+          <input id="settingYTKey" type="password" placeholder="Google Cloud API key" oninput="saveSettingsDebounced()">
+        </div>
+        <div class="settings-sub-heading">Channel 1</div>
+        <div class="settings-pair">
+          <div class="api-field"><label>Label</label><input id="settingYT1Label" type="text" placeholder="e.g. ChasStrengthClub" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>Channel ID</label><input id="settingYTChannel" type="text" placeholder="UC..." oninput="saveSettingsDebounced()"></div>
+        </div>
+        <div class="settings-sub-heading">Channel 2</div>
+        <div class="settings-pair">
+          <div class="api-field"><label>Label</label><input id="settingYT2Label" type="text" placeholder="e.g. Decentralized Strength" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>Channel ID</label><input id="settingYT2Channel" type="text" placeholder="UC..." oninput="saveSettingsDebounced()"></div>
+        </div>
       </div>
-      <div class="api-field">
-        <label>API Key</label>
-        <input id="settingYTKey" type="password" placeholder="Google Cloud API key" oninput="saveSettingsDebounced()">
+      <div class="section">
+        <div class="section-title">Meta — Facebook &amp; Instagram</div>
+        <div class="api-field">
+          <label>User Access Token (one token covers all your pages &amp; IG accounts)</label>
+          <input id="settingMetaToken" type="password" placeholder="EAAxxxx..." oninput="saveSettingsDebounced()">
+        </div>
+        <div class="settings-sub-heading">Facebook Pages</div>
+        <div class="settings-pair">
+          <div class="api-field"><label>Page 1 Label</label><input id="settingFBPage1Label" type="text" placeholder="ChasStrengthClub" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>Page 1 ID</label><input id="settingFBPage1Id" type="text" placeholder="123456..." oninput="saveSettingsDebounced()"></div>
+        </div>
+        <div class="settings-pair">
+          <div class="api-field"><label>Page 2 Label</label><input id="settingFBPage2Label" type="text" placeholder="Decentralized Strength" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>Page 2 ID</label><input id="settingFBPage2Id" type="text" placeholder="123456..." oninput="saveSettingsDebounced()"></div>
+        </div>
+        <div class="settings-pair">
+          <div class="api-field"><label>Page 3 Label</label><input id="settingFBPage3Label" type="text" placeholder="Barbie the Pug" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>Page 3 ID</label><input id="settingFBPage3Id" type="text" placeholder="123456..." oninput="saveSettingsDebounced()"></div>
+        </div>
+        <div class="settings-sub-heading">Instagram Business Accounts</div>
+        <div class="settings-pair">
+          <div class="api-field"><label>Account 1 Label</label><input id="settingIGAcct1Label" type="text" placeholder="@chasstrengthclub" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>Account 1 ID</label><input id="settingIGAcct1Id" type="text" placeholder="123456..." oninput="saveSettingsDebounced()"></div>
+        </div>
+        <div class="settings-pair">
+          <div class="api-field"><label>Account 2 Label</label><input id="settingIGAcct2Label" type="text" placeholder="@decentralizedstrength" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>Account 2 ID</label><input id="settingIGAcct2Id" type="text" placeholder="123456..." oninput="saveSettingsDebounced()"></div>
+        </div>
+        <div class="settings-pair">
+          <div class="api-field"><label>Account 3 Label</label><input id="settingIGAcct3Label" type="text" placeholder="@barbiethepug" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>Account 3 ID</label><input id="settingIGAcct3Id" type="text" placeholder="123456..." oninput="saveSettingsDebounced()"></div>
+        </div>
       </div>
     </div>
-    <div class="section">
-      <div class="section-title">Buzzsprout Stats</div>
-      <div class="api-field">
-        <label>API Key</label>
-        <input id="settingBSKey" type="password" placeholder="Buzzsprout API key" oninput="saveSettingsDebounced()">
+
+    <!-- ── Publish ── -->
+    <div class="stab-panel" id="sp-publish">
+      <div class="section">
+        <div class="section-title">Buzzsprout</div>
+        <div class="settings-pair">
+          <div class="api-field"><label>API Key</label><input id="settingBSKey" type="password" placeholder="Buzzsprout API key" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>Podcast ID</label><input id="settingBSPodcast" type="text" placeholder="12345" oninput="saveSettingsDebounced()"></div>
+        </div>
       </div>
-      <div class="api-field">
-        <label>Podcast ID</label>
-        <input id="settingBSPodcast" type="text" placeholder="12345" oninput="saveSettingsDebounced()">
+      <div class="section">
+        <div class="section-title">Blog — GitHub Pages</div>
+        <div class="api-field">
+          <label>GitHub Personal Access Token</label>
+          <input id="settingGithubToken" type="password" placeholder="ghp_..." oninput="saveSettingsDebounced()">
+        </div>
+        <div class="settings-pair">
+          <div class="api-field"><label>Repository (owner/name)</label><input id="settingGithubRepo" type="text" placeholder="ollieadam/chsstrengthclub" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>Blog URL</label><input id="settingBlogUrl" type="text" placeholder="https://chsstrengthclub.com/blog/" oninput="saveSettingsDebounced()"></div>
+        </div>
       </div>
     </div>
-    <div class="section">
-      <div class="section-title">Brands</div>
-      <div id="brandsSettings"></div>
+
+    <!-- ── Brands ── -->
+    <div class="stab-panel" id="sp-brands">
+      <div class="section">
+        <div class="section-title">Active Brands</div>
+        <div id="brandsSettings"></div>
+      </div>
+      <div class="section">
+        <div class="section-title">About</div>
+        <div class="text-sm text-muted">Content App v1 · All data stored locally in your browser.</div>
+      </div>
     </div>
-    <div class="section">
-      <div class="section-title">About</div>
-      <div class="text-sm text-muted">Content App v1 · All data stored locally in your browser.</div>
-    </div>
+
     <button class="btn btn-block mt-12" onclick="closeSettings()">Done</button>
   </div>
 </div>
@@ -684,10 +813,10 @@ function dbGet(store, key) {
   });
 }
 
-function dbPut(store, val) {
+function dbPut(store, val, key) {
   return new Promise((resolve, reject) => {
     const t = DB.transaction(store, 'readwrite');
-    const r = t.objectStore(store).put(val);
+    const r = key !== undefined ? t.objectStore(store).put(val, key) : t.objectStore(store).put(val);
     r.onsuccess = () => resolve();
     r.onerror = () => reject(r.error);
   });
@@ -710,17 +839,41 @@ function loadSettings() {
 }
 
 function saveSettings(s) {
-  return dbPut('settings', s);
+  return dbPut('settings', s, 'config');
 }
 
 let _settings = {};
 async function initSettings() {
   _settings = await loadSettings();
+  // Venice
   document.getElementById('settingVeniceKey').value = _settings.veniceKey || '';
-  document.getElementById('settingYTChannel').value = _settings.ytChannel || '';
+  // YouTube
   document.getElementById('settingYTKey').value = _settings.ytKey || '';
+  document.getElementById('settingYT1Label').value = _settings.yt1Label || '';
+  document.getElementById('settingYTChannel').value = _settings.ytChannel || '';
+  document.getElementById('settingYT2Label').value = _settings.yt2Label || '';
+  document.getElementById('settingYT2Channel').value = _settings.yt2Channel || '';
+  // Meta
+  document.getElementById('settingMetaToken').value = _settings.metaToken || '';
+  document.getElementById('settingFBPage1Label').value = _settings.fbPage1Label || '';
+  document.getElementById('settingFBPage1Id').value = _settings.fbPage1Id || '';
+  document.getElementById('settingFBPage2Label').value = _settings.fbPage2Label || '';
+  document.getElementById('settingFBPage2Id').value = _settings.fbPage2Id || '';
+  document.getElementById('settingFBPage3Label').value = _settings.fbPage3Label || '';
+  document.getElementById('settingFBPage3Id').value = _settings.fbPage3Id || '';
+  document.getElementById('settingIGAcct1Label').value = _settings.igAcct1Label || '';
+  document.getElementById('settingIGAcct1Id').value = _settings.igAcct1Id || '';
+  document.getElementById('settingIGAcct2Label').value = _settings.igAcct2Label || '';
+  document.getElementById('settingIGAcct2Id').value = _settings.igAcct2Id || '';
+  document.getElementById('settingIGAcct3Label').value = _settings.igAcct3Label || '';
+  document.getElementById('settingIGAcct3Id').value = _settings.igAcct3Id || '';
+  // Buzzsprout
   document.getElementById('settingBSKey').value = _settings.bsKey || '';
   document.getElementById('settingBSPodcast').value = _settings.bsPodcast || '';
+  // Blog / GitHub
+  document.getElementById('settingGithubToken').value = _settings.githubToken || '';
+  document.getElementById('settingGithubRepo').value = _settings.githubRepo || '';
+  document.getElementById('settingBlogUrl').value = _settings.blogUrl || '';
   setupBrandSettings();
 }
 
@@ -729,17 +882,50 @@ function saveSettingsDebounced() {
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => {
     _settings.veniceKey = document.getElementById('settingVeniceKey').value.trim();
-    _settings.ytChannel = document.getElementById('settingYTChannel').value.trim();
     _settings.ytKey = document.getElementById('settingYTKey').value.trim();
+    _settings.yt1Label = document.getElementById('settingYT1Label').value.trim();
+    _settings.ytChannel = document.getElementById('settingYTChannel').value.trim();
+    _settings.yt2Label = document.getElementById('settingYT2Label').value.trim();
+    _settings.yt2Channel = document.getElementById('settingYT2Channel').value.trim();
+    _settings.metaToken = document.getElementById('settingMetaToken').value.trim();
+    _settings.fbPage1Label = document.getElementById('settingFBPage1Label').value.trim();
+    _settings.fbPage1Id = document.getElementById('settingFBPage1Id').value.trim();
+    _settings.fbPage2Label = document.getElementById('settingFBPage2Label').value.trim();
+    _settings.fbPage2Id = document.getElementById('settingFBPage2Id').value.trim();
+    _settings.fbPage3Label = document.getElementById('settingFBPage3Label').value.trim();
+    _settings.fbPage3Id = document.getElementById('settingFBPage3Id').value.trim();
+    _settings.igAcct1Label = document.getElementById('settingIGAcct1Label').value.trim();
+    _settings.igAcct1Id = document.getElementById('settingIGAcct1Id').value.trim();
+    _settings.igAcct2Label = document.getElementById('settingIGAcct2Label').value.trim();
+    _settings.igAcct2Id = document.getElementById('settingIGAcct2Id').value.trim();
+    _settings.igAcct3Label = document.getElementById('settingIGAcct3Label').value.trim();
+    _settings.igAcct3Id = document.getElementById('settingIGAcct3Id').value.trim();
     _settings.bsKey = document.getElementById('settingBSKey').value.trim();
     _settings.bsPodcast = document.getElementById('settingBSPodcast').value.trim();
+    _settings.githubToken = document.getElementById('settingGithubToken').value.trim();
+    _settings.githubRepo = document.getElementById('settingGithubRepo').value.trim();
+    _settings.blogUrl = document.getElementById('settingBlogUrl').value.trim();
     saveSettings(_settings);
+    updateApiStatus();
     loadBrandSettings();
+    updatePublishTargets();
   }, 300);
 }
 
-function showSettings() { document.getElementById('settingsModal').classList.add('show'); }
+function showSettings() {
+  document.getElementById('settingsModal').classList.add('show');
+  // Reset to first tab
+  document.querySelectorAll('.stab').forEach((t,i) => t.classList.toggle('active', i===0));
+  document.querySelectorAll('.stab-panel').forEach((p,i) => p.classList.toggle('active', i===0));
+}
 function closeSettings() { document.getElementById('settingsModal').classList.remove('show'); }
+
+function showSettingsTab(btn, tab) {
+  document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.stab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('sp-' + tab).classList.add('active');
+}
 
 function setupBrandSettings() {
   const c = document.getElementById('brandsSettings');
@@ -786,6 +972,7 @@ function setActiveBrand(id) {
   _settings.activeBrand = id;
   saveSettings(_settings);
   loadBrandSettings();
+  updatePublishTargets();
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -798,6 +985,7 @@ function switchTab(idx) {
   document.querySelectorAll('.tab-panel').forEach((el, i) => el.classList.toggle('active', i === idx));
   document.querySelectorAll('.nav-btn').forEach((el, i) => el.classList.toggle('active', i === idx));
   if (idx === 0) refreshHome();
+  if (idx === 4) updatePublishTargets();
   document.getElementById('content').scrollTop = 0;
 }
 
@@ -865,8 +1053,10 @@ async function stopServer() {
 /* ── API Status ── */
 function updateApiStatus() {
   document.getElementById('apiVeniceStatus').textContent = _settings.veniceKey ? '✅' : '❌';
-  document.getElementById('apiYTStatus').textContent = (_settings.ytKey && _settings.ytChannel) ? '✅' : '❌';
+  document.getElementById('apiYTStatus').textContent = (_settings.ytKey && (_settings.ytChannel || _settings.yt2Channel)) ? '✅' : '❌';
+  document.getElementById('apiMetaStatus').textContent = _settings.metaToken ? '✅' : '❌';
   document.getElementById('apiBSStatus').textContent = (_settings.bsKey && _settings.bsPodcast) ? '✅' : '❌';
+  document.getElementById('apiBlogStatus').textContent = (_settings.githubToken && _settings.githubRepo) ? '✅' : '❌';
 }
 
 function fmtTime(s) {
@@ -890,6 +1080,186 @@ function loadRecordingToEdit(id) {
   _editLoadId = id;
   switchTab(3);
   setTimeout(() => editLoadRecording(id), 300);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PUBLISH
+   ═══════════════════════════════════════════════════════════════════ */
+let _livePosting = false;
+
+function toggleLivePosting() {
+  _livePosting = !_livePosting;
+  document.getElementById('liveToggle').classList.toggle('on', _livePosting);
+  document.getElementById('liveBar').classList.toggle('active', _livePosting);
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = !_livePosting;
+  btn.style.opacity = _livePosting ? '1' : '.4';
+  btn.className = `btn btn-block mt-8${_livePosting ? ' btn-danger' : ''}`;
+  btn.textContent = _livePosting ? '🚀 Publish Now' : '🚫 Live Posting is OFF';
+}
+
+function updatePublishTargets() {
+  const el = document.getElementById('publishTargets');
+  if (!el) return;
+  const targets = [];
+
+  for (let i = 1; i <= 3; i++) {
+    const label = _settings[`fbPage${i}Label`], id = _settings[`fbPage${i}Id`];
+    if (label && id) targets.push({ type:'fb', label, id, icon:'📘' });
+  }
+  for (let i = 1; i <= 3; i++) {
+    const label = _settings[`igAcct${i}Label`], id = _settings[`igAcct${i}Id`];
+    if (label && id) targets.push({ type:'ig', label, id, icon:'📸' });
+  }
+  if (_settings.githubToken && _settings.githubRepo) {
+    targets.push({ type:'blog', label:'Blog ('+_settings.githubRepo+')', id:_settings.githubRepo, icon:'📝' });
+  }
+
+  el.innerHTML = targets.length
+    ? targets.map(t => `<label class="pub-target"><input type="checkbox" data-type="${t.type}" data-id="${t.id}" checked><span>${t.icon} ${t.label}</span></label>`).join('')
+    : '<div style="color:var(--muted);font-size:12px">No platforms configured — add accounts in Settings.</div>';
+}
+
+async function publishToAll() {
+  if (!_livePosting) return;
+  const caption = (document.getElementById('postCaption').value || '').trim();
+  if (!caption) { toast('Add a caption before publishing', 3000); return; }
+  const checked = [...document.querySelectorAll('#publishTargets input[type=checkbox]:checked')];
+  if (!checked.length) { toast('Select at least one platform', 3000); return; }
+
+  const canvas = document.getElementById('postCanvas');
+  let imageBlob = null;
+  if (canvas.width > 0) imageBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+
+  let imageUrl = null;
+  const hasIG = checked.some(cb => cb.dataset.type === 'ig');
+  if (hasIG && imageBlob) {
+    try { imageUrl = await uploadImageToGitHub(imageBlob); }
+    catch(e) { toast('Could not host image for IG: ' + e.message, 4000); }
+  }
+
+  const btn = document.getElementById('publishBtn');
+  const origText = btn.textContent;
+  btn.textContent = '⏳ Publishing…'; btn.disabled = true;
+
+  let ok = 0, fail = 0;
+  for (const cb of checked) {
+    const { type, id } = cb.dataset;
+    try {
+      if      (type === 'fb')   await postToFBPage(id, caption, imageBlob);
+      else if (type === 'ig')   await postToIG(id, caption, imageUrl || '');
+      else if (type === 'blog') await postToGitHubBlog(caption);
+      ok++;
+    } catch(e) {
+      fail++;
+      toast(`${type.toUpperCase()} failed: ${e.message}`, 5000);
+    }
+  }
+
+  btn.textContent = origText; btn.disabled = false;
+  if (ok)   toast(`✅ Posted to ${ok} platform${ok > 1 ? 's' : ''}`, 4000);
+  if (fail) toast(`⚠️ ${fail} failed`, 4000);
+}
+
+async function _proxy(payload) {
+  const r = await fetch('/api/proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const j = await r.json();
+  if (j.error) throw new Error(typeof j.error === 'object' ? (j.error.message || JSON.stringify(j.error)) : j.error);
+  return j;
+}
+
+function blobToBase64(blob) {
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = () => res(reader.result.split(',')[1]);
+    reader.onerror = rej;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function postToFBPage(pageId, caption, imageBlob) {
+  if (!_settings.metaToken) throw new Error('No Meta token in Settings');
+  const token = _settings.metaToken;
+  if (imageBlob) {
+    const b64 = await blobToBase64(imageBlob);
+    return _proxy({ url: `https://graph.facebook.com/v21.0/${pageId}/photos`, method:'POST',
+      multipart: { caption, access_token: token, _image_b64: b64 } });
+  }
+  return _proxy({ url: `https://graph.facebook.com/v21.0/${pageId}/feed`, method:'POST',
+    json_body: { message: caption, access_token: token } });
+}
+
+async function postToIG(igId, caption, imageUrl) {
+  if (!_settings.metaToken) throw new Error('No Meta token in Settings');
+  if (!imageUrl) throw new Error('IG requires an image');
+  const token = _settings.metaToken;
+  const container = await _proxy({ url: `https://graph.facebook.com/v21.0/${igId}/media`, method:'POST',
+    json_body: { image_url: imageUrl, caption, access_token: token } });
+  return _proxy({ url: `https://graph.facebook.com/v21.0/${igId}/media_publish`, method:'POST',
+    json_body: { creation_id: container.id, access_token: token } });
+}
+
+async function uploadImageToGitHub(blob) {
+  if (!_settings.githubToken || !_settings.githubRepo) throw new Error('GitHub not configured in Settings');
+  const [owner, repo] = _settings.githubRepo.split('/');
+  if (!owner || !repo) throw new Error('GitHub repo must be owner/reponame format');
+  const filename = `assets/posts/${Date.now()}.png`;
+  const b64 = await blobToBase64(blob);
+  const result = await _proxy({ url: `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`,
+    method:'PUT', headers: { Authorization: `token ${_settings.githubToken}` },
+    json_body: { message: `post image ${Date.now()}`, content: b64 } });
+  return result.content.download_url;
+}
+
+async function postToGitHubBlog(content) {
+  if (!_settings.githubToken || !_settings.githubRepo) throw new Error('GitHub not configured in Settings');
+  const [owner, repo] = _settings.githubRepo.split('/');
+  const title = content.split('\n')[0].slice(0, 80);
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const filename = `blog/${slug}-${Date.now()}.html`;
+  const html = buildBlogPostHTML(title, content);
+  const b64 = btoa(unescape(encodeURIComponent(html)));
+  return _proxy({ url: `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`,
+    method:'PUT', headers: { Authorization: `token ${_settings.githubToken}` },
+    json_body: { message: `Add blog post: ${slug}`, content: b64 } });
+}
+
+function buildBlogPostHTML(title, body) {
+  const date = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  const paragraphs = body.split('\n').filter(Boolean).map(p => `<p>${p}</p>`).join('\n    ');
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title} | Charleston Strength Club</title>
+<meta name="description" content="${title}">
+<link rel="stylesheet" href="/global.css">
+</head>
+<body>
+<nav id="nav">
+  <a href="/" class="nav-logo">
+    <img src="/logo.png" alt="CHS Strength Club">
+    <span class="nav-logo-text">CHS Strength Club</span>
+  </a>
+</nav>
+<section style="max-width:780px;margin:6rem auto 4rem;padding:0 1.5rem">
+  <p style="font-family:'Oswald',sans-serif;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:#c0170f;margin-bottom:1rem">${date}</p>
+  <h1 style="font-family:'Black Han Sans',sans-serif;font-size:clamp(2rem,5vw,3.5rem);text-transform:uppercase;color:#f0ece4;line-height:1;margin-bottom:2rem">${title}</h1>
+  <div style="font-size:1rem;line-height:1.85;color:rgba(240,236,228,0.6)">
+    ${paragraphs}
+  </div>
+  <div style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid rgba(192,23,15,0.2)">
+    <a href="/blog/" style="font-family:'Oswald',sans-serif;font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:#c0170f;text-decoration:none">← Back to Blog</a>
+  </div>
+</section>
+<script src="/script.js"><\/script>
+</body>
+</html>`;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
