@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="52" fill="#0f0f0f"/>
+  <rect x="34" y="34" width="188" height="188" rx="36" fill="none" stroke="#1e1e1e" stroke-width="4"/>
+  <!-- teleprompter scroll lines -->
+  <g fill="#f0f0f0">
+    <rect x="74" y="92"  width="108" height="11" rx="5" opacity="0.35"/>
+    <rect x="74" y="120" width="108" height="13" rx="6"/>
+    <rect x="74" y="150" width="78"  height="11" rx="5" opacity="0.35"/>
+  </g>
+  <!-- center reading marker -->
+  <rect x="48" y="126" width="160" height="2" fill="#4ade80" opacity="0.55"/>
+  <!-- record dot -->
+  <circle cx="186" cy="76" r="13" fill="#f87171"/>
+</svg>

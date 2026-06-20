@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Decentralized Strength — Teleprompter</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0f0f0f;
+      color: #f0f0f0;
+      font-family: Georgia, serif;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .container { max-width: 720px; margin: 0 auto; }
+
+    header { text-align: center; margin-bottom: 28px; }
+    header .label { font-size: 11px; letter-spacing: 4px; color: #555; text-transform: uppercase; margin-bottom: 8px; }
+    header h1 { font-size: 22px; font-weight: bold; color: #fff; letter-spacing: 1px; }
+    header p { font-size: 13px; color: #666; margin-top: 4px; }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab {
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: 1px solid #2a2a2a;
+      background: #141414;
+      color: #888;
+      font-family: Georgia, serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab:hover { background: #1e1e1e; color: #ccc; }
+    .tab.active { background: #1e1e1e; color: #f0f0f0; border-color: #444; }
+    .tab-add {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px dashed #333;
+      background: transparent;
+      color: #555;
+      font-family: Georgia, serif;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab-add:hover { color: #888; border-color: #555; }
+
+    /* ── Controls ── */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #1a1a1a;
+      color: #f0f0f0;
+      font-family: Georgia, serif;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn:hover { background: #242424; }
+    .btn.primary { background: #f0f0f0; color: #0f0f0f; border-color: #f0f0f0; }
+    .btn.primary:hover { opacity: 0.88; }
+    .btn.danger { border-color: #5a2020; color: #f87171; }
+    .btn.danger:hover { background: #2a1010; }
+    .speed-wrap { display: flex; align-items: center; gap: 8px; }
+    .speed-wrap label { font-size: 12px; color: #666; }
+    input[type=range] {
+      width: 100px;
+      accent-color: #4ade80;
+      cursor: pointer;
+    }
+    .speed-val { font-size: 13px; color: #aaa; min-width: 20px; }
+    .font-btns { display: flex; gap: 6px; }
+    .font-btn {
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      border: 1px solid #2a2a2a;
+      background: #141414;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: Georgia, serif;
+    }
+    .font-btn:hover { background: #1e1e1e; color: #f0f0f0; }
+
+    /* ── Stage ── */
+    .stage {
+      background: #0a0a0a;
+      border: 1px solid #1e1e1e;
+      border-radius: 10px;
+      height: 460px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .fade-top {
+      position: absolute; top: 0; left: 0; right: 0; height: 70px;
+      background: linear-gradient(to bottom, #0a0a0a, transparent);
+      z-index: 2; pointer-events: none;
+    }
+    .fade-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
+      background: linear-gradient(to top, #0a0a0a, transparent);
+      z-index: 2; pointer-events: none;
+    }
+    .marker {
+      position: absolute; top: 50%; left: 0; right: 0;
+      height: 1px; background: #2a2a2a; z-index: 3;
+    }
+    .scroll-text {
+      padding: 140px 2rem;
+      font-size: 24px;
+      line-height: 1.75;
+      color: #f0f0f0;
+      transition: transform 0.05s linear;
+    }
+    .scroll-text p { margin-bottom: 1.2em; }
+
+    /* ── Progress ── */
+    .progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .progress-bar-bg { flex: 1; height: 3px; background: #222; border-radius: 2px; overflow: hidden; }
+    .progress-bar { height: 100%; background: #4ade80; border-radius: 2px; width: 0%; transition: width 0.1s linear; }
+    .progress-pct { font-size: 12px; color: #555; min-width: 36px; text-align: right; }
+
+    /* ── Editor ── */
+    .editor-section { margin-top: 8px; }
+    .editor-section h2 {
+      font-size: 11px; letter-spacing: 3px; color: #555;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .script-name-wrap { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+    .script-name-wrap label { font-size: 12px; color: #666; white-space: nowrap; }
+    .script-name-input {
+      flex: 1;
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      color: #f0f0f0;
+      font-family: Georgia, serif;
+      font-size: 13px;
+      padding: 7px 12px;
+    }
+    .script-name-input:focus { outline: none; border-color: #444; }
+    textarea {
+      width: 100%;
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #f0f0f0;
+      font-family: Georgia, serif;
+      font-size: 15px;
+      line-height: 1.7;
+      padding: 14px;
+      resize: vertical;
+      min-height: 200px;
+    }
+    textarea:focus { outline: none; border-color: #444; }
+    .editor-hint { font-size: 11px; color: #444; margin-top: 8px; }
+    .editor-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+    /* ── Recording ── */
+    .rec-section { margin-top: 8px; }
+    .rec-section h2 {
+      font-size: 11px; letter-spacing: 3px; color: #555;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .rec-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .mic-select {
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      color: #f0f0f0;
+      font-family: Georgia, serif;
+      font-size: 13px;
+      padding: 7px 10px;
+      max-width: 240px;
+    }
+    .mic-select:focus { outline: none; border-color: #444; }
+    .rec-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #f87171; display: inline-block;
+    }
+    .rec-dot.live { animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+    .rec-timer { font-size: 14px; color: #aaa; font-variant-numeric: tabular-nums; min-width: 54px; }
+    .rec-status { font-size: 12px; color: #666; }
+    .btn.rec-on { border-color: #5a2020; color: #f87171; }
+    .rec-review { margin-top: 8px; display: none; }
+    .rec-review.show { display: block; }
+    audio { width: 100%; margin-bottom: 12px; filter: invert(0.92) hue-rotate(180deg); border-radius: 6px; }
+    .trim-grid { display: grid; grid-template-columns: 70px 1fr 56px; gap: 8px 12px; align-items: center; margin-bottom: 12px; }
+    .trim-grid label { font-size: 12px; color: #666; }
+    .trim-grid .trim-val { font-size: 13px; color: #aaa; text-align: right; font-variant-numeric: tabular-nums; }
+    .trim-grid input[type=range] { width: 100%; }
+
+    /* ── Level meter ── */
+    .meter-wrap { display: flex; align-items: center; gap: 8px; }
+    .meter-label { font-size: 11px; color: #555; letter-spacing: 1px; }
+    .meter-bg {
+      width: 140px; height: 8px; border-radius: 4px;
+      background: #1a1a1a; overflow: hidden; border: 1px solid #222;
+    }
+    .meter-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(to right, #4ade80 0%, #4ade80 70%, #facc15 85%, #f87171 100%);
+      transition: width 0.05s linear;
+    }
+
+    /* ── Mirror mode ── */
+    .stage.mirror .scroll-text { transform-origin: center; }
+    .stage.mirror { transform: scaleX(-1); }
+
+    /* ── Read info ── */
+    .read-info {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      font-size: 12px; color: #555; margin-bottom: 16px;
+    }
+    .read-info b { color: #888; font-weight: normal; }
+
+    /* ── Countdown overlay ── */
+    .countdown {
+      position: absolute; inset: 0; z-index: 5;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(10,10,10,0.85);
+      font-size: 120px; color: #f0f0f0; font-weight: bold;
+    }
+    .countdown.show { display: flex; }
+
+    /* ── Fullscreen read mode ── */
+    .stage:fullscreen {
+      height: 100vh; width: 100vw; border-radius: 0; border: none;
+      background: #000;
+    }
+    .stage:fullscreen .scroll-text { font-size: 1.6em; }
+    .stage:-webkit-full-screen { height: 100vh; width: 100vw; background: #000; }
+
+    /* ── Shortcut hint ── */
+    .shortcut-hint { font-size: 11px; color: #333; margin-bottom: 16px; letter-spacing: 1px; }
+    .shortcut-hint kbd {
+      background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 3px;
+      padding: 1px 5px; font-size: 10px; color: #888; font-family: monospace;
+    }
+
+    /* ── Divider ── */
+    .divider { height: 1px; background: #1e1e1e; margin: 28px 0; }
+
+    footer { text-align: center; font-size: 11px; color: #2a2a2a; letter-spacing: 2px; margin-top: 32px; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="label">Teleprompter</div>
+    <h1>Decentralized Strength</h1>
+    <p>Add, edit, and scroll your podcast scripts</p>
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs" id="tabsContainer"></div>
+
+  <!-- Playback Controls -->
+  <div class="controls">
+    <button class="btn primary" id="playBtn" onclick="togglePlay()">▶ Play</button>
+    <button class="btn danger" id="recBtn" onclick="toggleRecord()">● Record</button>
+    <button class="btn" onclick="resetScroll()">↺ Reset</button>
+    <div class="speed-wrap">
+      <label>Speed</label>
+      <input type="range" min="1" max="10" value="3" step="1" id="speedSlider" oninput="updateSpeed(this.value)">
+      <span class="speed-val" id="speedVal">3</span>
+    </div>
+    <div class="font-btns">
+      <button class="font-btn" onclick="changeFontSize(-2)" title="Decrease font size">A−</button>
+      <button class="font-btn" onclick="changeFontSize(2)" title="Increase font size">A+</button>
+    </div>
+    <button class="btn" id="mirrorBtn" onclick="toggleMirror()" title="Flip for teleprompter glass (M)">⇄ Mirror</button>
+    <button class="btn" onclick="toggleFullscreen()" title="Fullscreen read mode (F)">⛶ Full</button>
+  </div>
+
+  <!-- Stage -->
+  <div class="stage" id="stage">
+    <div class="fade-top"></div>
+    <div class="marker"></div>
+    <div class="scroll-text" id="scrollText"></div>
+    <div class="fade-bottom"></div>
+    <div class="countdown" id="countdown"></div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar" id="progressBar"></div></div>
+    <span class="progress-pct" id="progressPct">0%</span>
+  </div>
+
+  <!-- Read info -->
+  <div class="read-info">
+    <span><b id="wordCount">0</b> words</span>
+    <span>≈ <b id="readEst">0:00</b> read time</span>
+    <span id="remainingWrap" style="display:none;"><b id="remainingTime">0:00</b> remaining</span>
+  </div>
+  <div class="shortcut-hint">
+    <kbd>Space</kbd> play/pause · <kbd>R</kbd> record · <kbd>↑</kbd><kbd>↓</kbd> speed · <kbd>F</kbd> fullscreen · <kbd>M</kbd> mirror · <kbd>0</kbd> reset
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Recording -->
+  <div class="rec-section">
+    <h2>Record Audio</h2>
+    <div class="rec-row">
+      <select class="mic-select" id="micSelect" title="Choose microphone"></select>
+      <button class="font-btn" onclick="listMics()" title="Refresh mic list" style="width:auto;padding:0 10px;">↻</button>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#666;cursor:pointer;">
+        <input type="checkbox" id="rollWithRec" checked style="accent-color:#4ade80;">
+        Scroll teleprompter while recording
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#666;cursor:pointer;">
+        <input type="checkbox" id="useCountdown" checked style="accent-color:#4ade80;">
+        3-2-1 countdown
+      </label>
+    </div>
+    <div class="rec-row">
+      <div class="meter-wrap">
+        <span class="meter-label">MIC</span>
+        <div class="meter-bg"><div class="meter-fill" id="meterFill"></div></div>
+      </div>
+      <button class="btn" id="micTestBtn" onclick="toggleMicTest()" title="Listen for input level before recording">Test Mic</button>
+    </div>
+    <div class="rec-row">
+      <span class="rec-dot" id="recDot" style="opacity:.3;"></span>
+      <span class="rec-timer" id="recTimer">0:00</span>
+      <span class="rec-status" id="recStatus">Press Record (or the ● button above) to start.</span>
+    </div>
+
+    <!-- Review / Edit -->
+    <div class="rec-review" id="recReview">
+      <audio id="recAudio" controls></audio>
+      <div class="trim-grid">
+        <label>Trim start</label>
+        <input type="range" id="trimStart" min="0" max="100" value="0" step="0.01" oninput="onTrimInput()">
+        <span class="trim-val" id="trimStartVal">0:00</span>
+        <label>Trim end</label>
+        <input type="range" id="trimEnd" min="0" max="100" value="100" step="0.01" oninput="onTrimInput()">
+        <span class="trim-val" id="trimEndVal">0:00</span>
+      </div>
+      <div class="editor-actions">
+        <button class="btn" onclick="previewTrim()">▶ Preview Trim</button>
+        <button class="btn primary" onclick="downloadTrimmed()">↓ Download Edited (WAV)</button>
+        <button class="btn" onclick="downloadOriginal()">↓ Download Original</button>
+        <button class="btn danger" onclick="discardRecording()">✕ Discard</button>
+      </div>
+      <div class="editor-hint">Drag the trim sliders to cut dead air off the start and end, preview, then download. "Edited" exports the trimmed selection as a WAV file.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Editor -->
+  <div class="editor-section">
+    <h2>Edit Script</h2>
+    <div class="script-name-wrap">
+      <label>Tab name</label>
+      <input class="script-name-input" id="scriptNameInput" type="text" placeholder="e.g. Intro" oninput="renameCurrentScript(this.value)">
+    </div>
+    <textarea id="scriptEditor" placeholder="Type or paste your script here...&#10;&#10;Use blank lines to separate paragraphs." oninput="updateCurrentScript(this.value)"></textarea>
+    <div class="editor-hint">Tip: Separate paragraphs with a blank line. Each paragraph shows as its own block in the teleprompter.</div>
+    <div class="editor-actions">
+      <button class="btn" onclick="addScript()">+ New Script</button>
+      <button class="btn danger" onclick="deleteCurrentScript()">✕ Delete This Script</button>
+    </div>
+  </div>
+
+  <footer>DECENTRALIZED STRENGTH PODCAST</footer>
+</div>
+
+<script>
+  // ── Default Scripts ──────────────────────────────────────────
+  let scripts = [
+    {
+      name: "Intro",
+      text: "Hey, welcome to Decentralized Strength.\n\nI'm Adam Oliver, a certified strength and conditioning specialist, and this is the show where I document my evolution as a coach and share honest conversations about strength, health, and longevity.\n\nSome episodes I go solo, some I bring in guests — coaches, scientists, athletes — people who've actually done the work.\n\nNo fluff, just real talk.\n\nGlad you're here."
+    },
+    {
+      name: "Outro",
+      text: "That's all for this episode of Decentralized Strength.\n\nIf you got something out of today's conversation, share it with someone who needs to hear it — that's honestly the best way to support the show.\n\nYou can find all episodes at decentralizedstrength.buzzsprout.com, or search Decentralized Strength on Spotify, Apple Podcasts, Amazon Music, and YouTube.\n\nI'm Adam Oliver.\n\nStay strong, stay consistent, and I'll talk to you next episode."
+    },
+    {
+      name: "AI Episode",
+      text: "What's up everyone, welcome back to Decentralized Strength. I'm your host Adam Oliver, CSCS, and today I'm going solo — just me and a topic I've been wanting to dig into for a while now.\n\nWe're talking about AI. Specifically, AI as a strength coaching tool.\n\nI'll be upfront: I'm a fan. I think AI is one of the most powerful tools available to coaches and athletes right now. Not because it replaces what we do — it absolutely doesn't — but because it makes good coaches better and helps athletes who might not have access to a coach get something they never had before.\n\nSo today I want to break down what AI can actually do in the strength coaching world, how I personally use it, what it can't do — and I want to leave you with some practical ways to start using it yourself.\n\nLet's get into it."
+    }
+  ];
+
+  let currentIndex = 0;
+  let playing = false;
+  let animFrame = null;
+  let fontSize = 24;
+  let speed = 3;
+  let scrollPos = 0;
+  let mirrored = false;
+  const WPM = 150; // average spoken words-per-minute for read-time estimate
+
+  // ── Persistence (localStorage) ────────────────────────────────
+  const STORAGE_KEY = 'ds-teleprompter-v1';
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        scripts, currentIndex, fontSize, speed, mirrored
+      }));
+    } catch (e) { /* storage full or blocked — ignore */ }
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      if (Array.isArray(s.scripts) && s.scripts.length) scripts = s.scripts;
+      if (typeof s.currentIndex === 'number') currentIndex = Math.min(s.currentIndex, scripts.length - 1);
+      if (typeof s.fontSize === 'number') fontSize = s.fontSize;
+      if (typeof s.speed === 'number') speed = s.speed;
+      if (typeof s.mirrored === 'boolean') mirrored = s.mirrored;
+    } catch (e) { /* corrupt data — fall back to defaults */ }
+  }
+
+  // ── Render Tabs ───────────────────────────────────────────────
+  function renderTabs() {
+    const container = document.getElementById('tabsContainer');
+    container.innerHTML = '';
+    scripts.forEach((s, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'tab' + (i === currentIndex ? ' active' : '');
+      btn.textContent = s.name;
+      btn.onclick = () => switchScript(i);
+      container.appendChild(btn);
+    });
+    const addBtn = document.createElement('button');
+    addBtn.className = 'tab-add';
+    addBtn.textContent = '+ New';
+    addBtn.onclick = addScript;
+    container.appendChild(addBtn);
+  }
+
+  // ── Render Script in Stage ────────────────────────────────────
+  function renderStage() {
+    const el = document.getElementById('scrollText');
+    const text = scripts[currentIndex].text;
+    el.innerHTML = text.split('\n\n').map(p =>
+      `<p>${p.replace(/\n/g, '<br>')}</p>`
+    ).join('');
+    el.style.fontSize = fontSize + 'px';
+    scrollPos = 0;
+    el.style.transform = 'translateY(0)';
+    updateProgress();
+    updateReadInfo();
+  }
+
+  // ── Word count & read-time estimate ───────────────────────────
+  function updateReadInfo() {
+    const text = scripts[currentIndex].text || '';
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+    document.getElementById('wordCount').textContent = words;
+    document.getElementById('readEst').textContent = fmtTime((words / WPM) * 60);
+  }
+
+  // ── Render Editor ─────────────────────────────────────────────
+  function renderEditor() {
+    document.getElementById('scriptEditor').value = scripts[currentIndex].text;
+    document.getElementById('scriptNameInput').value = scripts[currentIndex].name;
+  }
+
+  // ── Switch Script ─────────────────────────────────────────────
+  function switchScript(index) {
+    stopPlay();
+    currentIndex = index;
+    renderTabs();
+    renderStage();
+    renderEditor();
+    saveState();
+  }
+
+  // ── Play / Pause ──────────────────────────────────────────────
+  function togglePlay() {
+    playing = !playing;
+    const btn = document.getElementById('playBtn');
+    btn.textContent = playing ? '⏸ Pause' : '▶ Play';
+    document.getElementById('remainingWrap').style.display = playing ? '' : 'none';
+    if (playing) scrollLoop();
+    else cancelAnimationFrame(animFrame);
+  }
+
+  function stopPlay() {
+    playing = false;
+    cancelAnimationFrame(animFrame);
+    document.getElementById('playBtn').textContent = '▶ Play';
+    document.getElementById('remainingWrap').style.display = 'none';
+  }
+
+  function scrollLoop() {
+    if (!playing) return;
+    const el = document.getElementById('scrollText');
+    const stage = document.getElementById('stage');
+    const maxScroll = el.scrollHeight - stage.clientHeight + 140;
+    scrollPos += speed * 0.04;
+    el.style.transform = `translateY(-${Math.min(scrollPos, maxScroll)}px)`;
+    updateProgress();
+    if (scrollPos >= maxScroll) { stopPlay(); return; }
+    animFrame = requestAnimationFrame(scrollLoop);
+  }
+
+  function resetScroll() {
+    stopPlay();
+    scrollPos = 0;
+    document.getElementById('scrollText').style.transform = 'translateY(0)';
+    updateProgress();
+  }
+
+  // ── Progress ──────────────────────────────────────────────────
+  function updateProgress() {
+    const el = document.getElementById('scrollText');
+    const stage = document.getElementById('stage');
+    const maxScroll = el.scrollHeight - stage.clientHeight + 140;
+    const pct = maxScroll > 0 ? Math.min(100, Math.round((scrollPos / maxScroll) * 100)) : 0;
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+    // Remaining time, derived from the actual scroll rate (speed * 0.04 px/frame @ ~60fps).
+    const pxPerSec = speed * 0.04 * 60;
+    const remainingPx = Math.max(0, maxScroll - scrollPos);
+    document.getElementById('remainingTime').textContent = fmtTime(pxPerSec > 0 ? remainingPx / pxPerSec : 0);
+  }
+
+  // ── Speed / Font ──────────────────────────────────────────────
+  function updateSpeed(val) {
+    speed = parseInt(val);
+    document.getElementById('speedVal').textContent = val;
+    saveState();
+  }
+
+  function changeFontSize(delta) {
+    fontSize = Math.min(40, Math.max(16, fontSize + delta));
+    document.getElementById('scrollText').style.fontSize = fontSize + 'px';
+    saveState();
+  }
+
+  // ── Editor Actions ────────────────────────────────────────────
+  function updateCurrentScript(val) {
+    scripts[currentIndex].text = val;
+    renderStage();
+    saveState();
+  }
+
+  function renameCurrentScript(val) {
+    scripts[currentIndex].name = val || 'Script';
+    renderTabs();
+    saveState();
+  }
+
+  function addScript() {
+    scripts.push({ name: 'New Script', text: 'Type your script here...' });
+    switchScript(scripts.length - 1);
+    saveState();
+  }
+
+  function deleteCurrentScript() {
+    if (scripts.length === 1) {
+      alert("You need at least one script.");
+      return;
+    }
+    if (!confirm(`Delete "${scripts[currentIndex].name}"?`)) return;
+    scripts.splice(currentIndex, 1);
+    currentIndex = Math.max(0, currentIndex - 1);
+    renderTabs();
+    renderStage();
+    renderEditor();
+    saveState();
+  }
+
+  // ── Recording ─────────────────────────────────────────────────
+  let mediaRecorder = null;
+  let mediaStream = null;
+  let recordedChunks = [];
+  let recordedBlob = null;
+  let recordedURL = null;
+  let recording = false;
+  let timerInterval = null;
+  let recStartTime = 0;
+  let decodedBuffer = null;   // AudioBuffer of the recording, for trimming
+  let recordedMime = 'audio/webm';
+
+  function fmtTime(secs) {
+    secs = Math.max(0, Math.floor(secs));
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return m + ':' + String(s).padStart(2, '0');
+  }
+
+  async function listMics() {
+    const sel = document.getElementById('micSelect');
+    try {
+      // A permission grant is needed to see device labels.
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const mics = devices.filter(d => d.kind === 'audioinput');
+      const prev = sel.value;
+      sel.innerHTML = '';
+      if (mics.length === 0) {
+        sel.innerHTML = '<option value="">Default microphone</option>';
+        return;
+      }
+      mics.forEach((d, i) => {
+        const opt = document.createElement('option');
+        opt.value = d.deviceId;
+        opt.textContent = d.label || ('Microphone ' + (i + 1));
+        sel.appendChild(opt);
+      });
+      if (prev) sel.value = prev;
+    } catch (err) {
+      sel.innerHTML = '<option value="">Default microphone</option>';
+    }
+  }
+
+  function toggleRecord() {
+    if (recording) stopRecording();
+    else startRecording();
+  }
+
+  async function startRecording() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setStatus('Microphone not supported in this browser.');
+      return;
+    }
+    if (testing) stopMicTest(); // free the test stream before recording
+    const deviceId = document.getElementById('micSelect').value;
+    const constraints = { audio: deviceId ? { deviceId: { exact: deviceId } } : true };
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+    } catch (err) {
+      setStatus('Mic access denied or unavailable: ' + err.message);
+      return;
+    }
+    // Labels become available after permission — refresh the list.
+    listMics();
+    startMeter(mediaStream);
+
+    // Block the Record button so it can't be double-fired during countdown.
+    recording = true;
+    document.getElementById('recBtn').textContent = '■ Stop';
+    document.getElementById('recBtn').classList.add('rec-on');
+
+    if (document.getElementById('useCountdown').checked) {
+      const ok = await runCountdown(3);
+      if (!ok) return; // recording was cancelled mid-countdown
+    }
+    beginCapture();
+  }
+
+  function beginCapture() {
+    recordedChunks = [];
+    recordedMime = MediaRecorder.isTypeSupported('audio/webm')
+      ? 'audio/webm'
+      : (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '');
+    mediaRecorder = recordedMime
+      ? new MediaRecorder(mediaStream, { mimeType: recordedMime })
+      : new MediaRecorder(mediaStream);
+
+    mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = finalizeRecording;
+    mediaRecorder.start();
+
+    recStartTime = Date.now();
+    document.getElementById('recDot').classList.add('live');
+    document.getElementById('recDot').style.opacity = '1';
+    setStatus('Recording…');
+    timerInterval = setInterval(() => {
+      document.getElementById('recTimer').textContent = fmtTime((Date.now() - recStartTime) / 1000);
+    }, 250);
+
+    // Optionally roll the teleprompter from the top.
+    if (document.getElementById('rollWithRec').checked) {
+      resetScroll();
+      if (!playing) togglePlay();
+    }
+  }
+
+  function stopRecording() {
+    cancelCountdown();
+    const wasCapturing = mediaRecorder && mediaRecorder.state === 'recording';
+    if (wasCapturing) mediaRecorder.stop(); // fires finalizeRecording
+    if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+    stopMeter();
+    recording = false;
+    clearInterval(timerInterval);
+    stopPlay();
+    document.getElementById('recBtn').textContent = '● Record';
+    document.getElementById('recBtn').classList.remove('rec-on');
+    document.getElementById('recDot').classList.remove('live');
+    document.getElementById('recDot').style.opacity = '.3';
+    setStatus(wasCapturing ? 'Processing…' : 'Cancelled. Press Record to start.');
+  }
+
+  // ── Countdown ─────────────────────────────────────────────────
+  let countdownTimer = null;
+  let countdownResolve = null;
+
+  function runCountdown(from) {
+    return new Promise(resolve => {
+      countdownResolve = resolve;
+      const el = document.getElementById('countdown');
+      let n = from;
+      el.textContent = n;
+      el.classList.add('show');
+      countdownTimer = setInterval(() => {
+        n--;
+        if (n <= 0) {
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+          el.classList.remove('show');
+          countdownResolve = null;
+          resolve(true);
+        } else {
+          el.textContent = n;
+        }
+      }, 1000);
+    });
+  }
+
+  function cancelCountdown() {
+    if (countdownTimer) {
+      clearInterval(countdownTimer);
+      countdownTimer = null;
+      document.getElementById('countdown').classList.remove('show');
+    }
+    if (countdownResolve) { countdownResolve(false); countdownResolve = null; }
+  }
+
+  // ── Mic level meter ───────────────────────────────────────────
+  let meterCtx = null, meterRaf = null, testing = false, testStream = null;
+
+  function startMeter(stream) {
+    stopMeter();
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      meterCtx = new AC();
+      const src = meterCtx.createMediaStreamSource(stream);
+      const analyser = meterCtx.createAnalyser();
+      analyser.fftSize = 512;
+      src.connect(analyser);
+      const data = new Uint8Array(analyser.fftSize);
+      const fill = document.getElementById('meterFill');
+      const tick = () => {
+        analyser.getByteTimeDomainData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i++) { const v = (data[i] - 128) / 128; sum += v * v; }
+        const rms = Math.sqrt(sum / data.length);
+        const pct = Math.min(100, Math.round(rms * 180)); // scaled so normal speech sits mid-meter
+        fill.style.width = pct + '%';
+        meterRaf = requestAnimationFrame(tick);
+      };
+      tick();
+    } catch (e) { /* meter is non-critical */ }
+  }
+
+  function stopMeter() {
+    if (meterRaf) { cancelAnimationFrame(meterRaf); meterRaf = null; }
+    if (meterCtx) { try { meterCtx.close(); } catch (e) {} meterCtx = null; }
+    document.getElementById('meterFill').style.width = '0%';
+  }
+
+  async function toggleMicTest() {
+    if (testing) { stopMicTest(); return; }
+    if (recording) return;
+    const deviceId = document.getElementById('micSelect').value;
+    try {
+      testStream = await navigator.mediaDevices.getUserMedia({ audio: deviceId ? { deviceId: { exact: deviceId } } : true });
+    } catch (err) {
+      setStatus('Mic access denied or unavailable: ' + err.message);
+      return;
+    }
+    listMics();
+    startMeter(testStream);
+    testing = true;
+    document.getElementById('micTestBtn').textContent = '■ Stop Test';
+    setStatus('Testing mic — speak and watch the level.');
+  }
+
+  function stopMicTest() {
+    if (testStream) { testStream.getTracks().forEach(t => t.stop()); testStream = null; }
+    stopMeter();
+    testing = false;
+    document.getElementById('micTestBtn').textContent = 'Test Mic';
+    if (!recording) setStatus('Press Record (or the ● button above) to start.');
+  }
+
+  // ── Mirror & Fullscreen ───────────────────────────────────────
+  function toggleMirror() {
+    mirrored = !mirrored;
+    applyMirror();
+    saveState();
+  }
+
+  function applyMirror() {
+    document.getElementById('stage').classList.toggle('mirror', mirrored);
+    document.getElementById('mirrorBtn').classList.toggle('primary', mirrored);
+  }
+
+  function toggleFullscreen() {
+    const stage = document.getElementById('stage');
+    if (!document.fullscreenElement) {
+      (stage.requestFullscreen || stage.webkitRequestFullscreen).call(stage);
+    } else {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    }
+  }
+
+  // ── Keyboard shortcuts ────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return; // don't hijack typing
+    switch (e.key) {
+      case ' ': e.preventDefault(); togglePlay(); break;
+      case 'ArrowUp': e.preventDefault(); nudgeSpeed(1); break;
+      case 'ArrowDown': e.preventDefault(); nudgeSpeed(-1); break;
+      case 'r': case 'R': toggleRecord(); break;
+      case 'f': case 'F': toggleFullscreen(); break;
+      case 'm': case 'M': toggleMirror(); break;
+      case '0': resetScroll(); break;
+    }
+  });
+
+  function nudgeSpeed(delta) {
+    const slider = document.getElementById('speedSlider');
+    const val = Math.min(10, Math.max(1, parseInt(slider.value) + delta));
+    slider.value = val;
+    updateSpeed(val);
+  }
+
+  async function finalizeRecording() {
+    recordedBlob = new Blob(recordedChunks, { type: recordedMime || 'audio/webm' });
+    if (recordedURL) URL.revokeObjectURL(recordedURL);
+    recordedURL = URL.createObjectURL(recordedBlob);
+
+    const audio = document.getElementById('recAudio');
+    audio.src = recordedURL;
+    document.getElementById('recReview').classList.add('show');
+
+    // Decode for trimming/export.
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AC();
+      const arrayBuf = await recordedBlob.arrayBuffer();
+      decodedBuffer = await ctx.decodeAudioData(arrayBuf.slice(0));
+      ctx.close();
+      const dur = decodedBuffer.duration;
+      const ts = document.getElementById('trimStart');
+      const te = document.getElementById('trimEnd');
+      ts.max = dur; ts.value = 0;
+      te.max = dur; te.value = dur;
+      updateTrimLabels();
+      setStatus('Recorded ' + fmtTime(dur) + '. Edit and download below.');
+    } catch (err) {
+      decodedBuffer = null;
+      setStatus('Recorded. (Trimming unavailable — you can still download the original.)');
+    }
+  }
+
+  function setStatus(msg) { document.getElementById('recStatus').textContent = msg; }
+
+  function updateTrimLabels() {
+    document.getElementById('trimStartVal').textContent = fmtTime(parseFloat(document.getElementById('trimStart').value));
+    document.getElementById('trimEndVal').textContent = fmtTime(parseFloat(document.getElementById('trimEnd').value));
+  }
+
+  function onTrimInput() {
+    const ts = document.getElementById('trimStart');
+    const te = document.getElementById('trimEnd');
+    // Keep start before end.
+    if (parseFloat(ts.value) > parseFloat(te.value) - 0.1) {
+      if (event && event.target === ts) ts.value = Math.max(0, parseFloat(te.value) - 0.1);
+      else te.value = Math.min(parseFloat(ts.max), parseFloat(ts.value) + 0.1);
+    }
+    updateTrimLabels();
+  }
+
+  function previewTrim() {
+    const audio = document.getElementById('recAudio');
+    const start = parseFloat(document.getElementById('trimStart').value);
+    const end = parseFloat(document.getElementById('trimEnd').value);
+    audio.currentTime = start;
+    audio.play();
+    const stopAt = () => {
+      if (audio.currentTime >= end) {
+        audio.pause();
+        audio.removeEventListener('timeupdate', stopAt);
+      }
+    };
+    audio.addEventListener('timeupdate', stopAt);
+  }
+
+  function downloadOriginal() {
+    if (!recordedBlob) return;
+    const ext = (recordedMime.indexOf('mp4') !== -1) ? 'm4a' : 'webm';
+    triggerDownload(recordedBlob, 'recording-' + tabSlug() + '.' + ext);
+  }
+
+  function downloadTrimmed() {
+    if (!decodedBuffer) { downloadOriginal(); return; }
+    const start = parseFloat(document.getElementById('trimStart').value);
+    const end = parseFloat(document.getElementById('trimEnd').value);
+    const sliced = sliceBuffer(decodedBuffer, start, end);
+    const wav = encodeWAV(sliced);
+    triggerDownload(new Blob([wav], { type: 'audio/wav' }), 'recording-' + tabSlug() + '-edited.wav');
+  }
+
+  function tabSlug() {
+    return (scripts[currentIndex].name || 'script').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'script';
+  }
+
+  function triggerDownload(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function discardRecording() {
+    if (!confirm('Discard this recording?')) return;
+    if (recordedURL) URL.revokeObjectURL(recordedURL);
+    recordedBlob = null; recordedURL = null; decodedBuffer = null; recordedChunks = [];
+    document.getElementById('recAudio').removeAttribute('src');
+    document.getElementById('recReview').classList.remove('show');
+    document.getElementById('recTimer').textContent = '0:00';
+    setStatus('Press Record (or the ● button above) to start.');
+  }
+
+  // Slice an AudioBuffer between start/end seconds into a new buffer.
+  function sliceBuffer(buffer, start, end) {
+    const rate = buffer.sampleRate;
+    const startFrame = Math.floor(start * rate);
+    const endFrame = Math.min(buffer.length, Math.floor(end * rate));
+    const frames = Math.max(0, endFrame - startFrame);
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AC();
+    const out = ctx.createBuffer(buffer.numberOfChannels, frames, rate);
+    for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+      out.getChannelData(ch).set(buffer.getChannelData(ch).subarray(startFrame, endFrame));
+    }
+    ctx.close();
+    return out;
+  }
+
+  // Encode an AudioBuffer to a 16-bit PCM WAV (ArrayBuffer).
+  function encodeWAV(buffer) {
+    const numCh = buffer.numberOfChannels;
+    const rate = buffer.sampleRate;
+    const len = buffer.length;
+    const bytesPerSample = 2;
+    const blockAlign = numCh * bytesPerSample;
+    const dataSize = len * blockAlign;
+    const ab = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(ab);
+
+    const writeStr = (off, str) => { for (let i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i)); };
+
+    writeStr(0, 'RIFF');
+    view.setUint32(4, 36 + dataSize, true);
+    writeStr(8, 'WAVE');
+    writeStr(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);            // PCM
+    view.setUint16(22, numCh, true);
+    view.setUint32(24, rate, true);
+    view.setUint32(28, rate * blockAlign, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, 16, true);           // bits per sample
+    writeStr(36, 'data');
+    view.setUint32(40, dataSize, true);
+
+    // Interleave channels and write 16-bit samples.
+    const channels = [];
+    for (let ch = 0; ch < numCh; ch++) channels.push(buffer.getChannelData(ch));
+    let offset = 44;
+    for (let i = 0; i < len; i++) {
+      for (let ch = 0; ch < numCh; ch++) {
+        let s = Math.max(-1, Math.min(1, channels[ch][i]));
+        s = s < 0 ? s * 0x8000 : s * 0x7FFF;
+        view.setInt16(offset, s, true);
+        offset += 2;
+      }
+    }
+    return ab;
+  }
+
+  // ── Init ──────────────────────────────────────────────────────
+  loadState();
+  document.getElementById('speedSlider').value = speed;
+  document.getElementById('speedVal').textContent = speed;
+  applyMirror();
+  renderTabs();
+  renderStage();
+  renderEditor();
+  if (navigator.mediaDevices) {
+    listMics();
+    if (navigator.mediaDevices.addEventListener) {
+      navigator.mediaDevices.addEventListener('devicechange', listMics);
+    }
+  }
+</script>
+</body>
+</html>

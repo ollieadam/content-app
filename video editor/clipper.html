@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clip Editor</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f10;
+    --bg2: #1a1a1d;
+    --bg3: #222226;
+    --border: #2e2e33;
+    --border2: #3d3d44;
+    --text: #e8e8ec;
+    --muted: #888892;
+    --accent: #5b6af5;
+    --accent2: #3d4de0;
+    --success: #34c77b;
+    --danger: #f05656;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+  }
+
+  h1 span.dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  .drop-zone {
+    border: 1.5px dashed var(--border2);
+    border-radius: var(--radius);
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--bg2);
+    margin-bottom: 1.5rem;
+  }
+  .drop-zone:hover, .drop-zone.over {
+    border-color: var(--accent);
+    background: #1d1e2e;
+  }
+  .drop-icon {
+    font-size: 32px; margin-bottom: 0.75rem; display: block;
+  }
+  .drop-title { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .drop-sub { font-size: 12px; color: var(--muted); }
+
+  #fileInput { display: none; }
+
+  .editor { display: none; }
+
+  .media-wrap {
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #000;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 320px;
+    border: 1px solid var(--border);
+  }
+  #mediaEl { width: 100%; max-height: 320px; display: block; }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .panel-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.875rem;
+  }
+
+  .timeline-bar {
+    width: 100%; height: 44px;
+    border-radius: var(--radius-sm);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .tl-progress {
+    height: 100%; background: #1e2040;
+    position: absolute; top: 0; left: 0;
+    pointer-events: none;
+  }
+  .tl-selection {
+    height: 100%; position: absolute; top: 0;
+    background: rgba(91,106,245,0.22);
+    border-left: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    pointer-events: none;
+  }
+  .tl-head {
+    width: 2px; height: 100%;
+    background: var(--text);
+    position: absolute; top: 0;
+    pointer-events: none;
+    box-shadow: 0 0 6px rgba(255,255,255,0.3);
+  }
+  .tl-time-labels {
+    display: flex; justify-content: space-between;
+    font-size: 11px; color: var(--muted);
+    font-family: 'Courier New', monospace;
+    margin-bottom: 1rem;
+  }
+
+  .fields-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .field { flex: 1; min-width: 130px; }
+  .field label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 5px; font-weight: 500; }
+  .field input {
+    width: 100%; padding: 8px 10px;
+    font-size: 13px; font-family: 'Courier New', monospace;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: var(--bg3);
+    color: var(--text);
+    transition: border-color 0.12s;
+  }
+  .field input:focus { outline: none; border-color: var(--accent); }
+
+  .btn-row { display: flex; gap: 8px; margin-top: 1rem; flex-wrap: wrap; }
+
+  button {
+    padding: 8px 14px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500;
+    background: var(--bg3);
+    color: var(--text);
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.12s;
+    white-space: nowrap;
+  }
+  button:hover { background: #2a2a30; border-color: #4a4a55; }
+  button:active { transform: scale(0.97); }
+  button.primary { background: var(--accent); border-color: var(--accent2); color: #fff; }
+  button.primary:hover { background: var(--accent2); }
+  button:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+  .status {
+    font-size: 12px; margin-top: 0.75rem;
+    min-height: 16px; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .status.ok { color: var(--success); }
+  .status.err { color: var(--danger); }
+
+  .clips-list { display: flex; flex-direction: column; gap: 8px; }
+  .no-clips { font-size: 13px; color: var(--muted); text-align: center; padding: 2rem 0; }
+
+  .clip-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg3);
+    transition: border-color 0.12s;
+  }
+  .clip-card:hover { border-color: var(--border2); }
+  .clip-icon { font-size: 18px; opacity: 0.5; flex-shrink: 0; }
+  .clip-info { flex: 1; }
+  .clip-name { font-weight: 600; font-size: 13px; }
+  .clip-range {
+    color: var(--muted); font-family: 'Courier New', monospace;
+    font-size: 11px; margin-top: 2px;
+  }
+  .clip-dur { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  .clip-actions { display: flex; gap: 6px; }
+  .clip-actions button { padding: 5px 10px; font-size: 12px; }
+
+  .hint {
+    font-size: 11px; color: var(--muted);
+    margin-top: 0.75rem;
+    line-height: 1.6;
+  }
+
+  svg.icon { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -2px; }
+</style>
+</head>
+<body>
+
+<h1><span class="dot"></span> Clip Editor</h1>
+
+<div class="drop-zone" id="dropZone">
+  <span class="drop-icon">🎬</span>
+  <div class="drop-title">Drop a video or audio file here</div>
+  <div class="drop-sub">or click to browse — everything stays on your device</div>
+  <input type="file" id="fileInput" accept="audio/*,video/*">
+</div>
+
+<div class="editor" id="editor">
+
+  <div class="media-wrap" id="mediaWrap"></div>
+
+  <div class="panel">
+    <div class="panel-label">Timeline</div>
+    <div class="timeline-bar" id="tlBar">
+      <div class="tl-progress" id="tlProgress"></div>
+      <div class="tl-selection" id="tlSel" style="display:none"></div>
+      <div class="tl-head" id="tlHead" style="left:0%"></div>
+    </div>
+    <div class="tl-time-labels">
+      <span id="lblStart">0:00:00</span>
+      <span id="lblCurrent">0:00:00</span>
+      <span id="lblEnd">0:00:00</span>
+    </div>
+
+    <div class="fields-row">
+      <div class="field">
+        <label>Start time</label>
+        <input type="text" id="startTime" placeholder="0:00:00" value="0:00:00">
+      </div>
+      <div class="field">
+        <label>End time</label>
+        <input type="text" id="endTime" placeholder="0:00:10">
+      </div>
+      <div class="field">
+        <label>Clip name</label>
+        <input type="text" id="clipName" placeholder="clip-1" value="clip-1">
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button id="btnPlay">
+        <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Play
+      </button>
+      <button id="btnSetStart">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="9" y1="4" x2="9" y2="20"/><polyline points="5 8 9 4 13 8"/></svg>
+        Set start
+      </button>
+      <button id="btnSetEnd">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="15" y1="4" x2="15" y2="20"/><polyline points="11 16 15 20 19 16"/></svg>
+        Set end
+      </button>
+      <button id="btnPreview">
+        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        Preview
+      </button>
+      <button id="btnAddClip" class="primary">
+        <svg class="icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add clip
+      </button>
+    </div>
+    <div class="status" id="statusMsg"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label">Clip queue</div>
+    <div class="clips-list" id="clipsList">
+      <div class="no-clips">No clips yet — mark in/out points above and click Add clip.</div>
+    </div>
+    <div class="hint" id="exportHint" style="display:none">
+      ✦ Exports as .webm — open in VLC, HandBrake, or ffmpeg to convert to .mp4.
+    </div>
+  </div>
+
+</div>
+
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const editor = document.getElementById('editor');
+const mediaWrap = document.getElementById('mediaWrap');
+const tlBar = document.getElementById('tlBar');
+const tlProgress = document.getElementById('tlProgress');
+const tlSel = document.getElementById('tlSel');
+const tlHead = document.getElementById('tlHead');
+const startInput = document.getElementById('startTime');
+const endInput = document.getElementById('endTime');
+const clipNameInput = document.getElementById('clipName');
+const statusMsg = document.getElementById('statusMsg');
+const clipsList = document.getElementById('clipsList');
+const exportHint = document.getElementById('exportHint');
+const lblCurrent = document.getElementById('lblCurrent');
+const lblEnd = document.getElementById('lblEnd');
+
+let mediaEl, duration = 0, clips = [], clipCount = 0;
+let isDragging = false, fileURL = '', fileObj = null, mediaType = 'video';
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('over'); loadFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+function loadFile(file) {
+  if (!file || !file.type.match(/(audio|video)\/.*/)) { showStatus('Load a valid audio or video file.', 'err'); return; }
+  fileObj = file;
+  mediaType = file.type.startsWith('audio') ? 'audio' : 'video';
+  if (fileURL) URL.revokeObjectURL(fileURL);
+  fileURL = URL.createObjectURL(file);
+  mediaWrap.innerHTML = '';
+  mediaEl = document.createElement(mediaType === 'audio' ? 'audio' : 'video');
+  mediaEl.src = fileURL;
+  mediaEl.controls = false;
+  if (mediaType === 'audio') { mediaEl.style.cssText = 'width:100%;padding:1.5rem 0;'; }
+  mediaWrap.appendChild(mediaEl);
+  mediaEl.addEventListener('loadedmetadata', () => {
+    duration = mediaEl.duration;
+    endInput.value = fmtTime(duration);
+    lblEnd.textContent = fmtTime(duration);
+    clipNameInput.value = 'clip-1';
+    showStatus('Loaded: ' + file.name + '  (' + fmtTime(duration) + ')', 'ok');
+    editor.style.display = '';
+    dropZone.style.marginBottom = '1rem';
+  });
+  mediaEl.addEventListener('timeupdate', updateHead);
+}
+
+function fmtTime(s) {
+  if (isNaN(s)) return '0:00:00';
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = Math.floor(s % 60);
+  return h + ':' + String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+
+function parseSecs(v) {
+  v = (v || '').trim();
+  if (/^\d+(\.\d+)?$/.test(v)) return parseFloat(v);
+  const parts = v.split(':').map(Number);
+  if (parts.length === 3) return parts[0]*3600 + parts[1]*60 + parts[2];
+  if (parts.length === 2) return parts[0]*60 + parts[1];
+  return parseFloat(v) || 0;
+}
+
+function updateHead() {
+  if (!duration) return;
+  const pct = (mediaEl.currentTime / duration) * 100;
+  tlHead.style.left = pct + '%';
+  tlProgress.style.width = pct + '%';
+  lblCurrent.textContent = fmtTime(mediaEl.currentTime);
+  updateSelection();
+}
+
+function updateSelection() {
+  if (!duration) return;
+  const s = parseSecs(startInput.value), e = parseSecs(endInput.value);
+  if (!isNaN(s) && !isNaN(e) && e > s) {
+    tlSel.style.display = '';
+    tlSel.style.left = (s / duration * 100) + '%';
+    tlSel.style.width = ((e - s) / duration * 100) + '%';
+  } else { tlSel.style.display = 'none'; }
+}
+
+startInput.addEventListener('input', updateSelection);
+endInput.addEventListener('input', updateSelection);
+
+tlBar.addEventListener('mousedown', e => { isDragging = true; seekFromEvent(e); });
+document.addEventListener('mousemove', e => { if (isDragging) seekFromEvent(e); });
+document.addEventListener('mouseup', () => { isDragging = false; });
+
+function seekFromEvent(e) {
+  const rect = tlBar.getBoundingClientRect();
+  const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  if (mediaEl) { mediaEl.currentTime = pct * duration; updateHead(); }
+}
+
+const btnPlay = document.getElementById('btnPlay');
+btnPlay.addEventListener('click', () => {
+  if (!mediaEl) return;
+  if (mediaEl.paused) {
+    mediaEl.play();
+    btnPlay.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause`;
+  } else {
+    mediaEl.pause();
+    btnPlay.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Play`;
+  }
+});
+
+document.getElementById('btnSetStart').addEventListener('click', () => {
+  if (!mediaEl) return;
+  startInput.value = fmtTime(mediaEl.currentTime);
+  updateSelection();
+  showStatus('Start → ' + startInput.value, 'ok');
+});
+
+document.getElementById('btnSetEnd').addEventListener('click', () => {
+  if (!mediaEl) return;
+  endInput.value = fmtTime(mediaEl.currentTime);
+  updateSelection();
+  showStatus('End → ' + endInput.value, 'ok');
+});
+
+document.getElementById('btnPreview').addEventListener('click', () => {
+  if (!mediaEl) return;
+  const s = parseSecs(startInput.value), e = parseSecs(endInput.value);
+  if (isNaN(s)) return;
+  mediaEl.currentTime = s;
+  mediaEl.play();
+  btnPlay.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause`;
+  if (!isNaN(e)) {
+    const check = () => {
+      if (mediaEl.currentTime >= e) {
+        mediaEl.pause();
+        btnPlay.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Play`;
+      } else if (!mediaEl.paused) requestAnimationFrame(check);
+    };
+    requestAnimationFrame(check);
+  }
+});
+
+document.getElementById('btnAddClip').addEventListener('click', () => {
+  if (!fileObj) { showStatus('Load a file first.', 'err'); return; }
+  const s = parseSecs(startInput.value), e = parseSecs(endInput.value);
+  if (isNaN(s) || isNaN(e)) { showStatus('Invalid timestamps.', 'err'); return; }
+  if (e <= s) { showStatus('End must be after start.', 'err'); return; }
+  if (e > duration) { showStatus('End exceeds file duration.', 'err'); return; }
+  clipCount++;
+  const name = clipNameInput.value.trim() || ('clip-' + clipCount);
+  clips.push({ id: clipCount, name, start: s, end: e });
+  clipNameInput.value = 'clip-' + (clipCount + 1);
+  renderClips();
+  exportHint.style.display = '';
+  showStatus('Added "' + name + '"  (' + fmtTime(s) + ' → ' + fmtTime(e) + ')', 'ok');
+});
+
+function renderClips() {
+  if (!clips.length) {
+    clipsList.innerHTML = '<div class="no-clips">No clips yet — mark in/out points above and click Add clip.</div>';
+    return;
+  }
+  clipsList.innerHTML = '';
+  clips.forEach(c => {
+    const dur = c.end - c.start;
+    const card = document.createElement('div');
+    card.className = 'clip-card';
+    card.innerHTML = `
+      <div class="clip-icon">✂️</div>
+      <div class="clip-info">
+        <div class="clip-name">${c.name}</div>
+        <div class="clip-range">${fmtTime(c.start)} → ${fmtTime(c.end)}</div>
+      </div>
+      <div class="clip-dur">${fmtTime(dur)}</div>
+      <div class="clip-actions">
+        <button class="preview-btn" data-id="${c.id}" title="Preview">▶</button>
+        <button class="export-btn" data-id="${c.id}">↓ Export</button>
+        <button class="del-btn" data-id="${c.id}" title="Remove">✕</button>
+      </div>`;
+    clipsList.appendChild(card);
+  });
+
+  clipsList.querySelectorAll('.preview-btn').forEach(b => b.addEventListener('click', () => {
+    const c = clips.find(x => x.id == b.dataset.id);
+    if (!c || !mediaEl) return;
+    mediaEl.currentTime = c.start; mediaEl.play();
+    btnPlay.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause`;
+    const check = () => {
+      if (mediaEl.currentTime >= c.end) { mediaEl.pause(); btnPlay.innerHTML = `<svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg> Play`; }
+      else if (!mediaEl.paused) requestAnimationFrame(check);
+    };
+    requestAnimationFrame(check);
+  }));
+
+  clipsList.querySelectorAll('.del-btn').forEach(b => b.addEventListener('click', () => {
+    clips = clips.filter(x => x.id != b.dataset.id);
+    renderClips();
+    if (!clips.length) exportHint.style.display = 'none';
+  }));
+
+  clipsList.querySelectorAll('.export-btn').forEach(b => b.addEventListener('click', () => {
+    const c = clips.find(x => x.id == b.dataset.id);
+    if (c) exportClip(c, b);
+  }));
+}
+
+function exportClip(clip, btn) {
+  if (!fileObj) return;
+  btn.disabled = true; btn.textContent = '… Exporting';
+  showStatus('Exporting "' + clip.name + '"…', '');
+  const fr = new FileReader();
+  fr.onload = function(e) {
+    const blob = new Blob([e.target.result], { type: fileObj.type });
+    const url = URL.createObjectURL(blob);
+    const scratch = document.createElement(mediaType === 'audio' ? 'audio' : 'video');
+    scratch.src = url; scratch.muted = true; scratch.style.display = 'none';
+    document.body.appendChild(scratch);
+    scratch.addEventListener('loadedmetadata', () => {
+      let stream;
+      try { stream = scratch.captureStream ? scratch.captureStream() : scratch.mozCaptureStream(); }
+      catch { showStatus('Capture not supported — try Chrome or Firefox.', 'err'); clean(); return; }
+      const mimes = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','audio/webm'];
+      const mime = mimes.find(m => MediaRecorder.isTypeSupported(m));
+      if (!mime) { showStatus('MediaRecorder not supported in this browser.', 'err'); clean(); return; }
+      const rec = new MediaRecorder(stream, { mimeType: mime });
+      const chunks = [];
+      rec.ondataavailable = ev => { if (ev.data.size > 0) chunks.push(ev.data); };
+      rec.onstop = () => {
+        const out = new Blob(chunks, { type: mime });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(out);
+        a.download = clip.name + '.webm';
+        a.click();
+        showStatus('Exported "' + clip.name + '.webm"', 'ok');
+        clean(); btn.disabled = false; btn.textContent = '↓ Export';
+        URL.revokeObjectURL(url);
+      };
+      scratch.currentTime = clip.start;
+      scratch.addEventListener('seeked', function go() {
+        scratch.removeEventListener('seeked', go);
+        rec.start(); scratch.play();
+        const watch = () => {
+          if (scratch.currentTime >= clip.end || scratch.ended) { scratch.pause(); rec.stop(); }
+          else requestAnimationFrame(watch);
+        };
+        requestAnimationFrame(watch);
+      }, { once: true });
+    });
+    function clean() { scratch.pause(); if (scratch.parentNode) scratch.parentNode.removeChild(scratch); }
+  };
+  fr.readAsArrayBuffer(fileObj);
+}
+
+function showStatus(msg, type) {
+  statusMsg.textContent = msg;
+  statusMsg.className = 'status' + (type ? ' ' + type : '');
+}
+</script>
+</body>
+</html>
