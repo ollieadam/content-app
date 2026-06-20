@@ -834,12 +834,20 @@ function dbDel(store, key) {
 /* ═══════════════════════════════════════════════════════════════════
    SETTINGS
    ═══════════════════════════════════════════════════════════════════ */
-function loadSettings() {
-  return dbGet('settings', 'config').then(s => s || {});
+async function loadSettings() {
+  try {
+    const r = await fetch('/api/settings');
+    if (r.ok) return await r.json();
+  } catch(e) {}
+  return {};
 }
 
 function saveSettings(s) {
-  return dbPut('settings', s, 'config');
+  return fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(s)
+  });
 }
 
 let _settings = {};

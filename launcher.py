@@ -29,6 +29,7 @@ class Launcher:
 
         self.server_proc = None
         self.running = False
+        self.app_url = SERVER_URL
         self._build_ui()
         self.start_server()
 
@@ -89,9 +90,14 @@ class Launcher:
                 self.root.after(0, self._server_failed, 'Server exited unexpectedly')
                 return
             try:
-                with urllib.request.urlopen(SERVER_URL + '/api/status', timeout=1):
-                    self.root.after(0, self._server_ready)
-                    return
+                import json as _json
+                with urllib.request.urlopen(SERVER_URL + '/api/status', timeout=1) as resp:
+                    status = _json.loads(resp.read())
+                    tailscale = next((ip for ip in status.get('ips', []) if ip.startswith('100.')), None)
+                    if tailscale:
+                        self.app_url = f'http://{tailscale}:{status.get("port", 8080)}'
+                self.root.after(0, self._server_ready)
+                return
             except Exception:
                 time.sleep(0.5)
         self.root.after(0, self._server_failed, 'Server failed to start (timeout)')
@@ -119,7 +125,7 @@ class Launcher:
             return
         try:
             subprocess.Popen(
-                [FIREFOX, '--new-window', SERVER_URL],
+                [FIREFOX, '--new-window', self.app_url],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL
             )

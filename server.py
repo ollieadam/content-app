@@ -7,6 +7,7 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 HOST = '0.0.0.0'
 PORT = 8080
 DIR = os.path.dirname(os.path.abspath(__file__))
+SETTINGS_FILE = os.path.join(DIR, 'settings.json')
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -19,6 +20,12 @@ class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/api/status':
             self.send_json({'status': 'running', 'ips': get_ips(), 'port': PORT})
+        elif self.path == '/api/settings':
+            try:
+                with open(SETTINGS_FILE) as f:
+                    self.send_json(json.load(f))
+            except FileNotFoundError:
+                self.send_json({})
         else:
             super().do_GET()
 
@@ -26,6 +33,12 @@ class Handler(SimpleHTTPRequestHandler):
         if self.path == '/api/shutdown':
             self.send_json({'status': 'shutting_down'})
             threading.Thread(target=self.server.shutdown, daemon=True).start()
+        elif self.path == '/api/settings':
+            length = int(self.headers.get('Content-Length', 0))
+            data = json.loads(self.rfile.read(length))
+            with open(SETTINGS_FILE, 'w') as f:
+                json.dump(data, f)
+            self.send_json({'ok': True})
         elif self.path == '/api/proxy':
             length = int(self.headers.get('Content-Length', 0))
             self._handle_proxy(self.rfile.read(length))
