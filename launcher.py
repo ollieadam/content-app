@@ -17,12 +17,11 @@ DIM = '#555'
 
 class Launcher:
     def __init__(self):
-        self.root = tk.Tk()
+        self.root = tk.Tk(className='content-app-launcher')
         self.root.title('Content App')
         self.root.configure(bg=BG)
         self.root.resizable(False, False)
         self.root.protocol('WM_DELETE_WINDOW', self.on_close)
-        self.root.tk.call('wm', 'class', '.', 'Content-App-Launcher')
 
         # centre window
         sw = self.root.winfo_screenwidth()
