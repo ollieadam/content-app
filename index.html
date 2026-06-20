@@ -254,6 +254,31 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .tag{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:500;background:var(--bg3);color:var(--muted)}
 .tele-stage.mirror .tele-text{transform-origin:center}
 .tele-stage.mirror{transform:scaleX(-1)}
+
+/* ── Responsive: Desktop (>768px) ── */
+@media (min-width: 768px) {
+  .app{max-width:100%;flex-direction:row;flex-wrap:wrap;height:100vh}
+  .header{width:100%}
+  .header h1{font-size:17px}
+  .content{width:calc(100% - 220px);height:calc(100vh - var(--header-h));padding:16px 20px 4px 20px}
+  .nav{width:220px;height:calc(100vh - var(--header-h));flex-direction:column;border-top:none;border-right:1px solid var(--border);padding-bottom:0;justify-content:flex-start;padding-top:6px}
+  .nav-btn{flex:0 0 auto;flex-direction:row;justify-content:flex-start;padding:10px 16px;gap:10px;font-size:13px;border-left:3px solid transparent;border-radius:0}
+  .nav-btn.active{border-left-color:var(--red);background:var(--red-bg);color:var(--red)}
+  .nav-btn .nav-icon{font-size:18px}
+  .stat-grid{grid-template-columns:repeat(4,1fr)}
+  .post-aspects{grid-template-columns:repeat(4,1fr)}
+  .gen-grid{grid-template-columns:repeat(3,1fr)}
+  .brand-bar{flex-wrap:wrap}
+  .tele-stage{height:420px}
+  .hero-rec .big-btn{width:88px;height:88px;font-size:38px}
+  .section-title{font-size:12px}
+  .rec-item{padding:12px 16px}
+  .card-pad{padding:16px 20px}
+  .rec-mode-tabs{max-width:400px}
+  .rec-controls{flex-wrap:nowrap}
+  .form-group{margin-bottom:12px}
+  .post-canvas-wrap canvas{max-height:420px}
+}
 @media(max-width:360px){.rec-mode-tab{font-size:11px;padding:6px 0}}
 </style>
 </head>
