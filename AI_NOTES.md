@@ -8,7 +8,7 @@ posts. Runs entirely in the browser (client-side). Local Python server for Tails
 ## Repository
 - GitHub: `https://github.com/ollieadam/content-app`
 - Local path: `/home/ollie/decentralized strength pod/`
-- Desktop shortcut: `~/Desktop/Content App.desktop` → runs `server.py` → opens Firefox
+- Desktop shortcut: `~/Desktop/Content App.desktop` → runs `launcher.py` → persistent launcher window → opens Chrome `--app`
 
 ## Files
 
@@ -24,6 +24,10 @@ posts. Runs entirely in the browser (client-side). Local Python server for Tails
 | File | Purpose |
 |------|---------|
 | `server.py` | Python HTTP server on 0.0.0.0:8080. Has /api/shutdown + /api/status endpoints |
+| `launcher.py` | Python tkinter launcher window — persistent taskbar icon. Starts server, opens Chrome `--app` on click |
+
+### Launch Flow
+`launcher.py` (via .desktop file) → starts `server.py` subprocess → waits for server ready → user clicks "Open Content App" → `google-chrome-stable --app=http://localhost:8080` (frameless window, no tabs/address bar)
 
 ### Originals (kept, not part of new app)
 | File | Purpose |
@@ -32,10 +36,13 @@ posts. Runs entirely in the browser (client-side). Local Python server for Tails
 | `video editor/clipper.html` | Original standalone clip editor |
 | `video editor/to Edit/` | Raw video files (gitignored) |
 
-### Documentation
+### Other
 | File | Purpose |
 |------|---------|
 | `AI_NOTES.md` | This file — architecture notes for AI agents |
+| `content-app-launcher.sh` | Thin shell wrapper (exec `launcher.py`), kept for backwards compat |
+| `.gitignore` | Ignores video files, Python cache, OS junk |
+| `originals.md` | List of original standalone HTML files |
 
 ## Brands & Platforms
 
@@ -159,20 +166,49 @@ Social post composer:
 - `sw.js` caches app files, bypasses API calls (Venice/Google/Buzzsprout)
 - Service worker registered in init(), works on localhost (not file://)
 
-## Desktop Launch (server.py)
+## Desktop Launch
 
 ### server.py features
 - Python 3 http.server
-- Binds to 0.0.0.0:8080 (accessible via Tailscale IP)
+- Binds to 0.0.0.0:8080 (accessible via Tailscale IP on 100.x.x.x)
 - GET /api/status → JSON with server state + detected IPs
-- POST /api/shutdown → graceful shutdown via /api/shutdown endpoint
-- Prints QR-code-friendly URL on startup
+- POST /api/shutdown → graceful shutdown
+- No browser auto-open (launcher.py handles that)
+- Quiet logging (log_message override)
 - CORS headers for local development
+- Runs as subprocess of launcher.py
 
-### Desktop .desktop file
-- `~/Desktop/Content App.desktop`
-- Exec: `python3 /path/to/server.py` in terminal
-- Opens Firefox to http://localhost:8080
+### launcher.py features
+- Python tkinter window (~340x220px, black #0a0a0a / red #dc2626 theme)
+- Starts server.py as subprocess on launch; waits up to 15s for server ready
+- "🎬 Open Content App" button → `google-chrome-stable --app=http://localhost:8080`
+- "⏹ Stop Server" button — POSTs /api/shutdown, terminates server process
+- Close window = stop server + exit
+- WM_CLASS = `"content-app-launcher", "Content-app-launcher"` for Cinnamon taskbar matching
+- Centred on screen, not resizable
+- Status indicator: ○ Starting server… → ● Running
+
+### .desktop file (two copies)
+- `~/Desktop/Content App.desktop` — desktop shortcut
+- `~/.local/share/applications/Content App.desktop` — start menu entry
+- `Exec=python3 "/home/ollie/decentralized strength pod/launcher.py"`
+- `StartupWMClass=content-app-launcher` (matches launcher window's WM_CLASS)
+- `Icon=/home/ollie/decentralized strength pod/icon.svg`
+- `Terminal=false`, `Categories=AudioVideo;`
+
+### Workflow
+1. User clicks pinned taskbar icon (or desktop shortcut)
+2. `launcher.py` opens (small dark window with "Content App" header)
+3. Server starts in background (status: "Starting server…" → "● Running")
+4. User clicks "🎬 Open Content App"
+5. Chrome launches in `--app` mode (no tabs/address bar, looks like native app)
+6. User closes Chrome window; launcher stays open
+7. User clicks "Open Content App" again to reopen Chrome
+8. User clicks "Stop Server" or closes launcher → everything shuts down
+
+### History
+- Previously used `content-app-launcher.sh` + Firefox `--new-window`
+- Firefox caused double-tab issues; replaced with Chrome `--app`
 
 ## Key Technical Details
 
@@ -220,3 +256,11 @@ Social post composer:
 - Dark surfaces (#151515, #1a1a1a), subtle borders (#282828)
 - Mobile-first, max-width 480px container
 - Bottom nav bar, 60px height + safe area padding
+
+## Responsive Layout
+- Breakpoint: `@media (min-width: 1024px)` — desktop layout
+- Desktop `.content`: `max-width: 1600px`, centred with `margin: 0 auto`, padding `20px 32px 8px`
+- Phone `.app` has `max-width: 480px`; desktop `.app` has `max-width: 100%; height: 100vh`
+- Bottom nav unchanged on desktop (no sidebar)
+- Desktop scaling: bigger buttons, taller teleprompter (500px), wider grids (4 columns), larger text
+- Optimised for 1920×1200 screen (ASUS Zenbook)
