@@ -258,9 +258,90 @@ Social post composer:
 - Bottom nav bar, 60px height + safe area padding
 
 ## Responsive Layout
-- Breakpoint: `@media (min-width: 1024px)` — desktop layout
-- Desktop `.content`: `max-width: 1600px`, centred with `margin: 0 auto`, padding `20px 32px 8px`
-- Phone `.app` has `max-width: 480px`; desktop `.app` has `max-width: 100%; height: 100vh`
+- 700px breakpoint: home-grid 2-col, 4-col stat/post/gen grids, settings modal centered
+- 1024px breakpoint: larger padding, bigger buttons, taller teleprompter (500px)
+- `.app` is `width: 100%` (no max-width constraint)
 - Bottom nav unchanged on desktop (no sidebar)
-- Desktop scaling: bigger buttons, taller teleprompter (500px), wider grids (4 columns), larger text
 - Optimised for 1920×1200 screen (ASUS Zenbook)
+- `'use strict'` is active in the script block — all variables must be declared
+
+---
+
+## Session Update (2026-06-20)
+
+### Architecture Changes
+
+#### Settings — now server-side
+- Settings stored in `settings.json` in the app directory (NOT IndexedDB)
+- `GET /api/settings` → returns parsed JSON (empty object if file missing)
+- `POST /api/settings` → writes JSON body to settings.json
+- `loadSettings()` and `saveSettings()` in index.html fetch from `/api/settings`
+- Shared across all devices on Tailscale automatically
+- `dbPut(store, val, key)` now accepts optional 3rd key arg for out-of-line key stores
+
+#### Server — new endpoints (server.py)
+- `GET /api/settings` — load settings from settings.json
+- `POST /api/settings` — save settings to settings.json
+- `POST /api/proxy` — proxy external API calls (FB, IG, GitHub) to avoid browser CORS
+  - Supports `json_body` (JSON POST) and `multipart` (form-data with `_image_b64` for image uploads)
+  - `SETTINGS_FILE = os.path.join(DIR, 'settings.json')`
+- `do_OPTIONS` handler added for CORS preflight
+- Shutdown fix: `self.server.shutdown()` called in daemon thread to avoid deadlock
+
+#### Launcher (launcher.py) — opens Tailscale URL
+- On startup reads `/api/status`, extracts `100.x.x.x` Tailscale IP
+- Opens Firefox at `http://{tailscale_ip}:8080` (falls back to localhost)
+- `self.app_url` stores the resolved URL
+
+### New Features (index.html)
+
+#### Settings modal — tabbed
+- Tabs: Creative (Venice AI), Social (YouTube x2, Meta/FB/IG), Publish (Buzzsprout, GitHub/Blog), Brands
+- CSS: `.stab-bar` / `.stab` / `.stab-panel`
+- `showSettingsTab(btn, tab)` switches panels by matching `id="sp-{tab}"`
+
+#### Brands system
+- `BRANDS` constant: personal (no platforms), chs (yt/ig/fb), dsp (fb/buzzsprout), barbie (ig/fb)
+- `setupBrandSettings()` renders checkboxes in `#brandsSettings`
+- `loadBrandSettings()` populates `#brandBar`, `#recBrand`, `#postBrand`
+- `toggleBrandSetting(el)` / `setActiveBrand(id)` update `_settings.brands` / `_settings.activeBrand`
+
+#### Social Publishing (Post tab)
+- Live posting toggle: `_livePosting` flag, `toggleLivePosting()`, `#liveBar` / `#liveToggle`
+- `updatePublishTargets()` — shows ALL configured accounts regardless of brand (FB x3, IG x3, Blog)
+- `publishToAll()` — iterates checked targets, calls per-platform function, shows toast results
+- `postToFBPage(pageId, caption, imageBlob)` — text via `/feed`, image via `/photos` multipart
+- `postToIG(igId, caption, imageUrl)` — creates media container then publishes
+- `uploadImageToGitHub(blob)` — uploads PNG to `assets/posts/{timestamp}.png`, returns public URL for IG
+- `postToGitHubBlog(content)` — creates HTML post in `blog/` directory of GitHub repo
+- `buildBlogPostHTML(title, body)` — full HTML page (NOTE: `<\/script>` escaped inside template literal)
+- All external calls via `_proxy(payload)` → `POST /api/proxy`
+
+#### Settings fields added
+- YouTube: `yt1Label`, `ytChannel`, `yt2Label`, `yt2Channel`
+- Meta: `metaToken`, `fbPage1Label/Id`, `fbPage2Label/Id`, `fbPage3Label/Id`
+- Instagram: `igAcct1Label/Id`, `igAcct2Label/Id`, `igAcct3Label/Id`
+- GitHub/Blog: `githubToken`, `githubRepo` (format: `owner/reponame`), `blogUrl`
+- Brands: `brands` (array of active brand IDs), `activeBrand`
+
+### Key Proxy Patterns
+- JSON call: `_proxy({url, method, json_body: {...}})`
+- Image upload: `_proxy({url, method, multipart: {caption, access_token, _image_b64: base64string}})`
+- Settings debounce 300ms → `updateApiStatus()` + `loadBrandSettings()` + `updatePublishTargets()`
+
+### Meta/Facebook API Status (as of 2026-06-20)
+- Business account verified ✅
+- App ID: 4493585697545534, Business ID: 1521837516113590
+- Need: Page Access Token from Graph API Explorer → paste into Settings → Meta User Token
+- To get IG Account ID: `GET /v21.0/PAGE_ID?fields=instagram_business_account&access_token=TOKEN`
+- IG posting requires public image URL — app uploads to GitHub first, passes URL to IG API
+- Long-lived Page Access Token = permanent; user token = 60 days
+
+### Desktop Files Fixed
+- `~/Desktop/Content App.desktop` and `~/.local/share/applications/Content App.desktop`
+- Corrected path from `/home/ollie/decentralized strength pod/` → `/home/ollie/content app/`
+
+### Key Variables Updated
+- `_settings` — loaded from server (`/api/settings`), not IndexedDB
+- `_livePosting` — bool controlling Publish Now button
+- `app_url` (launcher.py) — Tailscale URL resolved at startup
