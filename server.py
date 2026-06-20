@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Content App server — serves index.html with ON/OFF control via Tailscale."""
 
-import os, sys, json, socket, webbrowser
+import os, sys, json, socket
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 HOST = '0.0.0.0'
@@ -79,8 +79,6 @@ def main():
     print(f'║  Press Ctrl+C to stop the server     ║')
     print(f'║  Or click "Stop Server" in the app   ║')
     print(f'╚══════════════════════════════════════╝')
-
-    webbrowser.open(f'http://localhost:{PORT}')
 
     try:
         server.serve_forever()
