@@ -75,6 +75,7 @@ class Launcher:
         self._set_status('Starting server…')
         self.open_btn.configure(state='disabled')
         self.stop_btn.configure(state='disabled')
+        self._ensure_tailscale_serve()
         self.server_proc = subprocess.Popen(
             [sys.executable, os.path.join(DIR, 'server.py')],
             cwd=DIR,
@@ -82,6 +83,33 @@ class Launcher:
             stderr=subprocess.DEVNULL
         )
         threading.Thread(target=self._wait_for_server, daemon=True).start()
+
+    def _ensure_tailscale_serve(self):
+        """Start Tailscale HTTPS serve if not already active."""
+        try:
+            r = subprocess.run(['tailscale', 'serve', '--bg', '--https=443', '8080'],
+                               capture_output=True, text=True, timeout=5)
+            if r.returncode != 0:
+                print(f'tailscale serve warn: {r.stderr.strip()}')
+        except Exception as e:
+            print(f'tailscale serve error: {e}')
+
+    def _resolve_magicdns(self):
+        """Extract MagicDNS hostname from tailscale status."""
+        try:
+            r = subprocess.run(['tailscale', 'status', '--json'],
+                               capture_output=True, text=True, timeout=5)
+            if r.returncode == 0:
+                import json as _json
+                data = _json.loads(r.stdout)
+                # Find current machine's DNS name
+                cur = data.get('CurrentNode', {})
+                dns = cur.get('DNSName', '').rstrip('.')
+                if dns:
+                    return f'https://{dns}'
+        except Exception:
+            pass
+        return None
 
     def _wait_for_server(self):
         deadline = time.time() + 15
@@ -96,6 +124,10 @@ class Launcher:
                     tailscale = next((ip for ip in status.get('ips', []) if ip.startswith('100.')), None)
                     if tailscale:
                         self.app_url = f'http://{tailscale}:{status.get("port", 8080)}'
+                # Try to use HTTPS via MagicDNS
+                https_url = self._resolve_magicdns()
+                if https_url:
+                    self.app_url = https_url
                 self.root.after(0, self._server_ready)
                 return
             except Exception:
@@ -104,7 +136,8 @@ class Launcher:
 
     def _server_ready(self):
         self.running = True
-        self._set_status('Running', ok=True)
+        label = f'🔒 {self.app_url}' if self.app_url.startswith('https') else f'Running — {self.app_url}'
+        self._set_status(label, ok=True)
         self.open_btn.configure(state='normal')
         self.stop_btn.configure(state='normal', fg=RED, activeforeground=RED)
         threading.Thread(target=self._poll_badge, daemon=True).start()

@@ -25,13 +25,14 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == '/api/status':
-            self.send_json({'status': 'running', 'ips': get_ips(), 'port': PORT})
+            settings_data = self._load_settings()
+            pw_hash = settings_data.get('appPassword', '')
+            https_url = get_magicdns_url()
+            self.send_json({'status': 'running', 'ips': get_ips(), 'port': PORT, 'passwordSet': bool(pw_hash), 'passwordHash': pw_hash, 'httpsUrl': https_url})
         elif self.path == '/api/settings':
-            try:
-                with open(SETTINGS_FILE) as f:
-                    self.send_json(json.load(f))
-            except FileNotFoundError:
-                self.send_json({})
+            if not self._check_auth():
+                return
+            self.send_json(self._load_settings())
         elif self.path == '/api/projects':
             try:
                 with open(PROJECTS_FILE) as f:
@@ -49,6 +50,8 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_json({'status': 'shutting_down'})
             threading.Thread(target=self.server.shutdown, daemon=True).start()
         elif self.path == '/api/settings':
+            if not self._check_auth():
+                return
             length = int(self.headers.get('Content-Length', 0))
             data = json.loads(self.rfile.read(length))
             with open(SETTINGS_FILE, 'w') as f:
@@ -87,6 +90,8 @@ class Handler(SimpleHTTPRequestHandler):
                 _badge_count = 0
             self.send_json({'ok': True})
         elif self.path == '/api/proxy':
+            if not self._check_auth():
+                return
             length = int(self.headers.get('Content-Length', 0))
             self._handle_proxy(self.rfile.read(length))
         elif self.path == '/api/chat':
@@ -112,10 +117,26 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_header('Content-Encoding', 'gzip')
             self.send_header('Content-Length', str(len(compressed)))
             self.send_header('Cache-Control', 'public, max-age=60')
+            self._cors()
+            self._add_csp()
             self.end_headers()
             self.wfile.write(compressed)
         else:
-            super().do_GET()
+            path2 = self.translate_path(self.path)
+            if os.path.isfile(path2):
+                ctype = self.guess_type(path2)
+                with open(path2, 'rb') as f:
+                    data = f.read()
+                self.send_response(200)
+                self.send_header('Content-Type', ctype)
+                self.send_header('Content-Length', str(len(data)))
+                self.send_header('Cache-Control', 'public, max-age=60')
+                self._cors()
+                self._add_csp()
+                self.end_headers()
+                self.wfile.write(data)
+            else:
+                super().do_GET()
 
     def _handle_proxy(self, body_bytes):
         """Proxy external API requests to avoid browser CORS restrictions."""
@@ -179,11 +200,7 @@ class Handler(SimpleHTTPRequestHandler):
         history  = req.get('history', [])
         message  = req.get('message', '')
 
-        try:
-            with open(SETTINGS_FILE) as f:
-                cfg = json.load(f)
-        except Exception:
-            cfg = {}
+        cfg = self._load_settings()
 
         if provider == 'venice':
             api_key = cfg.get('veniceKey', '')
@@ -271,6 +288,34 @@ class Handler(SimpleHTTPRequestHandler):
             except Exception:
                 pass
 
+    def _add_csp(self):
+        self.send_header('Content-Security-Policy',
+            "default-src 'self'; "
+            "media-src 'self' blob:; "
+            "img-src 'self' data: blob: https:; "
+            "connect-src 'self' https://api.venice.ai https://www.googleapis.com https://api.buzzsprout.com https://graph.facebook.com https://api.github.com; "
+            "script-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline';"
+        )
+
+    def _load_settings(self):
+        try:
+            with open(SETTINGS_FILE) as f:
+                return json.load(f)
+        except Exception:
+            return {}
+
+    def _check_auth(self):
+        settings_data = self._load_settings()
+        stored_hash = settings_data.get('appPassword', '')
+        if not stored_hash:
+            return True
+        header_hash = self.headers.get('X-App-Key', '')
+        if header_hash == stored_hash:
+            return True
+        self.send_json({'error': 'unauthorized'}, 401)
+        return False
+
     def send_json(self, data, code=200):
         self._send_raw(json.dumps(data).encode(), code)
 
@@ -278,6 +323,7 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_response(code)
         self.send_header('Content-Type', 'application/json')
         self._cors()
+        self._add_csp()
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -285,7 +331,7 @@ class Handler(SimpleHTTPRequestHandler):
     def _cors(self):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-App-Key')
 
     def log_message(self, fmt, *args):
         pass
@@ -296,6 +342,20 @@ class Handler(SimpleHTTPRequestHandler):
             return os.path.join(DIR, 'index.html')
         return p
 
+
+def get_magicdns_url():
+    try:
+        import subprocess as _sp
+        r = _sp.run(['tailscale', 'status', '--json'], capture_output=True, text=True, timeout=5)
+        if r.returncode == 0:
+            data = json.loads(r.stdout)
+            cur = data.get('CurrentNode', {})
+            dns = cur.get('DNSName', '').rstrip('.')
+            if dns:
+                return f'https://{dns}'
+    except Exception:
+        pass
+    return None
 
 def get_ips():
     ips = []

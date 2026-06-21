@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#dc2626">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
@@ -49,8 +49,9 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:-apple-system,system-ui,'Segoe
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
 /* ── Bottom Nav ── */
-.nav{height:calc(var(--nav-h) + var(--safe-bottom));padding-bottom:var(--safe-bottom);display:flex;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;z-index:10}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--muted);font-size:10px;cursor:pointer;transition:color .12s;-webkit-tap-highlight-color:transparent;padding:4px 0}
+.nav{height:calc(var(--nav-h) + var(--safe-bottom));padding-bottom:var(--safe-bottom);display:flex;background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;z-index:10;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{flex:1 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:var(--muted);font-size:10px;cursor:pointer;transition:color .12s;-webkit-tap-highlight-color:transparent;padding:8px 0;min-width:48px}
 .nav-btn .nav-icon{font-size:20px;line-height:1}
 .nav-btn.active{color:var(--red)}
 .nav-btn:active{opacity:.6}
@@ -143,6 +144,10 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .stat-card{border-radius:var(--radius-sm);background:var(--bg3);border:1px solid var(--border);padding:14px 10px;text-align:center}
 .stat-num{font-size:22px;font-weight:700}
 .stat-label{font-size:11px;color:var(--muted);margin-top:3px}
+/* ── Security Banner ── */
+.security-banner{padding:8px 12px;font-size:11px;text-align:center;background:var(--red-bg);color:var(--red);border-bottom:1px solid var(--red);display:none;flex-shrink:0}
+.security-banner a{color:inherit;text-decoration:underline}
+
 .api-status-list{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
 .api-status-row{display:flex;align-items:center;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border)}
 .api-status-row:last-child{border-bottom:none}
@@ -398,7 +403,60 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
   input,select{font-size:15px}
   .tab-panel{padding:20px 20px 8px}
 }
-@media(max-width:360px){.rec-mode-tab{font-size:11px;padding:6px 0}}
+/* ── Responsive: Small phones (≤480px) ── */
+@media (max-width: 480px) {
+  .header h1{font-size:13px}
+  .header-btn{width:30px;height:30px;font-size:14px}
+  .content{padding:8px 8px 4px}
+  .tab-panel{padding:8px 8px 4px}
+  .section{margin-bottom:14px}
+  .nav-btn{gap:1px;padding:6px 0;min-width:44px}
+  .nav-btn .nav-icon{font-size:18px}
+  .nav-btn{font-size:9px}
+  .tele-stage{height:260px}
+  .tele-text{font-size:18px;padding:80px 14px}
+  .post-canvas-wrap canvas{max-height:260px}
+  .settings-pair{grid-template-columns:1fr}
+  .hero-rec{padding:16px 8px}
+  .hero-rec .big-btn{width:64px;height:64px;font-size:26px}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:6px}
+  .stat-card{padding:10px 8px}
+  .stat-num{font-size:18px}
+  .gen-grid{grid-template-columns:repeat(2,1fr)}
+  .rec-preview{min-height:140px;max-height:200px}
+  .rec-preview video,.rec-preview audio{max-height:200px}
+  .edit-timeline{height:32px}
+  .lib-add-options{grid-template-columns:1fr}
+  .chat-bubble{font-size:14px;max-width:92%}
+  .chat-input-area textarea{font-size:16px;min-height:40px}
+  .btn{padding:8px 14px;font-size:12px}
+  .btn-sm{padding:5px 10px;font-size:11px}
+  .rec-btn{width:42px;height:42px}
+  .rec-timer{font-size:16px}
+  .form-group{margin-bottom:8px}
+  .section-title{font-size:10px;margin-bottom:8px}
+  .tele-controls{gap:4px}
+  .rec-mode-tab{font-size:11px;padding:6px 0}
+  .post-aspect{height:42px;padding:6px 8px;font-size:10px}
+}
+/* ── Responsive: Very small phones (≤360px) ── */
+@media (max-width: 360px) {
+  .header h1{font-size:12px}
+  .header-btn{width:26px;height:26px;font-size:13px}
+  .content{padding:4px 4px 4px}
+  .tab-panel{padding:6px 6px 4px}
+  .tele-stage{height:200px}
+  .tele-text{font-size:16px;padding:60px 10px}
+  .post-canvas-wrap canvas{max-height:200px}
+  .hero-rec .big-btn{width:56px;height:56px;font-size:22px}
+  .stat-grid{gap:4px}
+  .stat-card{padding:8px 6px}
+  .stat-num{font-size:16px}
+  .stat-label{font-size:10px}
+  .rec-mode-tab{font-size:10px;padding:5px 0}
+  .rec-preview{min-height:120px;max-height:160px}
+  .section{margin-bottom:10px}
+}
 </style>
 </head>
 <body>
@@ -412,6 +470,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 
   <!-- Content -->
   <main class="content" id="content">
+    <div class="security-banner" id="securityBanner">🔓 Using HTTP — passwords are sent in plain text. Access via <a href="https://tailscale.com/kb/1242/tailscale-serve/" target="_blank">Tailscale HTTPS</a> for secure connections.</div>
 
     <!-- ═══════ HOME ═══════ -->
     <section class="tab-panel active" id="tabHome">
@@ -437,6 +496,9 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
                 </div>
                 <span id="serverIP" style="font-size:11px;color:var(--muted);font-family:monospace"></span>
                 <button class="btn btn-sm btn-danger" onclick="stopServer()">⏹ Stop</button>
+              </div>
+              <div class="row mt-8" style="justify-content:center">
+                <canvas id="qrCanvas" style="border-radius:4px;background:#fff" width="0" height="0"></canvas>
               </div>
             </div>
           </div>
@@ -495,6 +557,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
               <span id="teleSpeedVal" class="mono" style="font-size:11px;color:var(--text)">3</span>
             </div>
             <button class="btn btn-sm btn-ghost" onclick="teleToggleMirror()" title="Mirror">⇄</button>
+            <button class="btn btn-sm btn-ghost" onclick="teleSpeak()" title="Speak script aloud" id="teleSpeakBtn">🔊</button>
             <button class="btn btn-sm btn-ghost" onclick="teleToggleFullscreen()" title="Fullscreen">⛶</button>
             <button class="btn btn-sm btn-ghost" onclick="teleFontSize(-2)">A−</button>
             <button class="btn btn-sm btn-ghost" onclick="teleFontSize(2)">A+</button>
@@ -514,6 +577,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
             <textarea id="scriptEditor" placeholder="Type or paste your script..." oninput="teleUpdate(this.value)" style="min-height:100px"></textarea>
             <div class="btn-group mt-8">
               <button class="btn btn-sm btn-outline" onclick="veniceGenerateScript()" title="Generate with Venice AI">✨ AI Script</button>
+              <button class="btn btn-sm btn-outline" onclick="scriptMicToggle()" id="scriptMicBtn" title="Dictate with mic">🎤</button>
               <button class="btn btn-sm btn-danger" onclick="teleDelete()">✕ Delete</button>
             </div>
           </div>
@@ -651,6 +715,12 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
               <button class="btn btn-sm btn-primary" onclick="postExportVideo()">↓ Export Video</button>
               <button class="btn btn-sm btn-outline" onclick="postExportFrame()">📷 Export Frame</button>
             </div>
+            <div class="row gap-8 mt-8" style="align-items:center">
+              <label style="margin:0;white-space:nowrap">Duration:</label>
+              <input type="number" id="postExportDur" value="5" min="1" max="60" style="width:60px;font-size:12px;padding:4px 6px">
+              <span style="font-size:11px;color:var(--muted)">sec</span>
+              <span id="postExportStatus" style="font-size:11px;color:var(--muted);flex:1;text-align:right"></span>
+            </div>
           </div>
         </div>
         <!-- Right: source + overlay + AI + publish -->
@@ -739,6 +809,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
         <textarea id="chatInput" placeholder="Message..." rows="1"
           onkeydown="chatKeyDown(event)" oninput="chatInputResize()"
           autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true"></textarea>
+        <button class="btn btn-sm btn-ghost" onclick="chatMicToggle()" id="chatMicBtn" title="Voice input">🎤</button>
         <button class="btn btn-primary" id="chatSendBtn" onclick="chatSendMessage()">Send</button>
       </div>
     </section>
@@ -836,7 +907,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
         <div class="section-title">Venice AI — image &amp; text generation</div>
         <div class="api-field">
           <label>API Key</label>
-          <input id="settingVeniceKey" type="password" placeholder="sk-..." oninput="saveSettingsDebounced()">
+          <input id="settingVeniceKey" type="password" autocomplete="off" placeholder="sk-..." oninput="saveSettingsDebounced()">
           <div class="api-status" id="veniceStatus"></div>
         </div>
       </div>
@@ -844,7 +915,15 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
         <div class="section-title">OpenRouter — multi-model AI chat</div>
         <div class="api-field">
           <label>API Key</label>
-          <input id="settingOpenrouterKey" type="password" placeholder="sk-or-..." oninput="saveSettingsDebounced()">
+          <input id="settingOpenrouterKey" type="password" autocomplete="off" placeholder="sk-or-..." oninput="saveSettingsDebounced()">
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">App Password</div>
+        <div class="api-field">
+          <label>Password (leave blank to disable)</label>
+          <input id="settingAppPassword" type="password" autocomplete="off" placeholder="Set a password to protect this app" oninput="saveSettingsDebounced()">
+          <div class="api-status" id="appPasswordStatus"></div>
         </div>
       </div>
     </div>
@@ -855,7 +934,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
         <div class="section-title">YouTube</div>
         <div class="api-field">
           <label>Google API Key (shared across both channels)</label>
-          <input id="settingYTKey" type="password" placeholder="Google Cloud API key" oninput="saveSettingsDebounced()">
+          <input id="settingYTKey" type="password" autocomplete="off" placeholder="Google Cloud API key" oninput="saveSettingsDebounced()">
         </div>
         <div class="settings-sub-heading">Channel 1</div>
         <div class="settings-pair">
@@ -867,12 +946,13 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
           <div class="api-field"><label>Label</label><input id="settingYT2Label" type="text" placeholder="e.g. Decentralized Strength" oninput="saveSettingsDebounced()"></div>
           <div class="api-field"><label>Channel ID</label><input id="settingYT2Channel" type="text" placeholder="UC..." oninput="saveSettingsDebounced()"></div>
         </div>
+        <div class="text-xs text-muted" style="margin-top:8px">Channel ID is found at YouTube → Your Channel → About → "Share" → Copy (starts with UC...)</div>
       </div>
       <div class="section">
         <div class="section-title">Meta — Facebook &amp; Instagram</div>
         <div class="api-field">
           <label>User Access Token (one token covers all your pages &amp; IG accounts)</label>
-          <input id="settingMetaToken" type="password" placeholder="EAAxxxx..." oninput="saveSettingsDebounced()">
+          <input id="settingMetaToken" type="password" autocomplete="off" placeholder="EAAxxxx..." oninput="saveSettingsDebounced()">
         </div>
         <div class="settings-sub-heading">Facebook Pages</div>
         <div class="settings-pair">
@@ -908,7 +988,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
       <div class="section">
         <div class="section-title">Buzzsprout</div>
         <div class="settings-pair">
-          <div class="api-field"><label>API Key</label><input id="settingBSKey" type="password" placeholder="Buzzsprout API key" oninput="saveSettingsDebounced()"></div>
+          <div class="api-field"><label>API Key</label><input id="settingBSKey" type="password" autocomplete="off" placeholder="Buzzsprout API key" oninput="saveSettingsDebounced()"></div>
           <div class="api-field"><label>Podcast ID</label><input id="settingBSPodcast" type="text" placeholder="12345" oninput="saveSettingsDebounced()"></div>
         </div>
       </div>
@@ -916,7 +996,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
         <div class="section-title">Blog — GitHub Pages</div>
         <div class="api-field">
           <label>GitHub Personal Access Token</label>
-          <input id="settingGithubToken" type="password" placeholder="ghp_..." oninput="saveSettingsDebounced()">
+          <input id="settingGithubToken" type="password" autocomplete="off" placeholder="ghp_..." oninput="saveSettingsDebounced()">
         </div>
         <div class="settings-pair">
           <div class="api-field"><label>Repository (owner/name)</label><input id="settingGithubRepo" type="text" placeholder="ollieadam/chsstrengthclub" oninput="saveSettingsDebounced()"></div>
@@ -938,6 +1018,30 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
     </div>
 
     <button class="btn btn-block mt-12" onclick="closeSettings()">Done</button>
+  </div>
+</div>
+
+<!-- ═══════ LOADING OVERLAY ═══════ -->
+<div class="modal-overlay" id="loadingOverlay" style="align-items:center;z-index:99">
+  <div style="text-align:center;padding:20px">
+    <div class="spinner" style="width:32px;height:32px;border-width:3px;margin:0 auto 12px"></div>
+    <div style="font-size:13px;color:var(--muted)">Loading Content App…</div>
+  </div>
+</div>
+
+<!-- ═══════ LOGIN OVERLAY ═══════ -->
+<div class="modal-overlay" id="loginOverlay">
+  <div class="modal" style="max-width:360px;border-radius:var(--radius);margin:auto">
+    <div class="modal-handle"></div>
+    <form id="loginForm" onsubmit="event.preventDefault();loginSubmit()">
+      <div class="modal-title" style="text-align:center">🔒 App Locked</div>
+      <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px">Enter the app password to continue</p>
+      <div class="form-group">
+        <input id="loginPassword" type="password" name="password" autocomplete="current-password" placeholder="Enter password" style="font-size:16px;text-align:center">
+      </div>
+      <button class="btn btn-block btn-primary" type="submit">Unlock</button>
+      <div id="loginError" style="color:var(--red);font-size:12px;text-align:center;margin-top:8px;display:none"></div>
+    </form>
   </div>
 </div>
 
@@ -1041,16 +1145,19 @@ function dbDel(store, key) {
    ═══════════════════════════════════════════════════════════════════ */
 async function loadSettings() {
   try {
-    const r = await fetch('/api/settings');
+    const h = { ..._authHeaders() };
+    const r = await fetch('/api/settings', { headers: h });
     if (r.ok) return await r.json();
+    if (r.status === 401) { showLogin(); return {}; }
   } catch(e) {}
   return {};
 }
 
 function saveSettings(s) {
+  const h = { 'Content-Type': 'application/json', ..._authHeaders() };
   return fetch('/api/settings', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: h,
     body: JSON.stringify(s)
   });
 }
@@ -1088,6 +1195,8 @@ async function initSettings() {
   document.getElementById('settingGithubToken').value = _settings.githubToken || '';
   document.getElementById('settingGithubRepo').value = _settings.githubRepo || '';
   document.getElementById('settingBlogUrl').value = _settings.blogUrl || '';
+  document.getElementById('settingAppPassword').value = '';
+  document.getElementById('appPasswordStatus').textContent = _settings.appPassword ? '✅ Password set' : '';
   setupBrandSettings();
 }
 
@@ -1120,10 +1229,25 @@ function saveSettingsDebounced() {
     _settings.githubToken = document.getElementById('settingGithubToken').value.trim();
     _settings.githubRepo = document.getElementById('settingGithubRepo').value.trim();
     _settings.blogUrl = document.getElementById('settingBlogUrl').value.trim();
-    saveSettings(_settings);
-    updateApiStatus();
-    loadBrandSettings();
-    updatePublishTargets();
+    const pwInput = document.getElementById('settingAppPassword').value.trim();
+    const doSave = () => {
+      saveSettings(_settings);
+      updateApiStatus();
+      loadBrandSettings();
+      updatePublishTargets();
+    };
+    if (pwInput) {
+      crypto.subtle.digest('SHA-256', new TextEncoder().encode(pwInput)).then(buf => {
+        const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+        _settings.appPassword = hash;
+        document.getElementById('appPasswordStatus').textContent = '✅ Password set';
+        doSave();
+      });
+    } else {
+      delete _settings.appPassword;
+      document.getElementById('appPasswordStatus').textContent = '';
+      doSave();
+    }
   }, 300);
 }
 
@@ -1135,11 +1259,209 @@ function showSettings() {
 }
 function closeSettings() { document.getElementById('settingsModal').classList.remove('show'); }
 
+/* ═══════════════════════════════════════════════════════════════════
+   QR CODE GENERATOR (inline, no deps)
+   ═══════════════════════════════════════════════════════════════════ */
+function generateQR(text, canvas) {
+  // Minimal QR code generator — version 1, byte mode, L-level
+  const glog = [0,0,1,25,2,50,26,198,3,223,51,238,27,104,199,75,4,100,224,14,52,141,239,129,28,193,105,248,200,8,76,113,5,138,101,47,225,36,15,33,53,147,142,218,240,18,130,69,29,181,194,125,106,39,249,185,201,154,9,120,77,228,114,166,6,191,139,98,102,221,48,253,226,152,37,179,16,145,34,136,54,208,148,206,143,150,219,189,241,210,19,92,131,56,70,64,30,66,182,163,195,72,126,110,107,58,40,84,250,133,186,61,202,94,155,159,10,21,121,43,78,212,229,172,115,243,167,87,7,112,192,247,140,128,99,13,103,74,222,237,49,197,254,24,227,165,153,119,38,184,180,124,17,68,146,217,35,32,137,46,55,63,209,91,149,188,207,205,144,135,151,178,220,252,190,97,242,86,211,171,20,42,93,158,132,60,57,83,71,109,65,162,31,45,67,216,183,123,164,118,196,23,73,236,127,12,111,246,108,161,59,82,41,157,85,170,251,96,134,177,187,204,62,90,203,89,95,176,156,169,160,81,11,245,22,235,122,117,44,215,79,174,213,233,230,231,173,232,116,214,244,234,168,80,88,175];
+  const gexp = [1,2,4,8,16,32,64,128,29,58,116,232,205,135,19,38,76,152,45,90,180,117,234,201,143,3,6,12,24,48,96,192,157,39,78,156,37,74,148,53,106,212,181,119,238,193,159,35,70,140,5,10,20,40,80,160,93,186,105,210,185,111,222,161,95,190,97,194,153,47,94,188,101,202,137,15,30,60,120,240,253,231,211,187,107,214,177,127,254,225,223,163,91,182,113,226,217,175,67,134,17,34,68,136,13,26,52,104,208,189,103,206,129,31,62,124,248,237,199,147,59,118,236,197,151,51,102,204,133,23,46,92,184,109,218,169,79,158,33,66,132,21,42,84,168,77,154,41,82,164,85,170,73,146,57,114,228,213,183,115,230,209,191,99,198,145,63,126,252,229,215,179,123,246,241,255,227,219,171,75,150,49,98,196,149,55,110,220,165,87,174,65,130,25,50,100,200,141,7,14,28,56,112,224,221,167,83,166,81,162,89,178,121,242,249,239,195,155,43,86,172,69,138,9,18,36,72,144,61,122,244,245,247,243,251,235,203,139,11,22,44,88,176,125,250,233,207,131,27,54,108,216,173,71,142,1];
+
+  function polyMul(p, q) {
+    const r = new Array(p.length + q.length - 1).fill(0);
+    for (let i = 0; i < p.length; i++)
+      for (let j = 0; j < q.length; j++)
+        r[i + j] ^= gexp[(glog[p[i]] + glog[q[j]]) % 255];
+    return r;
+  }
+
+  function rsEncode(data, ecLen) {
+    const gen = [1];
+    for (let i = 0; i < ecLen; i++) gen = polyMul(gen, [1, gexp[i]]);
+    const msg = [...data, ...new Array(ecLen).fill(0)];
+    for (let i = 0; i < data.length; i++) {
+      if (msg[i] === 0) continue;
+      const factor = glog[msg[i]];
+      for (let j = 0; j < gen.length; j++)
+        msg[i + j] ^= gexp[(factor + glog[gen[j]]) % 255];
+    }
+    return msg.slice(data.length);
+  }
+
+  // Encode text to byte array
+  const enc = new TextEncoder();
+  const bytes = enc.encode(text);
+  if (!bytes.length || bytes.length > 17) return; // version 1 max 17 bytes in byte mode L
+
+  // Mode: byte (0100), count, data, terminator
+  const modeBits = [0,1,0,0];
+  const countBits = [];
+  let c = bytes.length;
+  for (let i = 7; i >= 0; i--) { countBits.push((c >> i) & 1); c = c; }
+  const dataBits = [];
+  for (const b of bytes) for (let i = 7; i >= 0; i--) dataBits.push((b >> i) & 1);
+  const totalData = 152; // version 1-L: 19 bytes * 8 bits
+  let bits = [...modeBits, ...countBits, ...dataBits];
+  // Terminator
+  const termLen = Math.min(4, totalData - bits.length);
+  for (let i = 0; i < termLen; i++) bits.push(0);
+  // Pad to byte boundary
+  while (bits.length % 8 !== 0) bits.push(0);
+  // Pad bytes
+  const padBytes = [236, 17];
+  let pi = 0;
+  while (bits.length < totalData) {
+    for (let i = 7; i >= 0; i--) bits.push((padBytes[pi % 2] >> i) & 1);
+    pi++;
+  }
+
+  // Convert to codewords
+  const codewords = [];
+  for (let i = 0; i < bits.length; i += 8) {
+    let val = 0;
+    for (let j = 0; j < 8; j++) val = (val << 1) | bits[i + j];
+    codewords.push(val);
+  }
+
+  // RS error correction (7 EC codewords for version 1-L)
+  const dataCW = codewords.slice(0, 19);
+  const ecCW = rsEncode(dataCW, 7);
+  const allCW = [...dataCW, ...ecCW];
+
+  // Place modules
+  const size = 21;
+  const mod = Array.from({length: size}, () => new Array(size).fill(0));
+
+  // Finder patterns (top-left, top-right, bottom-left)
+  function placeFinder(r, c) {
+    for (let i = -1; i <= 7; i++)
+      for (let j = -1; j <= 7; j++) {
+        if (r + i < 0 || r + i >= size || c + j < 0 || c + j >= size) continue;
+        if (i >= 0 && i <= 6 && j >= 0 && j <= 6) {
+          const v = (i === 0 || i === 6 || j === 0 || j === 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4)) ? 1 : 0;
+          mod[r + i][c + j] = v;
+        } else {
+          mod[r + i][c + j] = 0; // separator
+        }
+      }
+  }
+  placeFinder(0, 0);
+  placeFinder(0, 14);
+  placeFinder(14, 0);
+
+  // Timing patterns
+  for (let i = 8; i < 13; i++) { mod[6][i] = (i % 2 === 0) ? 1 : 0; mod[i][6] = (i % 2 === 0) ? 1 : 0; }
+
+  // Dark module
+  mod[13][8] = 1;
+
+  // Place data
+  let di = 0;
+  for (let col = size - 1; col >= 0; col -= 2) {
+    if (col === 6) col = 5;
+    for (let row = 0; row < size; row++) {
+      for (let c = 0; c < 2; c++) {
+        const cc = col - c;
+        if (cc < 0 || mod[row][cc] !== 0) continue;
+        if (di < allCW.length) {
+          mod[row][cc] = (allCW[di >> 3] >> (7 - (di & 7))) & 1;
+          di++;
+        }
+      }
+    }
+    for (let row = size - 1; row >= 0; row--) {
+      for (let c = 0; c < 2; c++) {
+        const cc = col - c;
+        if (cc < 0 || mod[row][cc] !== 0) continue;
+        if (di < allCW.length) {
+          mod[row][cc] = (allCW[di >> 3] >> (7 - (di & 7))) & 1;
+          di++;
+        }
+      }
+    }
+  }
+
+  // Format info (mask 0)
+  const formatBits = [1,1,1,0,1,1,1,0,0,0,1,0,0,0,1];
+  for (let i = 0; i < 6; i++) { mod[8][i] = formatBits[i]; mod[i][8] = formatBits[i]; }
+  mod[8][7] = formatBits[6]; mod[7][8] = formatBits[7];
+  mod[8][8] = formatBits[8];
+  for (let i = 9; i < 15; i++) { mod[8][i] = formatBits[i - 1]; }
+  for (let i = 9; i < 15; i++) { mod[i][8] = formatBits[i - 1]; }
+  mod[0][8] = mod[8][14] = mod[14][8] = 1; // dark format bits
+  mod[8][size - 1] = 0;
+
+  // Render to canvas
+  const scale = 4;
+  canvas.width = size * scale;
+  canvas.height = size * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#000';
+  for (let r = 0; r < size; r++)
+    for (let c = 0; c < size; c++)
+      if (mod[r][c]) ctx.fillRect(c * scale, r * scale, scale, scale);
+}
+
 function showSettingsTab(btn, tab) {
   document.querySelectorAll('.stab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.stab-panel').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('sp-' + tab).classList.add('active');
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   APP PASSWORD AUTH
+   ═══════════════════════════════════════════════════════════════════ */
+let _authenticated = false;
+
+let _storedPasswordHash = '';
+
+async function checkAuth() {
+  if (_authenticated) return true;
+  if (sessionStorage.getItem('contentAppAuth')) { _authenticated = true; return true; }
+  try {
+    const r = await fetch('/api/status');
+    const d = await r.json();
+    _storedPasswordHash = d.passwordHash || '';
+    if (!d.passwordSet) { _authenticated = true; return true; }
+  } catch(e) { return true; }
+  showLogin();
+  return false;
+}
+
+function showLogin() {
+  document.getElementById('loginOverlay').classList.add('show');
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').style.display = 'none';
+  setTimeout(() => document.getElementById('loginPassword').focus(), 100);
+}
+
+async function loginSubmit() {
+  const pw = document.getElementById('loginPassword').value.trim();
+  if (!pw) return;
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+  const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  if (hash === _storedPasswordHash) {
+    _authenticated = true;
+    sessionStorage.setItem('contentAppAuth', hash);
+    document.getElementById('loginOverlay').classList.remove('show');
+    document.getElementById('loginError').style.display = 'none';
+    await bootstrapApp();
+  } else {
+    document.getElementById('loginError').textContent = 'Incorrect password';
+    document.getElementById('loginError').style.display = 'block';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginPassword').focus();
+  }
+}
+
+function _authHeaders() {
+  const h = {};
+  const stored = sessionStorage.getItem('contentAppAuth');
+  if (stored) h['X-App-Key'] = stored;
+  return h;
 }
 
 function setupBrandSettings() {
@@ -1256,7 +1578,13 @@ async function checkServerStatus() {
     document.getElementById('serverDot').style.background = 'var(--green)';
     document.getElementById('serverLabel').textContent = 'Running';
     const ips = (d.ips || []).filter(x => x !== '127.0.0.1');
-    document.getElementById('serverIP').textContent = ips.length ? 'http://' + ips[0] + ':' + (d.port || 8080) : 'http://localhost:' + (d.port || 8080);
+    const httpUrl = ips.length ? 'http://' + ips[0] + ':' + (d.port || 8080) : 'http://localhost:' + (d.port || 8080);
+    const url = d.httpsUrl || httpUrl;
+    document.getElementById('serverIP').textContent = url;
+    document.getElementById('serverLabel').textContent = d.httpsUrl ? '🔒 HTTPS' : 'Running';
+    // Generate QR code
+    const qrCanvas = document.getElementById('qrCanvas');
+    if (qrCanvas && url) generateQR(url, qrCanvas);
   } catch(e) {
     section.style.display = 'none';
   }
@@ -1273,7 +1601,9 @@ async function stopServer() {
 /* ── API Status ── */
 function updateApiStatus() {
   document.getElementById('apiVeniceStatus').textContent = _settings.veniceKey ? '✅' : '❌';
-  document.getElementById('apiYTStatus').textContent = (_settings.ytKey && (_settings.ytChannel || _settings.yt2Channel)) ? '✅' : '❌';
+  const ytKey = _settings.ytKey, ytCh = _settings.ytChannel || _settings.yt2Channel;
+  document.getElementById('apiYTStatus').textContent = ytCh ? '✅' : ytKey ? '⚠️' : '❌';
+  document.getElementById('apiYTStatus').title = ytCh ? 'YouTube configured' : ytKey ? 'Add a Channel ID (UC...)' : 'Add API key + Channel ID';
   document.getElementById('apiMetaStatus').textContent = _settings.metaToken ? '✅' : '❌';
   document.getElementById('apiBSStatus').textContent = (_settings.bsKey && _settings.bsPodcast) ? '✅' : '❌';
   document.getElementById('apiBlogStatus').textContent = (_settings.githubToken && _settings.githubRepo) ? '✅' : '❌';
@@ -1383,9 +1713,10 @@ async function publishToAll() {
 }
 
 async function _proxy(payload) {
+  const h = { 'Content-Type': 'application/json', ..._authHeaders() };
   const r = await fetch('/api/proxy', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: h,
     body: JSON.stringify(payload)
   });
   const j = await r.json();
@@ -1637,6 +1968,23 @@ function teleToggleFullscreen() {
   else (document.exitFullscreen || document.webkitExitFullscreen).call(document);
 }
 
+let _teleSynth = null;
+function teleSpeak() {
+  if (!window.speechSynthesis) { toast('Speech synthesis not available', 2000); return; }
+  const s = _scripts[_currentScript];
+  if (!s || !s.text.trim()) { toast('No script text to speak', 2000); return; }
+  if (window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+    document.getElementById('teleSpeakBtn').textContent = '🔊';
+    return;
+  }
+  const utt = new SpeechSynthesisUtterance(s.text);
+  utt.rate = _teleSpeed / 5;
+  utt.onend = () => { document.getElementById('teleSpeakBtn').textContent = '🔊'; };
+  document.getElementById('teleSpeakBtn').textContent = '⏹';
+  window.speechSynthesis.speak(utt);
+}
+
 function teleUpdate(val) {
   _scripts[_currentScript].text = val;
   renderScriptStage();
@@ -1647,6 +1995,44 @@ function teleRename(val) {
   _scripts[_currentScript].name = val || 'Script';
   renderScripts();
   saveScripts();
+}
+
+let _scriptRec = null;
+function scriptMicToggle() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { toast('Speech recognition not available on this browser', 2500); return; }
+  if (_scriptRec) {
+    _scriptRec.stop();
+    _scriptRec = null;
+    document.getElementById('scriptMicBtn').textContent = '🎤';
+    document.getElementById('scriptMicBtn').classList.remove('btn-primary');
+    document.getElementById('scriptMicBtn').classList.add('btn-outline');
+    return;
+  }
+  const rec = new SpeechRecognition();
+  rec.lang = 'en-US';
+  rec.interimResults = true;
+  rec.continuous = true;
+  _scriptRec = rec;
+  document.getElementById('scriptMicBtn').textContent = '⏹';
+  document.getElementById('scriptMicBtn').classList.remove('btn-outline');
+  document.getElementById('scriptMicBtn').classList.add('btn-primary');
+  rec.onresult = e => {
+    const ta = document.getElementById('scriptEditor');
+    let text = '';
+    for (let i = e.resultIndex; i < e.results.length; i++)
+      text += e.results[i][0].transcript;
+    ta.value = text;
+    teleUpdate(ta.value);
+  };
+  rec.onerror = () => { scriptMicToggle(); };
+  rec.onend = () => {
+    if (_scriptRec) _scriptRec = null;
+    document.getElementById('scriptMicBtn').textContent = '🎤';
+    document.getElementById('scriptMicBtn').classList.remove('btn-primary');
+    document.getElementById('scriptMicBtn').classList.add('btn-outline');
+  };
+  rec.start();
 }
 
 function teleAdd() {
@@ -2258,7 +2644,7 @@ async function postRender() {
     }
   }
 
-  // Draw overlay text
+  // Draw overlay text with word wrap
   const text = document.getElementById('postOverlayText').value;
   if (text) {
     const fontSize = parseInt(document.getElementById('postFontSize').value);
@@ -2268,14 +2654,27 @@ async function postRender() {
     ctx.shadowColor = 'rgba(0,0,0,0.7)';
     ctx.shadowBlur = 8;
     ctx.fillStyle = '#fff';
-    const lines = text.split('\n');
     const lh = fontSize * 1.3;
+    const maxWidth = c.width * 0.9;
+    const words = text.split(' ');
+    const lines = [];
+    let line = '';
+    for (const word of words) {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
     let y;
     if (pos === 'top') y = fontSize + 20;
     else if (pos === 'bottom') y = c.height - (lines.length * lh) - 20;
     else y = (c.height - lines.length * lh) / 2 + fontSize;
-    lines.forEach((line, i) => {
-      ctx.fillText(line, c.width / 2, y + i * lh);
+    lines.forEach((l, i) => {
+      ctx.fillText(l, c.width / 2, y + i * lh);
     });
     ctx.shadowBlur = 0;
   }
@@ -2285,6 +2684,7 @@ async function postRender() {
 
 function postExportVideo() {
   if (!_postCanvas) { toast('Render first', 2000); return; }
+  const dur = parseInt(document.getElementById('postExportDur').value) || 5;
   // Capture canvas as video via MediaRecorder
   try {
     const stream = _postCanvas.captureStream(30);
@@ -2298,11 +2698,18 @@ function postExportVideo() {
       a.href = URL.createObjectURL(blob);
       a.download = 'post-' + _postAspect.w + 'x' + _postAspect.h + '.webm';
       a.click();
-      toast('Video exported', 2000);
+      toast('Video exported (' + dur + 's)', 2000);
     };
     rec.start();
-    setTimeout(() => rec.stop(), 2000); // 2s placeholder
-    toast('Rendering 2s preview...', 2000);
+    const start = Date.now();
+    const tick = () => {
+      const elapsed = ((Date.now() - start) / 1000).toFixed(1);
+      document.getElementById('postExportStatus').textContent = 'Rendering... ' + elapsed + 's / ' + dur + 's';
+      if (elapsed < dur) requestAnimationFrame(tick);
+      else { rec.stop(); document.getElementById('postExportStatus').textContent = ''; }
+    };
+    tick();
+    toast('Rendering ' + dur + 's video...', 2000);
   } catch(e) { toast('Export not supported in this browser', 3000); }
 }
 
@@ -2346,17 +2753,15 @@ async function veniceGenerateImage() {
     };
     if (style) body.style_preset = style;
 
-    const r = await fetch(VENICE_IMG_URL, {
+    const d = await _proxy({
+      url: VENICE_IMG_URL,
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + _settings.veniceKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      headers: {
+        'Authorization': 'Bearer ' + _settings.veniceKey,
+        'Content-Type': 'application/json'
+      },
+      json_body: body
     });
-    if (!r.ok) {
-      const err = await r.json().catch(() => ({}));
-      results.innerHTML = '<div class="empty text-sm" style="color:var(--red)">Error: ' + (err.message || r.status) + '</div>';
-      return;
-    }
-    const d = await r.json();
     if (d.data && d.data.images) {
       results.innerHTML = d.data.images.map(img => {
         const src = img.b64_json ? 'data:image/png;base64,' + img.b64_json : img.url;
@@ -2387,19 +2792,22 @@ async function veniceGenerateScript() {
 
   toast('Generating script...', 3000);
   try {
-    const r = await fetch(VENICE_CHAT_URL, {
+    const d = await _proxy({
+      url: VENICE_CHAT_URL,
       method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + _settings.veniceKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      headers: {
+        'Authorization': 'Bearer ' + _settings.veniceKey,
+        'Content-Type': 'application/json'
+      },
+      json_body: {
         model: 'qwen3-4b',
         messages: [
           { role: 'system', content: sysPrompt },
           { role: 'user', content: userMsg }
         ],
         max_tokens: 800
-      })
+      }
     });
-    const d = await r.json();
     if (d.choices && d.choices[0]) {
       editor.value = d.choices[0].message.content.trim();
       teleUpdate(editor.value);
@@ -2415,11 +2823,11 @@ async function veniceGenerateScript() {
 async function veniceLoadStyles() {
   if (!_settings.veniceKey) return;
   try {
-    const r = await fetch(VENICE_BASE + '/image/styles', {
+    const d = await _proxy({
+      url: VENICE_BASE + '/image/styles',
+      method: 'GET',
       headers: { 'Authorization': 'Bearer ' + _settings.veniceKey }
     });
-    if (!r.ok) return;
-    const d = await r.json();
     if (d.data) {
       _veniceStyles = d.data;
       const sel = document.getElementById('veniceStyle');
@@ -2431,56 +2839,95 @@ async function veniceLoadStyles() {
 /* ═══════════════════════════════════════════════════════════════════
    INIT
    ═══════════════════════════════════════════════════════════════════ */
-(async function init() {
-  await dbOpen();
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('show');
+}
+
+function showLoading() {
+  document.getElementById('loadingOverlay').classList.add('show');
+}
+
+function defer(fn) {
+  if (typeof requestIdleCallback !== 'undefined') {
+    requestIdleCallback(fn, { timeout: 2000 });
+  } else {
+    setTimeout(fn, 1);
+  }
+}
+
+function checkSecurity() {
+  const isHttp = location.protocol === 'http:';
+  const isLocal = ['localhost', '127.0.0.1', '::1'].includes(location.hostname);
+  document.getElementById('securityBanner').style.display = (isHttp && !isLocal) ? 'block' : 'none';
+}
+
+async function bootstrapApp() {
+  // Critical path — load settings & scripts first
   await initSettings();
   await initScripts();
+
+  checkSecurity();
+
+  // Now we can show the UI and hide the loading overlay
   loadBrandSettings();
-  recListMics();
   refreshHome();
+  hideLoading();
 
-  // Register service worker
-  if ('serviceWorker' in navigator) {
-    try {
-      await navigator.serviceWorker.register('sw.js');
-    } catch(e) {}
-  }
+  // Defer non-critical work so the browser paints the UI first
+  defer(() => {
+    recListMics();
 
-  // Timeline click seeking
-  document.getElementById('editTimeline').addEventListener('click', e => {
-    if (!_editMedia || !_editDur) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    _editMedia.currentTime = pct * _editDur;
-    updateEditTimeline();
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+
+    // Timeline click seeking
+    document.getElementById('editTimeline').addEventListener('click', e => {
+      if (!_editMedia || !_editDur) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      _editMedia.currentTime = pct * _editDur;
+      updateEditTimeline();
+    });
+
+    // Populate rec script selector
+    function updateRecScripts() {
+      const sel = document.getElementById('recScript');
+      sel.innerHTML = '<option value="">None (no teleprompter)</option>' +
+        _scripts.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+    updateRecScripts();
+
+    // Watch for script changes to update rec selector
+    const origSave = saveScripts;
+    saveScripts = function() { origSave(); updateRecScripts(); };
+
+    // Load Venice styles
+    veniceLoadStyles();
+
+    // Initial post render
+    postRender();
+
+    // Periodically check server status
+    setInterval(checkServerStatus, 5000);
+
+    // Init chat provider/model dropdowns and load saved projects
+    chatSwitchProvider();
+    chatLoadProjects();
+
+    console.log('Content App initialized');
   });
+}
 
-  // Populate rec script selector
-  function updateRecScripts() {
-    const sel = document.getElementById('recScript');
-    sel.innerHTML = '<option value="">None (no teleprompter)</option>' +
-      _scripts.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-  }
-  updateRecScripts();
-
-  // Watch for script changes to update rec selector
-  const origSave = saveScripts;
-  saveScripts = function() { origSave(); updateRecScripts(); };
-
-  // Load Venice styles
-  veniceLoadStyles();
-
-  // Initial post render
-  postRender();
-
-  // Periodically check server status
-  setInterval(checkServerStatus, 5000);
-
-  console.log('Content App initialized');
-
-  // Init chat provider/model dropdowns and load saved projects
-  chatSwitchProvider();
-  chatLoadProjects();
+(function init() {
+  showLoading();
+  dbOpen().then(() => {
+    checkAuth().then(authed => {
+      if (!authed) { hideLoading(); return; }
+      bootstrapApp();
+    });
+  });
 })();
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -2665,6 +3112,36 @@ function chatInputResize() {
   const el = document.getElementById('chatInput');
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+let _chatRec = null;
+function chatMicToggle() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { toast('Speech recognition not available', 2500); return; }
+  if (_chatRec) {
+    _chatRec.stop();
+    _chatRec = null;
+    document.getElementById('chatMicBtn').textContent = '🎤';
+    return;
+  }
+  const rec = new SpeechRecognition();
+  rec.lang = 'en-US';
+  rec.interimResults = true;
+  rec.continuous = false;
+  _chatRec = rec;
+  document.getElementById('chatMicBtn').textContent = '⏹';
+  rec.onresult = e => {
+    const text = e.results[e.results.length - 1][0].transcript;
+    document.getElementById('chatInput').value = text;
+    chatInputResize();
+    setTimeout(() => chatSendMessage(), 300);
+  };
+  rec.onerror = () => { _chatRec = null; document.getElementById('chatMicBtn').textContent = '🎤'; };
+  rec.onend = () => {
+    _chatRec = null;
+    document.getElementById('chatMicBtn').textContent = '🎤';
+  };
+  rec.start();
 }
 
 function chatInsertToScript(text) {

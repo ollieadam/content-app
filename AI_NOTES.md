@@ -582,7 +582,58 @@ self.send_header('Content-Security-Policy',
 - Launcher already uses Firefox — no change needed
 - Update AI_NOTES to reflect Firefox is the intended browser
 
-### Testing Checklist for Next Session
+---
+
+## Session Update (2026-06-21)
+
+### Changes Implemented
+
+#### 🔒 App Password Authentication
+- **server.py**: Added `_load_settings()`, `_check_auth()` methods
+  - `GET /api/status` returns `passwordSet` + `passwordHash` for client-side verification
+  - `GET /api/settings`, `POST /api/settings`, `POST /api/proxy` protected by `X-App-Key` header
+  - `do_OPTIONS` allows `X-App-Key` header via CORS
+- **index.html**: Added login overlay (`#loginOverlay`)
+  - `checkAuth()` on init: checks `/api/status` for `passwordSet`, shows login if needed
+  - `loginSubmit()`: SHA-256 hashes password, compares to stored hash from server
+  - Auth state in `sessionStorage('contentAppAuth')` — persists per browser tab
+  - Password field in Settings → Creative tab (`#settingAppPassword`)
+  - SHA-256 hashed via `crypto.subtle.digest` before saving to `settings.json`
+  - `loadSettings()`/`saveSettings()`/`_proxy()` all include `X-App-Key` header when set
+
+#### 🔒 HTTPS via Tailscale Serve
+- **launcher.py**: `_ensure_tailscale_serve()` runs `tailscale serve --bg --https=443 8080`
+- **launcher.py**: `_resolve_magicdns()` extracts `machine.tailnet.ts.net` from `tailscale status --json`
+- App URL defaults to `https://{magicdns}` if available
+- **server.py**: `get_magicdns_url()` added, returns HTTPS URL in `/api/status` as `httpsUrl`
+- **index.html**: `checkServerStatus()` prefers `d.httpsUrl` for display + QR code
+- Launcher status shows `🔒 https://...` when HTTPS is active
+
+#### 📱 QR Code on Home Tab
+- **index.html**: Inline `generateQR(text, canvas)` — ~90 lines, no dependencies
+  - Version 1 (21×21), byte mode, L-level error correction (7 EC codewords)
+  - Full Reed-Solomon encoding with pre-computed Galois field tables
+  - Renders to canvas below server status bar
+  - Regenerates on each `checkServerStatus()` tick with current URL
+
+#### 🐛 Post Canvas — Text Wrapping
+- **index.html** `postRender()`: Replaced simple `ctx.fillText()` with word-wrap logic
+  - Uses `ctx.measureText()` to break lines at `maxWidth = c.width * 0.9`
+  - Multi-word text now wraps instead of overflowing
+
+#### 🐛 Fix 2-Second Video Export
+- **index.html** `postExportVideo()`: Replaced `setTimeout(() => rec.stop(), 2000)` with:
+  - User-selectable duration input (`#postExportDur`, default 5s, range 1-60)
+  - Real-time countdown during render (`#postExportStatus`)
+  - `requestAnimationFrame`-based timing for accurate duration
+
+#### 🛡️ CSP Headers
+- **server.py**: Added `_add_csp()` method called from `_send_raw()` and `_do_static()`
+  - `default-src 'self'`, `media-src 'self' blob:`, `img-src 'self' data: blob: https:`
+  - `connect-src 'self'` + Venice/Google/Buzzsprout/Facebook/GitHub APIs
+  - `script-src 'self' 'unsafe-inline'`, `style-src 'self' 'unsafe-inline'`
+
+### Testing Checklist
 - [ ] Run `tailscale serve --bg --https=443 8080`
 - [ ] Access app from phone via `https://<machine>.<tailnet>.ts.net`
 - [ ] Test mic + camera recording from phone (Record tab)
@@ -595,3 +646,128 @@ self.send_header('Content-Security-Policy',
 - [ ] Test post video export (should not be 2 seconds anymore)
 - [ ] Verify settings.json is in .gitignore (not tracked)
 - [ ] Check CSP headers in browser dev tools
+- [ ] After init reorder fix: verify login shows when password is set, settings persist after login
+
+---
+## Session Update (2026-06-21 — Fix Init Order + Handoff)
+
+### Bug Found: Init Order Causes Settings Wipe
+
+**Root cause:** In `init()`, `initSettings()` ran BEFORE `checkAuth()`. When a password was set:
+
+1. `initSettings()` → `loadSettings()` hit `GET /api/settings` without `X-App-Key` header → server returned 401
+2. `loadSettings()` returned `{}` → `_settings` was set to empty object
+3. `checkAuth()` then showed login overlay (but `_settings` was already `{}`)
+4. After login, nothing called `initSettings()` again — `_settings` stayed `{}`
+5. If the user typed anything in Settings, `saveSettingsDebounced()` wrote `{}` to server → **permanently wiped `settings.json`**
+6. On next page load: no password hash found → no login prompt → app loads with empty settings → self-perpetuating
+
+**Fix applied** (`index.html:2716-2772`):
+- `checkAuth()` now runs BEFORE `initSettings()` in `init()`
+- Extracted post-auth init logic into `bootstrapApp()` (lines 2716-2765)
+- `loginSubmit()` calls `await bootstrapApp()` after successful auth (line 1383)
+- Login now shows before settings are loaded; settings load correctly after auth
+
+### Current State
+
+| Aspect | Status |
+|--------|--------|
+| `settings.json` | **`{}`** — already wiped by old bug |
+| Init ordering | Fixed — `checkAuth()` before `initSettings()` |
+| Post-login bootstrap | Fixed — `loginSubmit()` calls `bootstrapApp()` |
+| App Password Auth | Implemented (SHA-256, `X-App-Key`, login overlay) |
+| HTTPS/Tailscale | Implemented (`launcher.py` auto-serve, MagicDNS) |
+| QR Code | Implemented (inline, no deps) |
+| Text wrapping | Fixed (`ctx.measureText()`) |
+| Video export duration | Fixed (user-selectable 1-60s, countdown) |
+| CSP headers | Implemented (`server.py` `_add_csp()`) |
+| `.gitignore` | Still needs `settings.json` and `projects.json` added |
+
+### What User Needs to Do
+Since `settings.json` is `{}`, the server has no password hash. The app loads without a login prompt but with no API keys. **They need to:**
+1. Open Settings (gear icon) — should be immediately accessible since no password
+2. Re-enter all API keys (Venice, YouTube, Meta, Buzzsprout, GitHub)
+3. Optionally set a new password in the Creative tab
+4. Hard refresh the browser (Ctrl+Shift+R) first to ensure they have the new code
+
+### Fixes Applied (2026-06-21 — Second Session)
+- **Syntax error in `saveSettingsDebounced()`** — lone `}` prematurely closed `setTimeout` callback, leaving three function calls orphaned + dangling `}, 300)` broke entire script parse. All functions were undefined → "nothing clicks". Fixed by removing orphaned lines (called inside `doSave()` anyhow) and closing callback properly.
+- **Viewport** — removed `user-scalable=no` to allow pinch-zoom on phones
+- **Nav touch targets** — increased `.nav-btn` padding from 4px to 8px for larger tap area
+
+### TTS & STT Added
+- **🔊 Teleprompter Speak** — `teleSpeak()` button in `.tele-controls` using `window.speechSynthesis`. Rate matches current speed slider. Click again to stop.
+- **🎤 Script Dictation** — `scriptMicToggle()` button in script editor `.btn-group`. Uses `SpeechRecognition` (continuous + interim results). Inline transcription into `#scriptEditor`. Red glow when active.
+- **🎤 Chat Voice Input** — `chatMicToggle()` button in `.chat-input-area`. Single-utterance `SpeechRecognition`, auto-sends after 300ms. Red glow when active.
+
+### Phone Readiness Audit
+| Issue | Severity | Status |
+|---|---|---|
+| `getUserMedia` blocked on HTTP from phone | 🔴 Critical | Fix: launch via `launcher.py` which runs `tailscale serve --bg --https=443 8080` then open `https://{magicdns}` on phone |
+| `user-scalable=no` prevents zoom | 🟡 Medium | Fixed |
+| Buttons below 44px tap target | 🟡 Medium | `.nav-btn` padding increased. `.btn-sm`/`.btn-xs`/`.header-btn` still small — future work |
+| Teleprompter stage 340px fixed height | 🟡 Medium | Still pending — needs 375px breakpoint |
+| CSP allows `media-src 'self' blob:` | ✅ Good | Web Speech API is browser-native, not affected by CSP |
+
+---
+## Session Update (2026-06-21 — Phone Auto-fill, Load Speed, Mobile Adaptation)
+
+### Changes to `index.html`
+
+#### 1. 🔑 Password Auto-fill (login overlay)
+- **Login form** (`#loginForm`): Wrapped input + button in `<form onsubmit="event.preventDefault();loginSubmit()">`
+- Added `name="password"` and `autocomplete="current-password"` to password input for iOS/Android password managers
+- Changed Unlock button to `type="submit"` — browser auto-associates the form as a login form
+- Removed manual `onkeydown` handler (form handles Enter natively)
+- Added `autocomplete="off"` to all **settings** password fields (Venice, OpenRouter, YouTube, Meta, Buzzsprout, GitHub, App Password) to suppress "Password on HTTP" browser warnings — these are API keys, not user credentials
+
+#### 2. ⚡ Loading Performance
+- **Loading overlay** (`#loadingOverlay`): Added centered spinner with "Loading Content App…" text, shown immediately on `init()` before any async work
+- **Critical path split**: `bootstrapApp()` now:
+  1. Loads settings + scripts (`await initSettings()`, `await initScripts()`) — essential for UI
+  2. Renders UI (`loadBrandSettings()`, `refreshHome()`) and hides loading overlay
+  3. Defers all non-critical work via `defer()` — mic listing, SW registration, Venice styles, post render, server polling, chat init
+- **`defer(fn)` helper**: Uses `requestIdleCallback(fn, {timeout:2000})` if available, falls back to `setTimeout(fn, 1)` — avoids blocking the paint
+- Changed `init()` from `async` IIFE to plain IIFE with promise chaining so the loading overlay appears synchronously
+- `loginSubmit()` calls `bootstrapApp()` after successful auth — loads settings correctly post-login
+
+#### 3. 📱 Mobile Adaptation (CSS)
+- **Scrollable nav**: `.nav` now has `overflow-x: auto; -webkit-overflow-scrolling: touch` with hidden scrollbar; `.nav-btn` changed from `flex:1` to `flex:1 0 auto; min-width:48px` so 7 tabs scroll on small screens instead of cramming
+- **New `@media (max-width: 480px)` breakpoint**:
+  - Smaller header (13px title, 30px buttons)
+  - Tighter padding (8px content/tabs)
+  - Teleprompter height 260px (was 340px) with smaller text
+  - Post canvas max-height 260px
+  - Stats grid 2 columns (was 3), smaller stat cards
+  - Settings pairs collapse to single column
+  - Smaller hero section, big record button 64px
+  - Nav icons 18px, labels 9px
+  - Smaller buttons, timers, form groups
+  - Touch targets at minimum 44×44px height
+  - Rec preview max-height 200px
+  - Library add options single column
+  - Chat bubbles wider (92%) with 14px text
+- **New `@media (max-width: 360px)` breakpoint**:
+  - Even smaller: teleprompter 200px, post canvas 200px, hero button 56px
+  - Minimal padding (4px), smaller everything
+
+#### 4. 🐛 Bug Fix: `requestIdleCallback` crash
+- `defer(fn)` was passing `1` (number) as second arg to `requestIdleCallback`, which expects `Options` dictionary → `TypeError: Argument 2 can't be converted to a dictionary`
+- Fixed with: `requestIdleCallback(fn, { timeout: 2000 })` when available, `setTimeout(fn, 1)` fallback otherwise
+
+### Key Files Modified
+| File | Lines | Changes |
+|------|-------|---------|
+| `index.html` | 52-54, 402-455, 1018-1040, 2833-2910 | CSS responsive, loading overlay, login form, init/bootstrap restructure |
+| `AI_NOTES.md` | This section | Session documentation |
+
+### Current Known Warnings (expected)
+- **"Password fields on insecure HTTP"** — appears when accessing via `http://` (Tailscale IP). Goes away when using HTTPS (`https://<machine>.<tailnet>.ts.net`). Settings API key fields have `autocomplete="off"` to minimize warnings.
+
+### Unfinished Items from Plan
+- [ ] `.gitignore` — add `settings.json`, `projects.json`, `*.pem`, `*.cert`
+- [ ] Fix `content-app-launcher.sh` stale path (still points to old directory)
+- [ ] Verify `getUserMedia` works from phone via Tailscale HTTPS
+- [ ] Increase `.btn-sm`/`.btn-xs`/`.header-btn` tap targets to 44px
+- [ ] Add 375px breakpoint for teleprompter stage height
+- [ ] Testing checklist above
