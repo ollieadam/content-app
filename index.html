@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <title>Content App</title>
 <style>
 /* ── Reset ── */
@@ -55,8 +56,8 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:-apple-system,system-ui,'Segoe
 .nav-btn:active{opacity:.6}
 
 /* ── Common Components ── */
-.section{margin-bottom:16px}
-.section-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.section{margin-bottom:20px}
+.section-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-bottom:12px}
 .card{border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);overflow:hidden}
 .card-pad{padding:12px 14px}
 .row{display:flex;align-items:center;gap:10px}
@@ -139,9 +140,14 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .rec-meta{font-size:11px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
 .rec-action{flex-shrink:0}
 .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.stat-card{border-radius:var(--radius-sm);background:var(--bg3);border:1px solid var(--border);padding:10px;text-align:center}
-.stat-num{font-size:20px;font-weight:700}
-.stat-label{font-size:10px;color:var(--muted);margin-top:2px}
+.stat-card{border-radius:var(--radius-sm);background:var(--bg3);border:1px solid var(--border);padding:14px 10px;text-align:center}
+.stat-num{font-size:22px;font-weight:700}
+.stat-label{font-size:11px;color:var(--muted);margin-top:3px}
+.api-status-list{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.api-status-row{display:flex;align-items:center;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border)}
+.api-status-row:last-child{border-bottom:none}
+.api-status-label{flex:1;font-size:13px;color:var(--text)}
+.api-status-row .stat-num{font-size:16px}
 
 /* ── Scripts (Teleprompter) ── */
 .script-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch}
@@ -159,6 +165,11 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .tele-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:6px}
 .tele-progress-fill{height:100%;background:var(--red);width:0%;border-radius:2px;transition:width .1s}
 .script-editor textarea{min-height:120px;font-size:14px}
+.scripts-layout{display:block}
+.scripts-left{display:flex;flex-direction:column;gap:0}
+.tele-stats{display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-bottom:8px}
+.post-layout{display:block}
+.post-left,.post-right{display:block}
 
 /* ── Record ── */
 .rec-mode-tabs{display:flex;gap:4px;margin-bottom:12px;background:var(--bg2);border-radius:var(--radius-sm);padding:3px;border:1px solid var(--border)}
@@ -191,10 +202,11 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .edit-clip-range{font-size:10px;color:var(--muted);font-family:'Courier New',monospace}
 
 /* ── Post ── */
-.post-aspects{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.post-aspect{aspect-ratio:var(--ar);border:2px solid var(--border);border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--muted);cursor:pointer;transition:all .12s;background:var(--bg2);padding:8px;min-height:60px}
+.post-aspects{display:flex;flex-direction:column;gap:6px}
+.post-aspect{border:2px solid var(--border);border-radius:var(--radius-sm);display:flex;flex-direction:row;align-items:center;gap:10px;font-size:11px;color:var(--muted);cursor:pointer;transition:all .12s;background:var(--bg2);padding:8px 10px;height:48px}
 .post-aspect.active{border-color:var(--red);color:var(--red);background:var(--red-bg)}
-.post-aspect .label{font-weight:600;font-size:12px}
+.post-aspect .label{font-weight:600;font-size:12px;min-width:28px}
+.post-aspect .ar-shape{border:1.5px solid currentColor;border-radius:2px;flex-shrink:0;height:28px;width:auto;aspect-ratio:var(--ar)}
 .post-canvas-wrap{background:#000;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
 .post-canvas-wrap canvas{display:block;max-width:100%;max-height:340px}
 .post-overlay-input{margin-bottom:6px}
@@ -252,6 +264,30 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .toast.show{display:block}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
+/* ── Chat Tab ── */
+.content.chat-open{overflow:hidden;padding:0}
+#tabChat.active{display:flex;flex-direction:column;padding:0;height:100%;min-height:0}
+.chat-top-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg)}
+.chat-top-bar select{flex:1;font-size:13px;padding:6px 10px}
+.chat-messages{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.chat-messages::-webkit-scrollbar{width:3px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.chat-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:8px;padding:40px 20px;color:var(--muted);text-align:center}
+.chat-empty-state .chat-empty-icon{font-size:40px;opacity:.5}
+.chat-bubble{max-width:88%;padding:10px 14px;border-radius:14px;font-size:15px;line-height:1.6;word-break:break-word;white-space:pre-wrap}
+.chat-bubble-user{align-self:flex-end;background:var(--red);color:#fff;border-bottom-right-radius:4px}
+.chat-ai-wrap{align-self:flex-start;display:flex;flex-direction:column;gap:5px;max-width:88%}
+.chat-bubble-ai{background:var(--bg3);border:1px solid var(--border);border-bottom-left-radius:4px}
+.chat-cursor{display:inline-block;width:2px;height:1em;background:var(--text);animation:blink .7s step-end infinite;vertical-align:text-bottom;margin-left:1px}
+.chat-actions{display:none;gap:6px}
+.chat-input-area{padding:8px 12px 10px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end;background:var(--bg);flex-shrink:0}
+.chat-input-area textarea{resize:none;min-height:44px;max-height:140px;flex:1;overflow-y:auto;padding:10px 12px;font-size:16px}
+.chat-projects{border-top:1px solid var(--border);flex-shrink:0;max-height:200px;overflow-y:auto;background:var(--bg2)}
+.chat-proj-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px}
+.chat-proj-name{flex:1;font-weight:500;truncate:hidden;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-proj-meta{font-size:11px;color:var(--muted);flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
 /* ── Silence Detection ── */
 .silence-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .silence-label{font-size:11px;color:var(--muted)}
@@ -260,6 +296,39 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .seg-item .idx{color:var(--dim);font-weight:600;min-width:20px}
 .seg-item .dur{color:var(--muted);font-family:'Courier New',monospace;font-size:11px}
 .seg-item .act{display:flex;gap:4px;margin-left:auto}
+
+/* ── Library Tab ── */
+.lib-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.lib-filters{display:flex;gap:6px;overflow-x:auto;flex:1;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.lib-filters::-webkit-scrollbar{display:none}
+.lib-chip{flex-shrink:0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;background:var(--bg3);border:1px solid var(--border);color:var(--muted);cursor:pointer}
+.lib-chip.active{background:var(--red);border-color:var(--red);color:#fff}
+.lib-sort{font-size:12px;padding:5px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);flex-shrink:0;width:auto}
+.lib-list{display:flex;flex-direction:column;gap:8px}
+.lib-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.lib-row-main{display:flex;align-items:center;gap:10px}
+.lib-row-icon{font-size:22px;flex-shrink:0;width:28px;text-align:center}
+.lib-row-info{flex:1;min-width:0}
+.lib-row-title{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lib-row-meta{font-size:11px;color:var(--muted);display:flex;gap:6px;margin-top:2px;flex-wrap:wrap}
+.lib-type-badge{display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;text-transform:uppercase;background:var(--bg3);color:var(--dim)}
+.lib-row-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.lib-ai-row{display:flex;align-items:center;gap:6px}
+.lib-ai-chip{font-size:11px;color:var(--muted);background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:2px 8px}
+.lib-confirm-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;display:none;flex-direction:column;gap:8px}
+.lib-confirm-bar.show{display:flex}
+.lib-confirm-bar-title{font-size:13px;font-weight:600}
+.lib-confirm-bar-reason{font-size:12px;color:var(--muted)}
+.lib-confirm-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.lib-add-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:200}
+.lib-add-overlay.show{display:flex}
+.lib-add-box{background:var(--bg2);border-radius:var(--radius) var(--radius) 0 0;width:100%;padding:20px 16px 32px;display:flex;flex-direction:column;gap:16px;max-width:960px;margin:0 auto}
+.lib-add-title{font-size:15px;font-weight:600;text-align:center;margin-bottom:4px}
+.lib-add-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lib-add-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:13px;color:var(--text);text-align:center}
+.lib-add-icon{font-size:32px}
+.lib-url-row{display:flex;gap:8px}
+.lib-url-row input{flex:1}
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar{width:3px;height:3px}
@@ -280,20 +349,20 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 
 /* ── Responsive: Wide (>700px) ── */
 @media (min-width: 700px) {
-  .content{max-width:1600px;margin:0 auto;padding:16px 28px 8px}
-  .header{padding:0 28px}
+  .content{max-width:960px;margin:0 auto;padding:16px 28px 8px}
+  .header{max-width:960px;margin:0 auto;padding:0 28px}
   .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
   .home-left .hero-rec{padding:32px 16px}
   .home-left .hero-rec .big-btn{width:96px;height:96px;font-size:40px}
   .stat-grid{grid-template-columns:repeat(4,1fr)}
-  .post-aspects{grid-template-columns:repeat(4,1fr)}
+  .post-aspects{flex-direction:row;flex-wrap:wrap}.post-aspects .post-aspect{flex:1;min-width:120px}
   .gen-grid{grid-template-columns:repeat(4,1fr)}
 }
 
 /* ── Responsive: Desktop (>1024px) ── */
 @media (min-width: 1024px) {
-  .content{padding:20px 40px 8px}
-  .header{padding:0 40px}
+  .content{padding:20px 28px 8px}
+  .header{padding:0 28px}
   .header h1{font-size:18px}
   .nav{height:calc(var(--nav-h) + 4px)}
   .nav-btn{padding:6px 0;gap:3px}
@@ -315,6 +384,11 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
   .edit-load-zone{padding:48px 24px}
   .section{margin-bottom:20px}
   .script-editor textarea{min-height:150px}
+  .scripts-layout{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+  #tabScripts .tele-stage{height:420px}
+  .post-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  #tabRecord{max-width:640px}
+  #tabEdit{max-width:860px}
   .btn{padding:10px 20px;font-size:14px}
   .btn-sm{padding:7px 14px;font-size:13px}
   .rec-btn{width:56px;height:56px}
@@ -387,12 +461,13 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
           <!-- API Config Status -->
           <div class="section">
             <div class="section-title">API Configuration</div>
-            <div class="stat-grid" id="apiStatusGrid">
-              <div class="stat-card" id="apiVeniceCard"><div class="stat-num" id="apiVeniceStatus">❌</div><div class="stat-label">Venice AI</div></div>
-              <div class="stat-card" id="apiYTCard"><div class="stat-num" id="apiYTStatus">❌</div><div class="stat-label">YouTube</div></div>
-              <div class="stat-card" id="apiMetaCard"><div class="stat-num" id="apiMetaStatus">❌</div><div class="stat-label">Meta</div></div>
-              <div class="stat-card" id="apiBSCard"><div class="stat-num" id="apiBSStatus">❌</div><div class="stat-label">Buzzsprout</div></div>
-              <div class="stat-card" id="apiBlogCard"><div class="stat-num" id="apiBlogStatus">❌</div><div class="stat-label">Blog</div></div>
+            <div class="api-status-list" id="apiStatusGrid">
+              <div class="api-status-row"><span class="api-status-label">Venice AI</span><span class="stat-num" id="apiVeniceStatus">❌</span></div>
+              <div class="api-status-row"><span class="api-status-label">OpenRouter</span><span class="stat-num" id="apiORStatus">❌</span></div>
+              <div class="api-status-row"><span class="api-status-label">YouTube</span><span class="stat-num" id="apiYTStatus">❌</span></div>
+              <div class="api-status-row"><span class="api-status-label">Meta</span><span class="stat-num" id="apiMetaStatus">❌</span></div>
+              <div class="api-status-row"><span class="api-status-label">Buzzsprout</span><span class="stat-num" id="apiBSStatus">❌</span></div>
+              <div class="api-status-row"><span class="api-status-label">Blog</span><span class="stat-num" id="apiBlogStatus">❌</span></div>
             </div>
             <button class="btn btn-sm btn-ghost mt-8" onclick="showSettings()" style="width:100%">⚙ Configure in Settings</button>
           </div>
@@ -403,40 +478,44 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
     <!-- ═══════ SCRIPTS ═══════ -->
     <section class="tab-panel" id="tabScripts">
       <div class="script-tabs" id="scriptTabs"></div>
-      <div class="tele-stage" id="teleStage">
-        <div class="tele-fade-top"></div>
-        <div class="tele-marker"></div>
-        <div class="tele-text" id="teleText"></div>
-        <div class="tele-fade-bot"></div>
-      </div>
-      <div class="tele-progress"><div class="tele-progress-fill" id="teleProgress"></div></div>
-      <div class="tele-controls">
-        <button class="btn btn-sm btn-primary" id="telePlayBtn" onclick="teleTogglePlay()">▶</button>
-        <button class="btn btn-sm" onclick="teleReset()">↺</button>
-        <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)">Speed
-          <input type="range" min="1" max="10" value="3" step="1" id="teleSpeed" oninput="teleSetSpeed(this.value)" style="width:60px">
-          <span id="teleSpeedVal" class="mono" style="font-size:11px;color:var(--text)">3</span>
-        </div>
-        <button class="btn btn-sm btn-ghost" onclick="teleToggleMirror()" title="Mirror">⇄</button>
-        <button class="btn btn-sm btn-ghost" onclick="teleToggleFullscreen()" title="Fullscreen">⛶</button>
-        <button class="btn btn-sm btn-ghost" onclick="teleFontSize(-2)">A−</button>
-        <button class="btn btn-sm btn-ghost" onclick="teleFontSize(2)">A+</button>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-bottom:8px">
-        <span><span id="teleWords">0</span> words</span>
-        <span>≈ <span id="teleReadTime">0:00</span> read</span>
-        <span id="teleRemainWrap" style="display:none"><span id="teleRemain">0:00</span> left</span>
-      </div>
-      <div class="card script-editor">
-        <div class="card-pad">
-          <div class="row mb-8" style="gap:6px">
-            <input id="scriptName" type="text" placeholder="Script name" style="flex:1;font-size:13px;padding:6px 10px" oninput="teleRename(this.value)">
-            <button class="btn btn-sm btn-ghost" onclick="teleAdd()" title="New script">+</button>
+      <div class="scripts-layout">
+        <div class="scripts-left">
+          <div class="tele-stage" id="teleStage">
+            <div class="tele-fade-top"></div>
+            <div class="tele-marker"></div>
+            <div class="tele-text" id="teleText"></div>
+            <div class="tele-fade-bot"></div>
           </div>
-          <textarea id="scriptEditor" placeholder="Type or paste your script..." oninput="teleUpdate(this.value)" style="min-height:100px"></textarea>
-          <div class="btn-group mt-8">
-            <button class="btn btn-sm btn-outline" onclick="veniceGenerateScript()" title="Generate with Venice AI">✨ AI Script</button>
-            <button class="btn btn-sm btn-danger" onclick="teleDelete()">✕ Delete</button>
+          <div class="tele-progress"><div class="tele-progress-fill" id="teleProgress"></div></div>
+          <div class="tele-controls">
+            <button class="btn btn-sm btn-primary" id="telePlayBtn" onclick="teleTogglePlay()">▶</button>
+            <button class="btn btn-sm" onclick="teleReset()">↺</button>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)">Speed
+              <input type="range" min="1" max="10" value="3" step="1" id="teleSpeed" oninput="teleSetSpeed(this.value)" style="width:60px">
+              <span id="teleSpeedVal" class="mono" style="font-size:11px;color:var(--text)">3</span>
+            </div>
+            <button class="btn btn-sm btn-ghost" onclick="teleToggleMirror()" title="Mirror">⇄</button>
+            <button class="btn btn-sm btn-ghost" onclick="teleToggleFullscreen()" title="Fullscreen">⛶</button>
+            <button class="btn btn-sm btn-ghost" onclick="teleFontSize(-2)">A−</button>
+            <button class="btn btn-sm btn-ghost" onclick="teleFontSize(2)">A+</button>
+          </div>
+          <div class="tele-stats">
+            <span><span id="teleWords">0</span> words</span>
+            <span>≈ <span id="teleReadTime">0:00</span> read</span>
+            <span id="teleRemainWrap" style="display:none"><span id="teleRemain">0:00</span> left</span>
+          </div>
+        </div>
+        <div class="card script-editor">
+          <div class="card-pad">
+            <div class="row mb-8" style="gap:6px">
+              <input id="scriptName" type="text" placeholder="Script name" style="flex:1;font-size:13px;padding:6px 10px" oninput="teleRename(this.value)">
+              <button class="btn btn-sm btn-ghost" onclick="teleAdd()" title="New script">+</button>
+            </div>
+            <textarea id="scriptEditor" placeholder="Type or paste your script..." oninput="teleUpdate(this.value)" style="min-height:100px"></textarea>
+            <div class="btn-group mt-8">
+              <button class="btn btn-sm btn-outline" onclick="veniceGenerateScript()" title="Generate with Venice AI">✨ AI Script</button>
+              <button class="btn btn-sm btn-danger" onclick="teleDelete()">✕ Delete</button>
+            </div>
           </div>
         </div>
       </div>
@@ -551,79 +630,152 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 
     <!-- ═══════ POST ═══════ -->
     <section class="tab-panel" id="tabPost">
-      <div class="section">
-        <div class="section-title">Aspect Ratio</div>
-        <div class="post-aspects">
-          <div class="post-aspect active" style="--ar:9/16" data-ar="9/16" onclick="postSetAspect(this)"><span class="label">9:16</span><span>Reels / Story</span></div>
-          <div class="post-aspect" style="--ar:1/1" data-ar="1/1" onclick="postSetAspect(this)"><span class="label">1:1</span><span>Feed</span></div>
-          <div class="post-aspect" style="--ar:4/5" data-ar="4/5" onclick="postSetAspect(this)"><span class="label">4:5</span><span>Portrait</span></div>
-          <div class="post-aspect" style="--ar:16/9" data-ar="16/9" onclick="postSetAspect(this)"><span class="label">16:9</span><span>YouTube / FB</span></div>
-        </div>
-      </div>
-      <div class="section">
-        <div class="section-title">Source Media</div>
-        <div class="row gap-8">
-          <select id="postSource" style="flex:1"><option value="">Select a saved recording</option></select>
-          <button class="btn btn-sm" onclick="document.getElementById('postFileInput').click()">Browse</button>
-          <input type="file" id="postFileInput" accept="video/*,audio/*" style="display:none" onchange="postLoadFile(this.files[0])">
-        </div>
-      </div>
-      <div class="section">
-        <div class="section-title">Text Overlay</div>
-        <div class="post-overlay-input">
-          <input id="postOverlayText" type="text" placeholder="Overlay text (title, caption...)" oninput="postRender()">
-        </div>
-        <div class="row gap-8 mb-8">
-          <div style="flex:1"><label>Font size</label><input type="range" min="12" max="64" value="28" id="postFontSize" oninput="postRender()"></div>
-          <div style="flex:1"><label>Position</label><select id="postTextPos" onchange="postRender()"><option value="bottom">Bottom</option><option value="top">Top</option><option value="center">Center</option></select></div>
-        </div>
-        <div class="post-canvas-wrap" id="postCanvasWrap">
-          <canvas id="postCanvas"></canvas>
-        </div>
-        <div class="btn-group mt-8">
-          <button class="btn btn-sm" onclick="postRender()">↻ Render</button>
-          <button class="btn btn-sm btn-primary" onclick="postExportVideo()">↓ Export Video</button>
-          <button class="btn btn-sm btn-outline" onclick="postExportFrame()">📷 Export Frame</button>
-        </div>
-      </div>
-      <div class="section">
-        <div class="section-title">Venice AI Graphics</div>
-        <div class="row gap-8 mb-8">
-          <input id="venicePrompt" type="text" placeholder="Describe the image to generate..." style="flex:1">
-          <button class="btn btn-sm btn-primary" onclick="veniceGenerateImage()">✨ Generate</button>
-        </div>
-        <div class="row gap-8 mb-8">
-          <select id="veniceStyle" style="flex:1;font-size:12px"></select>
-          <select id="veniceAspect" style="width:auto;font-size:12px">
-            <option value="1:1">1:1</option>
-            <option value="9:16" selected>9:16</option>
-            <option value="16:9">16:9</option>
-            <option value="4:5">4:5</option>
-          </select>
-        </div>
-        <div id="veniceResults" class="gen-grid"></div>
-      </div>
-
-      <!-- ── Publish ── -->
-      <div class="section">
-        <div class="section-title">Publish</div>
-        <div class="live-bar" id="liveBar">
-          <div>
-            <div style="font-size:13px;font-weight:600;color:var(--text)">⚡ Live Posting</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px">OFF by default — flip ON to post to real accounts</div>
+      <div class="post-layout">
+        <!-- Left: aspect + canvas + export -->
+        <div class="post-left">
+          <div class="section">
+            <div class="section-title">Aspect Ratio</div>
+            <div class="post-aspects">
+              <div class="post-aspect active" style="--ar:9/16" data-ar="9/16" onclick="postSetAspect(this)"><div class="ar-shape"></div><span class="label">9:16</span><span>Reels / Story</span></div>
+              <div class="post-aspect" style="--ar:1/1" data-ar="1/1" onclick="postSetAspect(this)"><div class="ar-shape"></div><span class="label">1:1</span><span>Feed</span></div>
+              <div class="post-aspect" style="--ar:4/5" data-ar="4/5" onclick="postSetAspect(this)"><div class="ar-shape"></div><span class="label">4:5</span><span>Portrait</span></div>
+              <div class="post-aspect" style="--ar:16/9" data-ar="16/9" onclick="postSetAspect(this)"><div class="ar-shape"></div><span class="label">16:9</span><span>YouTube / FB</span></div>
+            </div>
           </div>
-          <button class="live-toggle" id="liveToggle" onclick="toggleLivePosting()" aria-label="Toggle live posting"></button>
+          <div class="section">
+            <div class="post-canvas-wrap" id="postCanvasWrap">
+              <canvas id="postCanvas"></canvas>
+            </div>
+            <div class="btn-group mt-8">
+              <button class="btn btn-sm" onclick="postRender()">↻ Render</button>
+              <button class="btn btn-sm btn-primary" onclick="postExportVideo()">↓ Export Video</button>
+              <button class="btn btn-sm btn-outline" onclick="postExportFrame()">📷 Export Frame</button>
+            </div>
+          </div>
         </div>
-        <div class="form-group mt-8">
-          <label>Caption / Post Text</label>
-          <textarea id="postCaption" placeholder="Write your caption..." style="min-height:80px"></textarea>
+        <!-- Right: source + overlay + AI + publish -->
+        <div class="post-right">
+          <div class="section">
+            <div class="section-title">Source Media</div>
+            <div class="row gap-8">
+              <select id="postSource" style="flex:1"><option value="">Select a saved recording</option></select>
+              <button class="btn btn-sm" onclick="document.getElementById('postFileInput').click()">Browse</button>
+              <input type="file" id="postFileInput" accept="video/*,audio/*" style="display:none" onchange="postLoadFile(this.files[0])">
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-title">Text Overlay</div>
+            <div class="post-overlay-input">
+              <input id="postOverlayText" type="text" placeholder="Overlay text (title, caption...)" oninput="postRender()">
+            </div>
+            <div class="row gap-8 mb-8">
+              <div style="flex:1"><label>Font size</label><input type="range" min="12" max="64" value="28" id="postFontSize" oninput="postRender()"></div>
+              <div style="flex:1"><label>Position</label><select id="postTextPos" onchange="postRender()"><option value="bottom">Bottom</option><option value="top">Top</option><option value="center">Center</option></select></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-title">Venice AI Graphics</div>
+            <div class="row gap-8 mb-8">
+              <input id="venicePrompt" type="text" placeholder="Describe the image to generate..." style="flex:1">
+              <button class="btn btn-sm btn-primary" onclick="veniceGenerateImage()">✨ Generate</button>
+            </div>
+            <div class="row gap-8 mb-8">
+              <select id="veniceStyle" style="flex:1;font-size:12px"></select>
+              <select id="veniceAspect" style="width:auto;font-size:12px">
+                <option value="1:1">1:1</option>
+                <option value="9:16" selected>9:16</option>
+                <option value="16:9">16:9</option>
+                <option value="4:5">4:5</option>
+              </select>
+            </div>
+            <div id="veniceResults" class="gen-grid"></div>
+          </div>
+          <!-- ── Publish ── -->
+          <div class="section">
+            <div class="section-title">Publish</div>
+            <div class="live-bar" id="liveBar">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text)">⚡ Live Posting</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px">OFF by default — flip ON to post to real accounts</div>
+              </div>
+              <button class="live-toggle" id="liveToggle" onclick="toggleLivePosting()" aria-label="Toggle live posting"></button>
+            </div>
+            <div class="form-group mt-8">
+              <label>Caption / Post Text</label>
+              <textarea id="postCaption" placeholder="Write your caption..." style="min-height:80px"></textarea>
+            </div>
+            <div class="section-title" style="margin-top:12px">Post to</div>
+            <div class="card card-pad" id="publishTargets" style="padding:8px 16px;min-height:48px"></div>
+            <button class="btn btn-block mt-8" id="publishBtn" onclick="publishToAll()" disabled style="opacity:.4">
+              🚫 Live Posting is OFF
+            </button>
+          </div>
         </div>
-        <div class="section-title" style="margin-top:12px">Post to</div>
-        <div class="card card-pad" id="publishTargets" style="padding:8px 16px;min-height:48px"></div>
-        <button class="btn btn-block mt-8" id="publishBtn" onclick="publishToAll()" disabled style="opacity:.4">
-          🚫 Live Posting is OFF
-        </button>
       </div>
+    </section>
+
+    <!-- ═══════ CHAT ═══════ -->
+    <section class="tab-panel" id="tabChat">
+      <div class="chat-top-bar">
+        <select id="chatProviderSelect" onchange="chatSwitchProvider()">
+          <option value="openrouter">OpenRouter</option>
+          <option value="venice">Venice AI</option>
+        </select>
+        <select id="chatModelSelect" onchange="chatSaveModel()"></select>
+        <button class="btn btn-sm btn-ghost btn-icon" onclick="chatSaveProject()" title="Save project">💾</button>
+        <button class="btn btn-sm btn-ghost btn-icon" onclick="chatClear()" title="Clear chat">✕</button>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-empty-state" id="chatEmptyState">
+          <span class="chat-empty-icon">💬</span>
+          <span class="text-sm">Ask anything — scripts, show notes, hooks, captions</span>
+        </div>
+      </div>
+      <div class="chat-projects" id="chatProjects" style="display:none">
+        <div class="section-title" style="padding:8px 12px 4px">Saved Projects</div>
+        <div id="chatProjectsList"></div>
+      </div>
+      <div class="chat-input-area">
+        <textarea id="chatInput" placeholder="Message..." rows="1"
+          onkeydown="chatKeyDown(event)" oninput="chatInputResize()"
+          autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true"></textarea>
+        <button class="btn btn-primary" id="chatSendBtn" onclick="chatSendMessage()">Send</button>
+      </div>
+    </section>
+
+    <!-- ═══════ LIBRARY ═══════ -->
+    <section class="tab-panel" id="tabLibrary">
+      <div class="lib-confirm-bar" id="libConfirmBar">
+        <div>
+          <div class="lib-confirm-bar-title" id="libConfirmTitle">🤖 Sending to Chat</div>
+          <div class="lib-confirm-bar-reason" id="libConfirmReason"></div>
+        </div>
+        <div class="lib-confirm-actions">
+          <button class="btn btn-sm btn-primary" onclick="libraryChatGo()">Confirm →</button>
+          <select class="lib-sort" id="libConfirmModelSel" style="font-size:12px;width:auto"></select>
+          <button class="btn btn-sm btn-ghost" onclick="libraryCancelSend()">Cancel</button>
+        </div>
+      </div>
+      <div class="lib-toolbar">
+        <div class="lib-filters">
+          <button class="lib-chip active" onclick="librarySetFilter('all',this)">All</button>
+          <button class="lib-chip" onclick="librarySetFilter('audio',this)">🎙 Audio</button>
+          <button class="lib-chip" onclick="librarySetFilter('video',this)">🎬 Video</button>
+          <button class="lib-chip" onclick="librarySetFilter('image',this)">🖼 Image</button>
+          <button class="lib-chip" onclick="librarySetFilter('doc',this)">📄 Doc</button>
+          <button class="lib-chip" onclick="librarySetFilter('link',this)">🔗 Link</button>
+        </div>
+        <select class="lib-sort" id="libSort" onchange="libraryRender()">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="name">A–Z</option>
+        </select>
+        <button class="btn btn-sm btn-primary" onclick="libraryShowAdd()">+ Add</button>
+      </div>
+      <div class="lib-list" id="libList">
+        <div class="empty"><span class="icon">📚</span><span class="text">No items yet — add files or links</span></div>
+      </div>
+      <input type="file" id="libFileInput" accept="audio/*,video/*,image/*,.pdf,.txt,.doc,.docx" style="display:none" onchange="libraryHandleFile(this.files[0])">
     </section>
 
   </main>
@@ -635,7 +787,34 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
     <button class="nav-btn" data-tab="2" onclick="switchTab(2)"><span class="nav-icon">🎙</span>Record</button>
     <button class="nav-btn" data-tab="3" onclick="switchTab(3)"><span class="nav-icon">✂️</span>Edit</button>
     <button class="nav-btn" data-tab="4" onclick="switchTab(4)"><span class="nav-icon">📱</span>Post</button>
+    <button class="nav-btn" data-tab="5" onclick="switchTab(5)"><span class="nav-icon">💬</span>Chat</button>
+    <button class="nav-btn" data-tab="6" onclick="switchTab(6)"><span class="nav-icon">📚</span>Library</button>
   </nav>
+</div>
+
+<!-- ═══════ LIBRARY ADD OVERLAY ═══════ -->
+<div class="lib-add-overlay" id="libAddOverlay" onclick="libraryOverlayClick(event)">
+  <div class="lib-add-box">
+    <div class="lib-add-title">Add to Library</div>
+    <div class="lib-add-options">
+      <button class="lib-add-btn" onclick="libraryPickFile()">
+        <span class="lib-add-icon">📁</span>
+        <span>Upload file</span>
+        <span style="font-size:10px;color:var(--muted)">audio · video · image · doc</span>
+      </button>
+      <button class="lib-add-btn" onclick="libraryShowUrlInput()">
+        <span class="lib-add-icon">🔗</span>
+        <span>Paste URL</span>
+        <span style="font-size:10px;color:var(--muted)">YouTube · Facebook · website</span>
+      </button>
+    </div>
+    <div id="libUrlInputRow" style="display:none">
+      <div class="lib-url-row">
+        <input type="url" id="libUrlField" placeholder="https://..." style="font-size:14px" onkeydown="if(event.key==='Enter')libraryAddLink()">
+        <button class="btn btn-sm btn-primary" onclick="libraryAddLink()">Add</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════ SETTINGS MODAL ═══════ -->
@@ -659,6 +838,13 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
           <label>API Key</label>
           <input id="settingVeniceKey" type="password" placeholder="sk-..." oninput="saveSettingsDebounced()">
           <div class="api-status" id="veniceStatus"></div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-title">OpenRouter — multi-model AI chat</div>
+        <div class="api-field">
+          <label>API Key</label>
+          <input id="settingOpenrouterKey" type="password" placeholder="sk-or-..." oninput="saveSettingsDebounced()">
         </div>
       </div>
     </div>
@@ -776,19 +962,38 @@ const VENICE_MODELS_URL = VENICE_BASE + '/image/styles';
 const VENICE_IMG_URL = VENICE_BASE + '/image/generate';
 const VENICE_CHAT_URL = VENICE_BASE + '/chat/completions';
 
+const OR_MODELS = [
+  { id:'google/gemini-2.0-flash-exp:free',       label:'Gemini 2.0 Flash (free)' },
+  { id:'meta-llama/llama-3.3-70b-instruct:free', label:'Llama 3.3 70B (free)' },
+  { id:'deepseek/deepseek-r1:free',              label:'DeepSeek R1 (free)' },
+  { id:'qwen/qwen3-235b-a22b:free',              label:'Qwen3 235B (free)' },
+  { id:'mistralai/mistral-7b-instruct:free',     label:'Mistral 7B (free)' },
+];
+const VENICE_CHAT_MODELS = [
+  { id:'qwen3-4b',       label:'Qwen3 4B' },
+  { id:'llama-3.3-70b',  label:'Llama 3.3 70B' },
+  { id:'mistral-31-24b', label:'Mistral 24B' },
+];
+
+let _chatHistory = [];
+let _chatBusy    = false;
+let _libFilter   = 'all';
+let _libPending  = null;
+
 /* ═══════════════════════════════════════════════════════════════════
    INDEXED DB
    ═══════════════════════════════════════════════════════════════════ */
 let DB = null;
 function dbOpen() {
   return new Promise((resolve, reject) => {
-    const r = indexedDB.open('ContentApp', 1);
+    const r = indexedDB.open('ContentApp', 2);
     r.onupgradeneeded = e => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('recordings')) db.createObjectStore('recordings', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings');
       if (!db.objectStoreNames.contains('scripts')) db.createObjectStore('scripts', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('clips')) db.createObjectStore('clips', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('library')) db.createObjectStore('library', { keyPath: 'id' });
     };
     r.onsuccess = e => { DB = e.target.result; resolve(); };
     r.onerror = e => reject(e.target.error);
@@ -855,6 +1060,7 @@ async function initSettings() {
   _settings = await loadSettings();
   // Venice
   document.getElementById('settingVeniceKey').value = _settings.veniceKey || '';
+  document.getElementById('settingOpenrouterKey').value = _settings.openrouterKey || '';
   // YouTube
   document.getElementById('settingYTKey').value = _settings.ytKey || '';
   document.getElementById('settingYT1Label').value = _settings.yt1Label || '';
@@ -890,6 +1096,7 @@ function saveSettingsDebounced() {
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => {
     _settings.veniceKey = document.getElementById('settingVeniceKey').value.trim();
+    _settings.openrouterKey = document.getElementById('settingOpenrouterKey').value.trim();
     _settings.ytKey = document.getElementById('settingYTKey').value.trim();
     _settings.yt1Label = document.getElementById('settingYT1Label').value.trim();
     _settings.ytChannel = document.getElementById('settingYTChannel').value.trim();
@@ -992,9 +1199,11 @@ function switchTab(idx) {
   currentTab = idx;
   document.querySelectorAll('.tab-panel').forEach((el, i) => el.classList.toggle('active', i === idx));
   document.querySelectorAll('.nav-btn').forEach((el, i) => el.classList.toggle('active', i === idx));
+  document.getElementById('content').classList.toggle('chat-open', idx === 5);
   if (idx === 0) refreshHome();
   if (idx === 4) updatePublishTargets();
-  document.getElementById('content').scrollTop = 0;
+  if (idx === 6) libraryRender();
+  if (idx !== 5) document.getElementById('content').scrollTop = 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1024,7 +1233,10 @@ async function refreshHome() {
           <div class="rec-title truncate">${r.title}</div>
           <div class="rec-meta"><span>${fmtTimeShort(r.date)}</span><span>${r.dur ? fmtTime(r.dur) : ''}</span><span class="tag">${(BRANDS.find(b=>b.id===r.brand)||{}).emoji||''} ${r.brand||''}</span></div>
         </div>
-        <button class="btn btn-xs btn-ghost rec-action" onclick="loadRecordingToEdit('${r.id}')">✂️</button>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-xs btn-ghost rec-action" onclick="loadRecordingToEdit('${r.id}')">✂️</button>
+          <button class="btn btn-xs btn-ghost rec-action" onclick="libraryAddFromRecording('${r.id}')" title="Save to Library">📚</button>
+        </div>
       </div>
     `).join('');
   }
@@ -1065,6 +1277,7 @@ function updateApiStatus() {
   document.getElementById('apiMetaStatus').textContent = _settings.metaToken ? '✅' : '❌';
   document.getElementById('apiBSStatus').textContent = (_settings.bsKey && _settings.bsPodcast) ? '✅' : '❌';
   document.getElementById('apiBlogStatus').textContent = (_settings.githubToken && _settings.githubRepo) ? '✅' : '❌';
+  document.getElementById('apiORStatus').textContent = _settings.openrouterKey ? '✅' : '❌';
 }
 
 function fmtTime(s) {
@@ -2264,7 +2477,569 @@ async function veniceLoadStyles() {
   setInterval(checkServerStatus, 5000);
 
   console.log('Content App initialized');
+
+  // Init chat provider/model dropdowns and load saved projects
+  chatSwitchProvider();
+  chatLoadProjects();
 })();
+
+/* ═══════════════════════════════════════════════════════════════════
+   AI CHAT
+   ═══════════════════════════════════════════════════════════════════ */
+
+function chatModels() {
+  const provider = document.getElementById('chatProviderSelect').value;
+  return provider === 'venice' ? VENICE_CHAT_MODELS : OR_MODELS;
+}
+
+function chatSwitchProvider() {
+  const provider = document.getElementById('chatProviderSelect').value;
+  const models   = chatModels();
+  const sel      = document.getElementById('chatModelSelect');
+  sel.innerHTML  = models.map(m => `<option value="${m.id}">${m.label}</option>`).join('');
+  const saved = localStorage.getItem('chatModel_' + provider);
+  if (saved && models.find(m => m.id === saved)) sel.value = saved;
+}
+
+function chatSaveModel() {
+  const provider = document.getElementById('chatProviderSelect').value;
+  localStorage.setItem('chatModel_' + provider, document.getElementById('chatModelSelect').value);
+}
+
+function chatSystemPrompt() {
+  const brand = BRANDS.find(b => b.id === _settings.activeBrand) || BRANDS[0];
+  return `You are a helpful AI assistant for ${brand.label}. Help with podcast scripts, show notes, social media captions, titles, hooks, and content creation tasks. Be concise and direct.`;
+}
+
+function chatRenderUser(text) {
+  const msgsEl = document.getElementById('chatMessages');
+  const el = document.createElement('div');
+  el.className = 'chat-bubble chat-bubble-user';
+  el.textContent = text;
+  msgsEl.appendChild(el);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+function chatRenderAi(streaming) {
+  const msgsEl = document.getElementById('chatMessages');
+  const wrap   = document.createElement('div');
+  wrap.className = 'chat-ai-wrap';
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble chat-bubble-ai';
+  const content = document.createElement('span');
+  content.className = 'chat-msg-content';
+  bubble.appendChild(content);
+  if (streaming) {
+    const cursor = document.createElement('span');
+    cursor.className = 'chat-cursor';
+    bubble.appendChild(cursor);
+  }
+  wrap.appendChild(bubble);
+
+  const actions = document.createElement('div');
+  actions.className = 'chat-actions';
+  actions.style.display = 'none';
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'btn btn-xs btn-ghost';
+  copyBtn.textContent = '⎘ Copy';
+  copyBtn.onclick = () => { navigator.clipboard.writeText(content.textContent); toast('Copied', 1500); };
+
+  const scriptBtn = document.createElement('button');
+  scriptBtn.className = 'btn btn-xs btn-ghost';
+  scriptBtn.textContent = '→ Script';
+  scriptBtn.onclick = () => chatInsertToScript(content.textContent);
+
+  actions.appendChild(copyBtn);
+  actions.appendChild(scriptBtn);
+  wrap.appendChild(actions);
+  msgsEl.appendChild(wrap);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+  return wrap;
+}
+
+async function chatSendMessage() {
+  const input    = document.getElementById('chatInput');
+  const text     = input.value.trim();
+  const provider = document.getElementById('chatProviderSelect').value;
+  if (!text || _chatBusy) return;
+  const key = provider === 'venice' ? _settings.veniceKey : _settings.openrouterKey;
+  if (!key) { toast('Set ' + (provider === 'venice' ? 'Venice' : 'OpenRouter') + ' API key in Settings', 3000); return; }
+
+  input.value = '';
+  chatInputResize();
+  document.getElementById('chatEmptyState')?.remove();
+  document.getElementById('chatProjects').style.display = 'none';
+
+  _chatHistory.push({ role: 'user', content: text });
+  chatRenderUser(text);
+  await chatStream(provider);
+}
+
+async function chatStream(provider) {
+  _chatBusy = true;
+  document.getElementById('chatSendBtn').disabled = true;
+
+  const model   = document.getElementById('chatModelSelect').value;
+  const msgsEl  = document.getElementById('chatMessages');
+  const wrap    = chatRenderAi(true);
+  const content = wrap.querySelector('.chat-msg-content');
+  let aiText    = '';
+  let isError   = false;
+
+  try {
+    const resp = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message:  _chatHistory.at(-1).content,
+        history:  _chatHistory.slice(0, -1),
+        model,
+        provider,
+        system:   chatSystemPrompt(),
+      }),
+    });
+
+    const reader  = resp.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      aiText += chunk;
+      if (aiText.startsWith('[Error') || aiText.startsWith('[API Error')) isError = true;
+      content.textContent = aiText;
+      msgsEl.scrollTop = msgsEl.scrollHeight;
+    }
+
+    if (!isError) {
+      _chatHistory.push({ role: 'assistant', content: aiText });
+      wrap.querySelector('.chat-actions').style.display = 'flex';
+    }
+  } catch(e) {
+    content.textContent = '[Error: ' + e.message + ']';
+    isError = true;
+  } finally {
+    wrap.querySelector('.chat-cursor')?.remove();
+    _chatBusy = false;
+    document.getElementById('chatSendBtn').disabled = false;
+    if (isError) {
+      content.textContent = chatFriendlyError(content.textContent);
+      const retryBtn = document.createElement('button');
+      retryBtn.className = 'btn btn-sm btn-outline';
+      retryBtn.style.marginTop = '8px';
+      retryBtn.textContent = '↩ Retry';
+      retryBtn.onclick = () => { wrap.remove(); chatStream(provider); };
+      wrap.appendChild(retryBtn);
+    }
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+}
+
+function chatFriendlyError(raw) {
+  if (raw.includes('429')) return '⏳ Rate limit hit — wait 30–60 seconds then tap Retry, or switch to a different model.';
+  if (raw.includes('401')) return '🔑 Invalid API key — check your OpenRouter key in Settings → Creative.';
+  if (raw.includes('402')) return '💳 Account needs credits — top up your OpenRouter account.';
+  if (raw.includes('API key not set')) return '🔑 OpenRouter key not set — go to Settings → Creative.';
+  return raw;
+}
+
+function chatClear() {
+  _chatHistory = [];
+  const msgsEl = document.getElementById('chatMessages');
+  msgsEl.innerHTML = '';
+  const empty = document.createElement('div');
+  empty.id = 'chatEmptyState';
+  empty.className = 'chat-empty-state';
+  empty.innerHTML = '<span class="chat-empty-icon">💬</span><span class="text-sm">Ask anything — scripts, show notes, hooks, captions</span>';
+  msgsEl.appendChild(empty);
+  chatLoadProjects();
+}
+
+function chatKeyDown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatSendMessage(); }
+}
+
+function chatInputResize() {
+  const el = document.getElementById('chatInput');
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function chatInsertToScript(text) {
+  const script = _scripts[_currentScript];
+  if (!script) { toast('No script selected', 2000); return; }
+  script.text = (script.text || '').trimEnd() + '\n\n' + text.trim();
+  saveScripts();
+  document.getElementById('scriptEditor').value = script.text;
+  toast('Inserted into script', 2000);
+}
+
+/* ── Projects ── */
+
+async function chatSaveProject() {
+  if (!_chatHistory.length) { toast('Nothing to save', 2000); return; }
+  const name = prompt('Project name:');
+  if (!name?.trim()) return;
+  const provider = document.getElementById('chatProviderSelect').value;
+  const model    = document.getElementById('chatModelSelect').value;
+  const proj = {
+    id:        'proj_' + Date.now(),
+    name:      name.trim(),
+    brand:     _settings.activeBrand || 'personal',
+    provider,
+    model,
+    history:   [..._chatHistory],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+  try {
+    await fetch('/api/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(proj),
+    });
+    toast('Project saved', 2000);
+  } catch(e) {
+    toast('Save failed', 2000);
+  }
+}
+
+async function chatLoadProjects() {
+  const panel = document.getElementById('chatProjects');
+  const list  = document.getElementById('chatProjectsList');
+  try {
+    const projects = await fetch('/api/projects').then(r => r.json());
+    if (!projects.length) { panel.style.display = 'none'; return; }
+    panel.style.display = '';
+    list.innerHTML = projects.map(p => {
+      const brand = BRANDS.find(b => b.id === p.brand) || BRANDS[0];
+      const date  = new Date(p.createdAt).toLocaleDateString();
+      return `<div class="chat-proj-row">
+        <span class="chat-proj-name">${brand.emoji} ${p.name}</span>
+        <span class="chat-proj-meta">${date}</span>
+        <button class="btn btn-xs btn-outline" onclick='chatLoadProject(${JSON.stringify(p)})'>Load</button>
+        <button class="btn btn-xs btn-ghost" onclick="chatDeleteProject('${p.id}')">🗑</button>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    panel.style.display = 'none';
+  }
+}
+
+function chatLoadProject(proj) {
+  _chatHistory = proj.history || [];
+  const provSel  = document.getElementById('chatProviderSelect');
+  if (proj.provider) { provSel.value = proj.provider; chatSwitchProvider(); }
+  const modSel = document.getElementById('chatModelSelect');
+  if (proj.model && [...modSel.options].some(o => o.value === proj.model)) modSel.value = proj.model;
+  chatRedrawHistory();
+  document.getElementById('chatProjects').style.display = 'none';
+}
+
+function chatRedrawHistory() {
+  const msgsEl = document.getElementById('chatMessages');
+  msgsEl.innerHTML = '';
+  document.getElementById('chatEmptyState')?.remove();
+  for (const msg of _chatHistory) {
+    if (msg.role === 'user') {
+      chatRenderUser(msg.content);
+    } else if (msg.role === 'assistant') {
+      const wrap    = chatRenderAi(false);
+      const content = wrap.querySelector('.chat-msg-content');
+      content.textContent = msg.content;
+      wrap.querySelector('.chat-actions').style.display = 'flex';
+    }
+  }
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+async function chatDeleteProject(id) {
+  try {
+    await fetch('/api/projects/delete/' + id, { method: 'POST' });
+    chatLoadProjects();
+  } catch(e) {
+    toast('Delete failed', 2000);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIBRARY
+   ═══════════════════════════════════════════════════════════════════ */
+
+function libraryTypeIcon(type) {
+  return { audio:'🎙', video:'🎬', image:'🖼', doc:'📄', link:'🔗' }[type] || '📎';
+}
+
+function libraryRelTime(ts) {
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return m + 'm ago';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h ago';
+  const d = Math.floor(h / 24);
+  if (d < 30) return d + 'd ago';
+  return Math.floor(d / 30) + 'mo ago';
+}
+
+function librarySuggestModel(item) {
+  if (item.type === 'image') {
+    return { provider:'openrouter', model:'google/gemini-2.0-flash-exp:free', label:'Gemini 2.0 Flash', reason:'Gemini has vision — can analyse images directly' };
+  }
+  if (item.subtype === 'youtube') {
+    return { provider:'openrouter', model:'google/gemini-2.0-flash-exp:free', label:'Gemini 2.0 Flash', reason:'Gemini can analyse YouTube videos via URL' };
+  }
+  if (item.type === 'audio' || item.type === 'video') {
+    return { provider:'venice', model:'llama-3.3-70b', label:'Llama 3.3 70B', reason:'Paste a transcript for analysis — Llama 3.3 70B handles long audio text well' };
+  }
+  if (item.type === 'doc') {
+    return { provider:'openrouter', model:'qwen/qwen3-235b-a22b:free', label:'Qwen3 235B', reason:'Qwen3 235B excels at long-document analysis' };
+  }
+  return { provider:'openrouter', model:'qwen/qwen3-235b-a22b:free', label:'Qwen3 235B', reason:'Qwen3 235B is strong for web content and article analysis' };
+}
+
+async function libraryRender() {
+  const all = await dbGetAll('library');
+  const sort = document.getElementById('libSort')?.value || 'newest';
+  let items = _libFilter === 'all' ? all : all.filter(i => i.type === _libFilter);
+  if (sort === 'newest') items.sort((a,b) => b.date - a.date);
+  else if (sort === 'oldest') items.sort((a,b) => a.date - b.date);
+  else items.sort((a,b) => a.title.localeCompare(b.title));
+
+  const list = document.getElementById('libList');
+  if (!items.length) {
+    list.innerHTML = '<div class="empty"><span class="icon">📚</span><span class="text">No items yet — add files or links</span></div>';
+    return;
+  }
+
+  list.innerHTML = items.map(item => {
+    const sug = librarySuggestModel(item);
+    const meta = item.type === 'link' ? (item.url || '') : (item.size ? (item.size > 1048576 ? (item.size/1048576).toFixed(1)+'MB' : Math.round(item.size/1024)+'KB') : '');
+    return `<div class="lib-row">
+      <div class="lib-row-main">
+        <div class="lib-row-icon">${libraryTypeIcon(item.type)}</div>
+        <div class="lib-row-info">
+          <div class="lib-row-title">${item.title}</div>
+          <div class="lib-row-meta">
+            <span class="lib-type-badge">${item.subtype || item.type}</span>
+            <span>${libraryRelTime(item.date)}</span>
+            ${meta ? `<span class="truncate" style="max-width:180px">${meta}</span>` : ''}
+          </div>
+        </div>
+        <div class="lib-row-actions">
+          <button class="btn btn-xs btn-ghost" onclick="librarySendToChat('${item.id}')" title="Send to Chat">💬</button>
+          <button class="btn btn-xs btn-ghost" onclick="libraryDelete('${item.id}')" title="Delete">✕</button>
+        </div>
+      </div>
+      <div class="lib-ai-row">
+        <span class="lib-ai-chip">🤖 ${sug.label}</span>
+        <span style="font-size:11px;color:var(--dim)">${sug.reason}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function librarySetFilter(f, btn) {
+  _libFilter = f;
+  document.querySelectorAll('.lib-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  libraryRender();
+}
+
+function libraryShowAdd() {
+  document.getElementById('libAddOverlay').classList.add('show');
+  document.getElementById('libUrlInputRow').style.display = 'none';
+  document.getElementById('libUrlField').value = '';
+}
+
+function libraryHideAdd() {
+  document.getElementById('libAddOverlay').classList.remove('show');
+}
+
+function libraryOverlayClick(e) {
+  if (e.target === document.getElementById('libAddOverlay')) libraryHideAdd();
+}
+
+function libraryPickFile() {
+  libraryHideAdd();
+  document.getElementById('libFileInput').click();
+}
+
+function libraryShowUrlInput() {
+  document.getElementById('libUrlInputRow').style.display = 'block';
+  document.getElementById('libUrlField').focus();
+}
+
+async function libraryHandleFile(file) {
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  let type = 'doc';
+  if (/^(mp3|wav|m4a|ogg|aac|flac)$/.test(ext)) type = 'audio';
+  else if (/^(mp4|webm|mov|avi|mkv)$/.test(ext)) type = 'video';
+  else if (/^(jpg|jpeg|png|gif|webp|svg)$/.test(ext)) type = 'image';
+
+  const item = {
+    id: 'lib_' + Date.now(),
+    title: file.name.replace(/\.[^.]+$/, ''),
+    type,
+    subtype: 'upload',
+    date: Date.now(),
+    size: file.size,
+    url: null,
+    blob: file,
+    notes: '',
+  };
+  await dbPut('library', item);
+  toast('Added to library', 2000);
+  libraryRender();
+  document.getElementById('libFileInput').value = '';
+}
+
+async function libraryAddLink() {
+  const url = document.getElementById('libUrlField').value.trim();
+  if (!url) return;
+  let subtype = 'website';
+  let title = url;
+  if (/youtube\.com|youtu\.be/.test(url)) { subtype = 'youtube'; title = 'YouTube: ' + url.split('v=')[1]?.split('&')[0] || url; }
+  else if (/facebook\.com|fb\.com/.test(url)) { subtype = 'facebook'; title = 'Facebook post'; }
+  else { try { title = new URL(url).hostname; } catch(e) {} }
+
+  const item = {
+    id: 'lib_' + Date.now(),
+    title,
+    type: 'link',
+    subtype,
+    date: Date.now(),
+    size: 0,
+    url,
+    blob: null,
+    notes: '',
+  };
+  await dbPut('library', item);
+  toast('Link added to library', 2000);
+  libraryHideAdd();
+  libraryRender();
+}
+
+async function libraryAddFromRecording(id) {
+  const rec = await dbGet('recordings', id);
+  if (!rec) return;
+  const existing = await dbGetAll('library');
+  if (existing.some(i => i.id === 'lib_rec_' + rec.id)) { toast('Already in library', 2000); return; }
+  const item = {
+    id: 'lib_rec_' + rec.id,
+    title: rec.title || 'Recording',
+    type: rec.type === 'screen' ? 'video' : rec.type,
+    subtype: 'recording',
+    date: rec.date,
+    size: rec.blob?.size || 0,
+    url: null,
+    blob: rec.blob,
+    notes: '',
+  };
+  await dbPut('library', item);
+  toast('Saved to Library', 2000);
+}
+
+async function libraryDelete(id) {
+  await dbDel('library', id);
+  libraryRender();
+}
+
+async function librarySendToChat(id) {
+  const item = await dbGet('library', id);
+  if (!item) return;
+  _libPending = item;
+  const sug = librarySuggestModel(item);
+
+  document.getElementById('libConfirmTitle').textContent = `🤖 Best model for "${item.title}"`;
+  document.getElementById('libConfirmReason').textContent = `Suggested: ${sug.label} — ${sug.reason}`;
+
+  const sel = document.getElementById('libConfirmModelSel');
+  sel.innerHTML = '';
+  const allModels = [
+    { provider:'openrouter', model:'google/gemini-2.0-flash-exp:free', label:'Gemini 2.0 Flash (OR)' },
+    { provider:'openrouter', model:'qwen/qwen3-235b-a22b:free', label:'Qwen3 235B (OR)' },
+    { provider:'openrouter', model:'meta-llama/llama-3.3-70b-instruct:free', label:'Llama 3.3 70B (OR)' },
+    { provider:'openrouter', model:'deepseek/deepseek-r1:free', label:'DeepSeek R1 (OR)' },
+    { provider:'venice', model:'llama-3.3-70b', label:'Llama 3.3 70B (Venice)' },
+    { provider:'venice', model:'mistral-31-24b', label:'Mistral 24B (Venice)' },
+  ];
+  allModels.forEach(m => {
+    const o = document.createElement('option');
+    o.value = JSON.stringify({ provider: m.provider, model: m.model });
+    o.textContent = m.label;
+    if (m.provider === sug.provider && m.model === sug.model) o.selected = true;
+    sel.appendChild(o);
+  });
+
+  document.getElementById('libConfirmBar').classList.add('show');
+  document.getElementById('content').scrollTop = 0;
+}
+
+function libraryCancelSend() {
+  _libPending = null;
+  document.getElementById('libConfirmBar').classList.remove('show');
+}
+
+async function libraryChatGo() {
+  const item = _libPending;
+  if (!item) return;
+  const sel = document.getElementById('libConfirmModelSel');
+  const chosen = JSON.parse(sel.value);
+  _libPending = null;
+  document.getElementById('libConfirmBar').classList.remove('show');
+
+  switchTab(5);
+
+  const provSel = document.getElementById('chatProviderSelect');
+  provSel.value = chosen.provider;
+  chatSwitchProvider();
+  await new Promise(r => setTimeout(r, 50));
+  const modSel = document.getElementById('chatModelSelect');
+  if ([...modSel.options].some(o => o.value === chosen.model)) modSel.value = chosen.model;
+
+  if (item.type === 'image' && item.blob) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result;
+      const inp = document.getElementById('chatInput');
+      inp.value = 'Analyse this image:';
+      chatInputResize();
+      chatRenderUser('Analyse this image:\n[Image: ' + item.title + ']');
+      const imgEl = document.createElement('img');
+      imgEl.src = dataUrl;
+      imgEl.style.cssText = 'max-width:100%;border-radius:8px;margin-top:6px';
+      const msgs = document.getElementById('chatMessages');
+      msgs.lastElementChild?.appendChild(imgEl);
+      _chatHistory.push({ role:'user', content:'[Image attached: ' + item.title + '] Please analyse this image.' });
+      msgs.scrollTop = msgs.scrollHeight;
+    };
+    reader.readAsDataURL(item.blob);
+  } else if (item.type === 'link') {
+    const msg = 'Analyse this: ' + item.url;
+    document.getElementById('chatInput').value = msg;
+    chatInputResize();
+    document.getElementById('chatInput').focus();
+  } else if (item.type === 'doc' && item.blob) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      document.getElementById('chatInput').value = reader.result;
+      chatInputResize();
+      document.getElementById('chatInput').focus();
+    };
+    reader.readAsText(item.blob);
+  } else {
+    const note = item.type === 'audio' || item.type === 'video'
+      ? 'No direct audio/video analysis — paste a transcript below for ' + item.title + ':'
+      : 'Analyse: ' + item.title;
+    document.getElementById('chatInput').value = note;
+    chatInputResize();
+    document.getElementById('chatInput').focus();
+  }
+}
 </script>
 </body>
 </html>

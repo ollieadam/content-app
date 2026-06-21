@@ -20,3 +20,11 @@ desktop.ini
 .vscode/
 .idea/
 *.code-workspace
+
+# Secrets
+settings.json
+projects.json
+
+# SSL certs
+*.pem
+*.cert

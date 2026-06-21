@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 """Content App server — serves index.html with ON/OFF control via Tailscale."""
 
-import os, sys, json, socket, urllib.request, urllib.error, base64, threading
+import os, sys, json, socket, urllib.request, urllib.error, base64, threading, gzip, io
 from http.server import HTTPServer, SimpleHTTPRequestHandler
+
+_GZIP_TYPES = {'.html', '.js', '.css', '.json', '.svg', '.txt'}
 
 HOST = '0.0.0.0'
 PORT = 8080
 DIR = os.path.dirname(os.path.abspath(__file__))
-SETTINGS_FILE = os.path.join(DIR, 'settings.json')
+SETTINGS_FILE  = os.path.join(DIR, 'settings.json')
+PROJECTS_FILE  = os.path.join(DIR, 'projects.json')
+
+_badge_lock  = threading.Lock()
+_badge_count = 0
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -26,10 +32,19 @@ class Handler(SimpleHTTPRequestHandler):
                     self.send_json(json.load(f))
             except FileNotFoundError:
                 self.send_json({})
+        elif self.path == '/api/projects':
+            try:
+                with open(PROJECTS_FILE) as f:
+                    self.send_json(json.load(f))
+            except FileNotFoundError:
+                self.send_json([])
+        elif self.path == '/api/badge':
+            self.send_json({'count': _badge_count})
         else:
-            super().do_GET()
+            self._do_static()
 
     def do_POST(self):
+        global _badge_count
         if self.path == '/api/shutdown':
             self.send_json({'status': 'shutting_down'})
             threading.Thread(target=self.server.shutdown, daemon=True).start()
@@ -39,11 +54,68 @@ class Handler(SimpleHTTPRequestHandler):
             with open(SETTINGS_FILE, 'w') as f:
                 json.dump(data, f)
             self.send_json({'ok': True})
+        elif self.path == '/api/projects':
+            length = int(self.headers.get('Content-Length', 0))
+            project = json.loads(self.rfile.read(length))
+            try:
+                with open(PROJECTS_FILE) as f:
+                    projects = json.load(f)
+            except FileNotFoundError:
+                projects = []
+            projects = [p for p in projects if p.get('id') != project.get('id')]
+            projects.insert(0, project)
+            with open(PROJECTS_FILE, 'w') as f:
+                json.dump(projects, f)
+            with _badge_lock:
+                _badge_count += 1
+            self.send_json({'ok': True})
+        elif self.path.startswith('/api/projects/delete/'):
+            proj_id = self.path.split('/')[-1]
+            self.rfile.read(int(self.headers.get('Content-Length', 0)))
+            try:
+                with open(PROJECTS_FILE) as f:
+                    projects = json.load(f)
+                projects = [p for p in projects if p.get('id') != proj_id]
+                with open(PROJECTS_FILE, 'w') as f:
+                    json.dump(projects, f)
+            except FileNotFoundError:
+                pass
+            self.send_json({'ok': True})
+        elif self.path == '/api/badge/clear':
+            self.rfile.read(int(self.headers.get('Content-Length', 0)))
+            with _badge_lock:
+                _badge_count = 0
+            self.send_json({'ok': True})
         elif self.path == '/api/proxy':
             length = int(self.headers.get('Content-Length', 0))
             self._handle_proxy(self.rfile.read(length))
+        elif self.path == '/api/chat':
+            length = int(self.headers.get('Content-Length', 0))
+            self._handle_chat(self.rfile.read(length))
         else:
             self.send_error(404)
+
+    def _do_static(self):
+        path = self.translate_path(self.path)
+        if not os.path.isfile(path):
+            super().do_GET()
+            return
+        ext = os.path.splitext(path)[1].lower()
+        accept = self.headers.get('Accept-Encoding', '')
+        if 'gzip' in accept and ext in _GZIP_TYPES:
+            with open(path, 'rb') as f:
+                data = f.read()
+            compressed = gzip.compress(data, compresslevel=6)
+            ctype = self.guess_type(path)
+            self.send_response(200)
+            self.send_header('Content-Type', ctype)
+            self.send_header('Content-Encoding', 'gzip')
+            self.send_header('Content-Length', str(len(compressed)))
+            self.send_header('Cache-Control', 'public, max-age=60')
+            self.end_headers()
+            self.wfile.write(compressed)
+        else:
+            super().do_GET()
 
     def _handle_proxy(self, body_bytes):
         """Proxy external API requests to avoid browser CORS restrictions."""
@@ -92,6 +164,112 @@ class Handler(SimpleHTTPRequestHandler):
             self._send_raw(json.dumps(err).encode(), e.code)
         except Exception as e:
             self.send_json({'error': str(e)}, 500)
+
+    def _handle_chat(self, body_bytes):
+        """Stream LLM responses from OpenRouter or Venice AI."""
+        import http.client, ssl
+        try:
+            req = json.loads(body_bytes)
+        except Exception:
+            self.send_json({'error': 'bad request'}, 400)
+            return
+
+        provider = req.get('provider', 'openrouter')
+        model    = req.get('model', '')
+        history  = req.get('history', [])
+        message  = req.get('message', '')
+
+        try:
+            with open(SETTINGS_FILE) as f:
+                cfg = json.load(f)
+        except Exception:
+            cfg = {}
+
+        if provider == 'venice':
+            api_key = cfg.get('veniceKey', '')
+            host, path = 'api.venice.ai', '/api/v1/chat/completions'
+            referer = 'http://localhost:8080'
+        else:
+            api_key = cfg.get('openrouterKey', '')
+            host, path = 'openrouter.ai', '/api/v1/chat/completions'
+            referer = 'http://localhost:8080'
+
+        if not api_key:
+            self.send_response(200)
+            self._cors()
+            self.send_header('Content-Type', 'text/plain')
+            self.end_headers()
+            self.wfile.write(b'[Error: API key not set in Settings]')
+            return
+
+        messages = [{'role': 'system', 'content': req.get('system', 'You are a helpful content creation assistant.')}]
+        messages += history
+        messages.append({'role': 'user', 'content': message})
+
+        payload = json.dumps({
+            'model': model,
+            'messages': messages,
+            'stream': True,
+            'max_tokens': 2000,
+        }).encode()
+
+        hdrs = {
+            'Authorization': f'Bearer {api_key}',
+            'Content-Type': 'application/json',
+            'HTTP-Referer': referer,
+            'X-Title': 'Content App',
+        }
+
+        try:
+            ctx  = ssl.create_default_context()
+            conn = http.client.HTTPSConnection(host, context=ctx, timeout=60)
+            conn.request('POST', path, body=payload, headers=hdrs)
+            resp = conn.getresponse()
+
+            if resp.status != 200:
+                body = resp.read().decode(errors='replace')
+                self.send_response(200)
+                self._cors()
+                self.send_header('Content-Type', 'text/plain')
+                self.end_headers()
+                self.wfile.write(f'[API Error: {resp.status} {resp.reason}]'.encode())
+                return
+
+            self.send_response(200)
+            self._cors()
+            self.send_header('Content-Type', 'text/plain; charset=utf-8')
+            self.send_header('Cache-Control', 'no-cache')
+            self.end_headers()
+
+            while True:
+                line = resp.readline()
+                if not line:
+                    break
+                line = line.decode(errors='replace').strip()
+                if not line.startswith('data: '):
+                    continue
+                raw = line[6:]
+                if raw == '[DONE]':
+                    break
+                try:
+                    delta = json.loads(raw)['choices'][0]['delta'].get('content', '')
+                    if delta:
+                        self.wfile.write(delta.encode('utf-8'))
+                        self.wfile.flush()
+                except Exception:
+                    pass
+
+        except Exception as e:
+            try:
+                self.wfile.write(f'\n[Error: {e}]'.encode())
+                self.wfile.flush()
+            except Exception:
+                pass
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
     def send_json(self, data, code=200):
         self._send_raw(json.dumps(data).encode(), code)

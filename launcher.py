@@ -107,7 +107,32 @@ class Launcher:
         self._set_status('Running', ok=True)
         self.open_btn.configure(state='normal')
         self.stop_btn.configure(state='normal', fg=RED, activeforeground=RED)
+        threading.Thread(target=self._poll_badge, daemon=True).start()
         self.open_app()
+
+    def _poll_badge(self):
+        import json as _json
+        while self.running:
+            try:
+                with urllib.request.urlopen(SERVER_URL + '/api/badge', timeout=2) as r:
+                    data = _json.loads(r.read())
+                    count = data.get('count', 0)
+                    self.root.after(0, self._update_badge, count)
+            except Exception:
+                pass
+            time.sleep(5)
+
+    def _update_badge(self, count):
+        if count > 0:
+            self.root.title(f'Content App  ({count} new)')
+            self.status_lbl.configure(
+                text=f'  \U0001f4f1 {count} project{"s" if count != 1 else ""} saved from phone',
+                fg=FG
+            )
+        else:
+            self.root.title('Content App')
+            if self.running:
+                self.status_lbl.configure(text='  Running', fg=FG)
 
     def _server_failed(self, msg):
         self.running = False
@@ -131,6 +156,13 @@ class Launcher:
             )
         except FileNotFoundError:
             self._set_status('Firefox not found at ' + FIREFOX)
+        try:
+            req = urllib.request.Request(SERVER_URL + '/api/badge/clear', method='POST')
+            req.add_header('Content-Length', '0')
+            urllib.request.urlopen(req, timeout=1)
+            self.root.after(0, self._update_badge, 0)
+        except Exception:
+            pass
 
     def stop_server(self):
         try:

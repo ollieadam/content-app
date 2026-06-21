@@ -7,8 +7,8 @@ posts. Runs entirely in the browser (client-side). Local Python server for Tails
 
 ## Repository
 - GitHub: `https://github.com/ollieadam/content-app`
-- Local path: `/home/ollie/decentralized strength pod/`
-- Desktop shortcut: `~/Desktop/Content App.desktop` → runs `launcher.py` → persistent launcher window → opens Chrome `--app`
+- Local path: `/home/ollie/content app/`
+- Desktop shortcut: `~/Desktop/Content App.desktop` → runs `launcher.py` → persistent launcher window → opens Firefox `--new-window`
 
 ## Files
 
@@ -27,7 +27,7 @@ posts. Runs entirely in the browser (client-side). Local Python server for Tails
 | `launcher.py` | Python tkinter launcher window — persistent taskbar icon. Starts server, opens Chrome `--app` on click |
 
 ### Launch Flow
-`launcher.py` (via .desktop file) → starts `server.py` subprocess → waits for server ready → user clicks "Open Content App" → `google-chrome-stable --app=http://localhost:8080` (frameless window, no tabs/address bar)
+`launcher.py` (via .desktop file) → starts `server.py` subprocess → waits for server ready → user clicks "Open Content App" → Firefox `--new-window` at Tailscale IP (or localhost fallback)
 
 ### Originals (kept, not part of new app)
 | File | Purpose |
@@ -181,12 +181,14 @@ Social post composer:
 ### launcher.py features
 - Python tkinter window (~340x220px, black #0a0a0a / red #dc2626 theme)
 - Starts server.py as subprocess on launch; waits up to 15s for server ready
-- "🎬 Open Content App" button → `google-chrome-stable --app=http://localhost:8080`
+- Resolves Tailscale IP from `/api/status` and opens the app at `http://{tailscale_ip}:8080`
+- "🎬 Open Content App" button → Firefox `--new-window` at the resolved URL
 - "⏹ Stop Server" button — POSTs /api/shutdown, terminates server process
 - Close window = stop server + exit
 - WM_CLASS = `"content-app-launcher", "Content-app-launcher"` for Cinnamon taskbar matching
 - Centred on screen, not resizable
 - Status indicator: ○ Starting server… → ● Running
+- Polls `/api/badge` every 5s to show project-saved notifications from phone
 
 ### .desktop file (two copies)
 - `~/Desktop/Content App.desktop` — desktop shortcut
@@ -208,7 +210,8 @@ Social post composer:
 
 ### History
 - Previously used `content-app-launcher.sh` + Firefox `--new-window`
-- Firefox caused double-tab issues; replaced with Chrome `--app`
+- Briefly switched to Chrome `--app` mode to fix Firefox double-tab issue
+- Switched back to Firefox (user preference) — works fine now
 
 ## Key Technical Details
 
@@ -345,3 +348,250 @@ Social post composer:
 - `_settings` — loaded from server (`/api/settings`), not IndexedDB
 - `_livePosting` — bool controlling Publish Now button
 - `app_url` (launcher.py) — Tailscale URL resolved at startup
+
+---
+
+## Session Update (2026-06-20 — Content Library)
+
+### Feature: 📚 Library Tab (tab index 6)
+
+New 7th tab added to the nav. Stores all content types in IndexedDB `library` store.
+
+#### Library Item Schema
+```js
+{
+  id:      'lib_' + Date.now(),
+  title:   string,
+  type:    'audio'|'video'|'image'|'doc'|'link',
+  subtype: 'recording'|'upload'|'youtube'|'facebook'|'website',
+  date:    number (ms),
+  size:    number (bytes, 0 for links),
+  url:     string|null,
+  blob:    Blob|null,
+  notes:   string,
+}
+```
+
+#### IndexedDB
+- DB version bumped `1` → `2` in `dbOpen()` to add `library` store with `{ keyPath: 'id' }`
+
+#### Key JS Functions
+- `libraryRender()` — fetches all from `library` store, applies `_libFilter` + `_libSort`, renders rows
+- `libraryAdd(file)` — file upload → dbPut → render
+- `libraryAddLink(url)` — URL paste, auto-detects youtube/facebook/website → dbPut → render
+- `libraryDelete(id)` — dbDel → render
+- `librarySuggestModel(item)` → `{provider, model, label, reason}` — maps content type to best AI model
+- `librarySendToChat(id)` — shows inline confirmation banner at top of Library tab
+- `libraryChatConfirm(item)` — switches to Chat tab, pre-selects model, injects content
+
+#### AI Model Routing
+| type | model | reason |
+|------|-------|--------|
+| image | OpenRouter · Gemini 2.0 Flash | vision |
+| youtube link | OpenRouter · Gemini 2.0 Flash | YouTube URL analysis |
+| audio/video file | Venice · Llama 3.3 70B | long transcript analysis |
+| doc/text | OpenRouter · Qwen3 235B | long-document analysis |
+| facebook/website | OpenRouter · Qwen3 235B | web content analysis |
+
+#### Send to Chat Flow
+1. User clicks 💬 on library item
+2. Inline banner shows suggested model + reason + [Confirm] [Change ▾] [Cancel]
+3. On confirm: `switchTab(5)`, pre-select provider/model, inject content as first user message
+   - Image → base64 data URL embedded in message bubble + sent as vision content
+   - URL → "Analyse this: {url}" as user message
+   - Text/doc → file text content as user message
+   - Audio/video file → note "No direct audio — paste transcript"
+
+#### Home Tab
+- Each recording row in `refreshHome()` gets a "📚" button → `libraryAddFromRecording(id)`
+
+#### sw.js
+- Cache version bumped `v3` → `v4`
+
+#### CSS classes added
+- `.lib-filters`, `.lib-chip`, `.lib-chip.active`
+- `.lib-toolbar`, `.lib-list`, `.lib-row`
+- `.lib-row-main`, `.lib-row-meta`, `.lib-row-actions`
+- `.lib-type-badge`, `.lib-ai-chip`
+- `.lib-add-overlay`, `.lib-add-box`
+- `.lib-confirm-bar`
+
+---
+
+## Session Update (2026-06-20 — Security Audit & Next Session Plan)
+
+### Full Codebase Review — Issues Found
+
+#### 🔴 Critical (blocking "record from phone")
+
+**1. No HTTPS → `getUserMedia` blocked on phone**
+- Server serves plain HTTP on `0.0.0.0:8080`
+- `navigator.mediaDevices.getUserMedia()` requires a secure context (HTTPS or localhost)
+- From phone via Tailscale (`http://100.x.x.x:8080`), mic/camera silently denied
+- **Fix:** Use Tailscale Serve for auto TLS cert:
+  ```
+  tailscale serve --bg --https=443 8080
+  ```
+  Then access at `https://<machine>.<tailnet>.ts.net` from phone.
+
+**2. API keys exposed to every device on the Tailnet**
+- `GET /api/settings` returns all secrets (Venice, YouTube, Meta, GitHub, etc.) with no auth
+- Anyone on the same network can curl them
+- `settings.json` not in `.gitignore` — risk of accidental commit
+- **Fix:** Add app password protection + add to `.gitignore`
+
+#### 🟡 Medium
+
+**3. `content-app-launcher.sh` has stale path**
+- Points to `/home/ollie/decentralized strength pod/launcher.py`
+- Should be `/home/ollie/content app/launcher.py`
+
+**4. Old path references in `.desktop` files still point to old location**
+
+**5. No QR code for phone access**
+- Server shows IP but user must type it manually on phone
+- QR code on Home tab would let user scan and open instantly
+
+**6. Canvas video export is hardcoded 2-second placeholder**
+- `postExportVideo()` line ~2304: `setTimeout(() => rec.stop(), 2000)`
+- Always exports only 2 seconds
+- Should export proper duration or let user set it
+
+**7. Post overlay text doesn't wrap**
+- `postRender()` uses single `ctx.fillText` calls — long text overflows
+- Need word-wrap using `ctx.measureText()`
+
+**8. No CSP headers**
+- Server sends no Content-Security-Policy
+- Should add basic CSP for defense-in-depth
+
+**9. Service worker caches API `GET` responses**
+- `sw.js:26` caches all successful GET requests
+- Could serve stale `/api/status` or other dynamic data
+
+**10. Settings modal doesn't close on overlay backdrop click**
+- Library add overlay does, but settings requires clicking "Done" button
+- Inconsistent UX
+
+### Planned Changes for Next Session
+
+#### 1. 🔐 App Password Authentication
+**Files:** `server.py` + `index.html`
+- Add `appPassword` field to `settings.json`
+- Store SHA-256 hash of password
+- On page load, if password is set, show login overlay blocking app
+- Verify client-side against stored hash
+- Store auth state in `sessionStorage` (lasts per browser tab)
+- Server-side: protect `GET /api/settings` by checking `X-App-Key` header against stored hash
+- Password field in Settings modal (new "Security" tab or under Creative)
+
+**Implementation details:**
+- `server.py`: Add `_check_auth()` method that compares `X-App-Key` header value (SHA-256 of password) against stored hash
+- Protected endpoints: `GET /api/settings`, `POST /api/settings`, `POST /api/proxy`
+- `index.html`: Add login modal overlay (similar to settings modal but simpler)
+- CSS: `.login-overlay`, `.login-modal` classes
+- JS: `_authenticated` flag, `checkAuth()` on init, `showLogin()`, `loginSubmit()`
+- Use `crypto.subtle.digest('SHA-256', ...)` for hashing
+
+#### 2. 🔒 HTTPS via Tailscale Serve
+**One-time setup (not code):**
+- Run: `tailscale serve --bg --https=443 8080`
+- Add to `launcher.py` to auto-run this command on startup
+- Detect MagicDNS hostname and show as primary URL on Home tab + QR code
+
+**launcher.py changes:**
+- On startup, run `tailscale serve --bg --https=443 8080` (or check if already active)
+- Extract `machine.tailnet.ts.net` from `tailscale status --json`
+- Set `self.app_url` to `https://{magicdns}:443` (or just `https://{magicdns}`)
+- Show the HTTPS URL in launcher status bar
+
+#### 3. 📋 `.gitignore` update
+Add lines:
+```
+settings.json
+projects.json
+*.pem
+*.cert
+```
+
+#### 4. 🩹 Fix `content-app-launcher.sh`
+Change line 1 from:
+```bash
+exec python3 "/home/ollie/decentralized strength pod/launcher.py"
+```
+to:
+```bash
+exec python3 "/home/ollie/content app/launcher.py"
+```
+
+#### 5. 📱 QR Code on Home Tab
+**File:** `index.html`
+- Add inline QR code generator (small ~50 line JS function using canvas)
+- Show QR code below server status bar on Home tab
+- Encode the current Tailscale/HTTPS URL
+- Regenerate when URL changes
+
+**QR generation approach:**
+- Use a minimal inline QR code generator (not a library)
+- ~40 lines of JS using `canvas` to render QR matrix
+- Or embed a small base64-encoded QR lib in the HTML
+
+#### 6. 🐛 Fix Post Canvas — Text Wrapping
+**File:** `index.html` — `postRender()` function
+- Replace simple `ctx.fillText()` with word-wrap logic:
+  ```js
+  function wrapText(ctx, text, maxWidth) {
+    const words = text.split(' ');
+    const lines = [];
+    let line = '';
+    for (const word of words) {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+  ```
+
+#### 7. 🐛 Fix 2-Second Video Export Placeholder
+**File:** `index.html` — `postExportVideo()`
+- Replace `setTimeout(() => rec.stop(), 2000)` with:
+  - User-selectable duration (input field)
+  - Or set to 5 seconds default
+  - Show countdown/progress during render
+
+#### 8. 🛡️ Add CSP Headers
+**File:** `server.py` — in `_send_raw()` and `do_GET()`
+```python
+self.send_header('Content-Security-Policy',
+    "default-src 'self'; "
+    "media-src 'self' blob:; "
+    "img-src 'self' data: blob: https:; "
+    "connect-src 'self' https://api.venice.ai https://www.googleapis.com https://api.buzzsprout.com https://graph.facebook.com https://api.github.com; "
+    "script-src 'self' 'unsafe-inline'; "
+    "style-src 'self' 'unsafe-inline';"
+)
+```
+
+#### 9. Fix Launcher — Use Firefox (confirmed: user prefers Firefox over Chrome)
+- Launcher already uses Firefox — no change needed
+- Update AI_NOTES to reflect Firefox is the intended browser
+
+### Testing Checklist for Next Session
+- [ ] Run `tailscale serve --bg --https=443 8080`
+- [ ] Access app from phone via `https://<machine>.<tailnet>.ts.net`
+- [ ] Test mic + camera recording from phone (Record tab)
+- [ ] Test screen recording from phone
+- [ ] Set app password, verify login overlay appears
+- [ ] Verify password persists across page reload (sessionStorage)
+- [ ] Test settings API returns 401 without correct `X-App-Key` header
+- [ ] Scan QR code from phone, verify it opens the correct URL
+- [ ] Test post text overlay wrapping with long captions
+- [ ] Test post video export (should not be 2 seconds anymore)
+- [ ] Verify settings.json is in .gitignore (not tracked)
+- [ ] Check CSP headers in browser dev tools

@@ -1,2 +1,2 @@
 #!/bin/bash
-exec python3 "/home/ollie/decentralized strength pod/launcher.py"
+exec python3 "/home/ollie/content app/launcher.py"
