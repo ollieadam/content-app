@@ -347,6 +347,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .lib-sort{font-size:12px;padding:5px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);flex-shrink:0;width:auto}
 .lib-list{display:flex;flex-direction:column;gap:8px}
 .lib-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.lib-row-posted{opacity:.55}
 .lib-row-main{display:flex;align-items:center;gap:10px}
 .lib-row-icon{font-size:22px;flex-shrink:0;width:28px;text-align:center}
 .lib-row-info{flex:1;min-width:0}
@@ -553,6 +554,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
       <span id="apiVeniceStatus" style="display:none"></span>
       <span id="apiORStatus" style="display:none"></span>
       <span id="apiGoogleStatus" style="display:none"></span>
+      <span id="apiAssemblyStatus" style="display:none"></span>
       <span id="apiYTStatus" style="display:none"></span>
       <span id="apiMetaStatus" style="display:none"></span>
       <span id="apiBSStatus" style="display:none"></span>
@@ -653,12 +655,12 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
       </div>
     </section>
 
-    <!-- ═══════ EDIT ═══════ -->
-    <!-- ═══════ CREATE (Edit + Thumbnail + Content) ═══════ -->
+    <!-- ═══════ CREATE (Source → Editor → Draft → Canvas) ═══════ -->
     <section class="tab-panel" id="tabPost">
-      <!-- ── Edit ── -->
+      <!-- ── Source Media ── -->
       <div class="section">
-        <div class="section-title">Load Media</div>
+        <div class="section-title">Source Media</div>
+        <select id="postSource" onchange="postSourceSelect()" style="width:100%;margin-bottom:8px"><option value="">Select from Library…</option></select>
         <div class="edit-load-zone" id="editDrop" onclick="document.getElementById('editFile').click()">
           <span class="icon" id="editDropIcon">🎬</span>
           <div style="font-size:13px;font-weight:500" id="editDropLabel">Drop video or audio</div>
@@ -723,8 +725,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
           </div>
         </div>
       </div>
-      <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 16px">
-      <div class="post-layout">
+      <div class="post-layout" id="postLayout" style="display:none">
         <!-- Left: aspect + canvas + export -->
         <div class="post-left">
           <div class="section">
@@ -753,16 +754,8 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
             </div>
           </div>
         </div>
-        <!-- Right: source + overlay + AI + publish -->
+        <!-- Right: overlay + AI + publish -->
         <div class="post-right">
-          <div class="section">
-            <div class="section-title">Source Media</div>
-            <div class="row gap-8">
-              <select id="postSource" style="flex:1"><option value="">Select a saved recording</option></select>
-              <button class="btn btn-sm" onclick="document.getElementById('postFileInput').click()">Browse</button>
-              <input type="file" id="postFileInput" accept="video/*,audio/*" style="display:none" onchange="postLoadFile(this.files[0])">
-            </div>
-          </div>
           <div class="section">
             <div class="section-title">Text Overlay</div>
             <div class="post-overlay-input">
@@ -1670,6 +1663,7 @@ function switchTab(idx) {
   document.querySelectorAll('.nav-btn').forEach((el, i) => el.classList.toggle('active', i === idx));
   document.getElementById('content').classList.toggle('chat-open', idx === 3);
   if (idx === 0) refreshHome();
+  if (idx === 2) populatePostSource();
   if (idx !== 3) document.getElementById('content').scrollTop = 0;
 }
 
@@ -1756,6 +1750,7 @@ function updateApiStatus() {
   document.getElementById('apiBlogStatus').textContent = (_settings.githubToken && _settings.githubRepo) ? '✅' : '❌';
   document.getElementById('apiORStatus').textContent = _settings.openrouterKey ? '✅' : '❌';
   document.getElementById('apiGoogleStatus').textContent = _settings.googleKey ? '✅' : '❌';
+  document.getElementById('apiAssemblyStatus').textContent = _settings.assemblyAiKey ? '✅' : '❌';
   renderHb();
 }
 
@@ -1792,12 +1787,13 @@ function _renderHbBar() {
   if (!hb) return;
   const s = _settings || {};
   const checks = [
-    { label: 'Server',     ok: _serverAlive },
-    { label: 'Venice',     ok: !!s.veniceKey },
-    { label: 'OpenRouter', ok: !!s.openrouterKey },
-    { label: 'Google',     ok: !!s.googleKey },
-    { label: 'YouTube',    ok: !!(s.ytChannel || s.yt2Channel) },
-    { label: 'Buzzsprout', ok: !!(s.bsKey && s.bsPodcast) },
+    { label: 'Server',      ok: _serverAlive },
+    { label: 'Venice',      ok: !!s.veniceKey },
+    { label: 'OpenRouter',  ok: !!s.openrouterKey },
+    { label: 'Google',      ok: !!s.googleKey },
+    { label: 'AssemblyAI',  ok: !!s.assemblyAiKey },
+    { label: 'YouTube',     ok: !!(s.ytChannel || s.yt2Channel) },
+    { label: 'Buzzsprout',  ok: !!(s.bsKey && s.bsPodcast) },
   ];
   const apiErrors = checks.filter(c => !c.ok).length;
   const runtimeErrors = _hbErrors.length;
@@ -1826,9 +1822,10 @@ function renderHb() {
     { label: 'Server',     ok: _serverAlive },
     { label: 'Venice',     ok: !!s.veniceKey },
     { label: 'OpenRouter', ok: !!s.openrouterKey },
-    { label: 'Google',     ok: !!s.googleKey },
-    { label: 'YouTube',    ok: !!(s.ytChannel || s.yt2Channel) },
-    { label: 'Buzzsprout', ok: !!(s.bsKey && s.bsPodcast) },
+    { label: 'Google',      ok: !!s.googleKey },
+    { label: 'AssemblyAI',  ok: !!s.assemblyAiKey },
+    { label: 'YouTube',     ok: !!(s.ytChannel || s.yt2Channel) },
+    { label: 'Buzzsprout',  ok: !!(s.bsKey && s.bsPodcast) },
   ];
   const runtimeErrors = _hbErrors.length;
 
@@ -2039,15 +2036,32 @@ async function draftRender() {
   const el = document.getElementById('draftList');
   if (!el) return;
   const drafts = (await dbGetAll('drafts')).sort((a, b) => b.ts - a.ts);
-  el.innerHTML = drafts.length ? drafts.map(d => `
-    <div class="edit-clip">
-      <div class="edit-clip-info">
-        <div class="edit-clip-name">${esc(d.title || d.seed.slice(0, 40) || 'Draft')}</div>
-        <div class="edit-clip-range">${fmtTimeShort(d.ts)}</div>
+  if (!drafts.length) { el.innerHTML = '<div class="empty text-sm">No drafts yet</div>'; return; }
+  el.innerHTML = drafts.map(d => {
+    const fields = [
+      { label: 'Title',       ok: !!d.title },
+      { label: 'Topic',       ok: !!d.seed },
+      { label: 'Description', ok: !!d.desc },
+      { label: 'Hashtags',    ok: !!d.tags },
+    ];
+    const checkRow = fields.map(f =>
+      `<span style="color:${f.ok ? '#3fb950' : '#f85149'};font-size:11px">${f.ok ? '✓' : '✗'} ${f.label}</span>`
+    ).join(' ');
+    return `<div class="lib-row">
+      <div class="lib-row-main">
+        <div class="lib-row-icon">📝</div>
+        <div class="lib-row-info">
+          <div class="lib-row-title">${esc(d.title || d.seed?.slice(0,40) || 'Draft')}</div>
+          <div class="lib-row-meta" style="display:flex;gap:8px;flex-wrap:wrap">${checkRow}<span style="color:var(--muted)">· ${libraryRelTime(d.ts)}</span></div>
+        </div>
+        <div class="lib-row-actions">
+          <button class="btn btn-xs btn-primary" onclick="draftComplete('${d.id}')" title="Save as completed post">✓ Post</button>
+          <button class="btn btn-xs btn-outline" onclick="draftLoad('${d.id}')">Load</button>
+          <button class="btn btn-xs btn-danger" onclick="draftDelete('${d.id}')">✕</button>
+        </div>
       </div>
-      <button class="btn btn-xs btn-outline" onclick="draftLoad('${d.id}')">Load</button>
-      <button class="btn btn-xs btn-danger" onclick="draftDelete('${d.id}')">✕</button>
-    </div>`).join('') : '<div class="empty text-sm">No drafts yet</div>';
+    </div>`;
+  }).join('');
 }
 
 async function draftLoad(id) {
@@ -2065,6 +2079,27 @@ async function draftLoad(id) {
 async function draftDelete(id) {
   await dbDel('drafts', id);
   draftRender();
+}
+
+async function draftComplete(id) {
+  const d = await dbGet('drafts', id);
+  if (!d) return;
+  await dbPut('library', {
+    id: 'lib_draft_' + id,
+    title: d.title || d.seed?.slice(0, 60) || 'Post',
+    type: 'draft',
+    subtype: 'completed',
+    brand: _settings.activeBrand || '',
+    date: Date.now(),
+    size: 0,
+    url: null,
+    blob: null,
+    notes: [d.seed, d.desc, d.tags].filter(Boolean).join('\n\n'),
+    posted: false,
+    draftFields: { title: d.title, seed: d.seed, desc: d.desc, tags: d.tags }
+  });
+  toast('Saved to Library as completed post', 2500);
+  libraryRender();
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -2554,12 +2589,13 @@ function recFinalize() {
   document.getElementById('recAfter').style.display = 'block';
 }
 
-function recSave() {
+async function recSave() {
   if (!_recBlob) return;
   const brand = document.getElementById('recBrand').value || 'personal';
   const title = document.getElementById('recTitle').value.trim() || 'Untitled';
+  const id = 'rec_' + Date.now();
   const rec = {
-    id: 'rec_' + Date.now(),
+    id,
     title,
     brand,
     type: _recMode,
@@ -2567,12 +2603,24 @@ function recSave() {
     dur: Math.round((Date.now() - _recStart) / 1000),
     blob: _recBlob
   };
-  dbPut('recordings', rec).then(() => {
-    toast('Recording saved!', 2000);
-    document.getElementById('recAfter').style.display = 'none';
-    document.getElementById('recTimer').textContent = '0:00';
-    _recBlob = null;
+  await dbPut('recordings', rec);
+  await dbPut('library', {
+    id: 'lib_' + id,
+    title,
+    type: _recMode === 'screen' ? 'video' : _recMode,
+    subtype: 'recording',
+    brand,
+    date: rec.date,
+    size: _recBlob.size,
+    url: null,
+    blob: _recBlob,
+    notes: '',
   });
+  toast('Saved to Library', 2000);
+  populatePostSource();
+  document.getElementById('recAfter').style.display = 'none';
+  document.getElementById('recTimer').textContent = '0:00';
+  _recBlob = null;
 }
 
 function recDiscard() {
@@ -2646,11 +2694,13 @@ let _editSegments = [];
 function editLoad(file) {
   if (!file || !file.type.match(/(audio|video)\/.*/)) { toast('Please select audio or video', 2500); return; }
   _editFile = file;
+  _postFile = file;
   const url = URL.createObjectURL(file);
   _editBlob = file;
   const isAudio = file.type.startsWith('audio');
   const ed = document.getElementById('editEditor');
   ed.style.display = 'block';
+  document.getElementById('postLayout').style.display = '';
   setTransfer('Loading ' + file.name + '…');
   document.getElementById('editDropIcon').textContent = '⏳';
   document.getElementById('editDropLabel').textContent = 'Loading…';
@@ -2695,6 +2745,16 @@ function editLoadRecording(id) {
     const file = new File([rec.blob], rec.title + '.webm', { type: rec.blob.type });
     editLoad(file);
   });
+}
+
+async function libraryLoadToEdit(id) {
+  const item = await dbGet('library', id);
+  if (!item || !item.blob) { toast('No file data — re-upload the video', 3000); return; }
+  const mime = item.blob.type || (item.type === 'video' ? 'video/mp4' : 'audio/mp3');
+  const ext = mime.split('/')[1] || (item.type === 'video' ? 'mp4' : 'mp3');
+  const file = new File([item.blob], (item.title || 'file') + '.' + ext, { type: mime });
+  switchTab(2);
+  setTimeout(() => { editLoad(file); toast('Loaded — click 🤖 AI Detect Clips', 3000); }, 300);
 }
 
 function updateEditTimeline() {
@@ -2767,6 +2827,7 @@ function renderEditClips() {
         <div class="edit-clip-name">${c.name}</div>
         <div class="edit-clip-range">${fmtTime(c.start)} → ${fmtTime(c.end)} (${fmtTime(c.end-c.start)})</div>
       </div>
+      <button class="btn btn-xs btn-primary" onclick="clipToDraft(${c.id})" title="Send to Draft Creator">✍️</button>
       <button class="btn btn-xs btn-ghost" onclick="editExportClip(${c.id})">↓</button>
       <button class="btn btn-xs btn-danger" onclick="editDeleteClip(${c.id})">✕</button>
     </div>
@@ -2776,6 +2837,16 @@ function renderEditClips() {
 function editDeleteClip(id) {
   _editClips = _editClips.filter(c => c.id !== id);
   renderEditClips();
+}
+
+function clipToDraft(id) {
+  const c = _editClips.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('contentTitle').value = c.name;
+  document.getElementById('contentSeed').value = c.notes || (c.name + ' — ' + fmtTime(c.start) + ' to ' + fmtTime(c.end));
+  document.getElementById('postLayout').style.display = '';
+  document.getElementById('contentSeed').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  toast('Clip sent to Draft Creator — hit ✨ Generate All', 2500);
 }
 
 function editExportClip(id) {
@@ -3048,6 +3119,23 @@ async function editAIDetectClips() {
     renderEditClips();
 
     const srcName = _editFile.name.replace(/\.[^.]+$/, '');
+    const srcId = 'lib_src_' + srcName.replace(/\W+/g, '_');
+    const srcExists = await dbGet('library', srcId);
+    if (!srcExists) {
+      await dbPut('library', {
+        id: srcId,
+        title: srcName,
+        type: _editFile.type.startsWith('audio') ? 'audio' : 'video',
+        subtype: 'upload',
+        brand: _settings.activeBrand || '',
+        date: Date.now(),
+        size: _editFile.size,
+        url: null,
+        blob: _editFile,
+        notes: '',
+      });
+    }
+
     for (let i = 0; i < _editClips.length; i++) {
       const c = _editClips[i];
       await dbPut('library', {
@@ -3066,6 +3154,7 @@ async function editAIDetectClips() {
     }
 
     clearTransfer();
+    populatePostSource();
     toast(`✓ ${chapters.length} clips detected and saved to Library`, 3500);
   } catch(e) {
     clearTransfer();
@@ -3094,14 +3183,38 @@ function postSetAspect(el) {
   postRender();
 }
 
+async function populatePostSource() {
+  const all = await dbGetAll('library');
+  // Show all video/audio items — blob check happens on select, not here
+  const media = all.filter(i => i.type === 'video' || i.type === 'audio');
+  const sel = document.getElementById('postSource');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Select from Library…</option>';
+  media.sort((a, b) => b.date - a.date).forEach(i => {
+    const opt = document.createElement('option');
+    opt.value = i.id;
+    opt.textContent = i.title + (i.type === 'audio' ? ' 🎙' : ' 🎬');
+    sel.appendChild(opt);
+  });
+  if (cur) sel.value = cur;
+}
+
+async function postSourceSelect() {
+  const id = document.getElementById('postSource').value;
+  if (!id) return;
+  const item = await dbGet('library', id);
+  if (!item) return;
+  if (!item.blob) { toast('File not stored locally — re-upload or drop the file in', 3000); return; }
+  const mime = item.blob.type || (item.type === 'video' ? 'video/mp4' : 'audio/mp3');
+  const ext = mime.split('/')[1] || 'mp4';
+  const file = new File([item.blob], (item.title || 'file') + '.' + ext, { type: mime });
+  editLoad(file);
+}
+
 function postLoadFile(file) {
   if (!file) return;
   _postFile = file;
   toast('Loaded: ' + file.name, 2000);
-  // Populate recording selector
-  const sel = document.getElementById('postSource');
-  for (let o of sel.options) o.selected = false;
-  sel.value = '';
   postRender();
 }
 
@@ -3871,7 +3984,9 @@ function _libraryItemHtml(item) {
   const sug = librarySuggestModel(item);
   const meta = item.type === 'link' ? (item.url || '') : (item.size ? (item.size > 1048576 ? (item.size/1048576).toFixed(1)+'MB' : Math.round(item.size/1024)+'KB') : '');
   const timeInfo = item.start != null ? `${fmtTime(item.start)}–${fmtTime(item.end)}` : '';
-  return `<div class="lib-row" id="librow-${esc(item.id)}">
+  const canEdit = item.blob && (item.type === 'video' || item.type === 'audio');
+  const posted = !!item.posted;
+  return `<div class="lib-row${posted ? ' lib-row-posted' : ''}" id="librow-${esc(item.id)}">
     <div class="lib-row-main">
       <div class="lib-row-icon">${libraryTypeIcon(item.type)}</div>
       <div class="lib-row-info">
@@ -3881,9 +3996,13 @@ function _libraryItemHtml(item) {
           <span>${libraryRelTime(item.date)}</span>
           ${timeInfo ? `<span style="color:var(--muted)">${timeInfo}</span>` : ''}
           ${meta ? `<span class="truncate" style="max-width:160px">${esc(meta)}</span>` : ''}
+          ${posted ? `<span style="color:#3fb950;font-size:11px">✓ posted</span>` : ''}
         </div>
       </div>
       <div class="lib-row-actions">
+        <button class="btn btn-xs btn-ghost" onclick="libraryTogglePosted('${esc(item.id)}')" title="${posted ? 'Mark unposted' : 'Mark as posted'}">${posted ? '✅' : '⬜'}</button>
+        ${canEdit ? `<button class="btn btn-xs btn-ghost" onclick="libraryLoadToEdit('${esc(item.id)}')" title="Edit clips">✂️</button>` : ''}
+        ${canEdit ? `<button class="btn btn-xs btn-ghost" onclick="libraryLoadToPost('${esc(item.id)}')" title="Use for Post">🎨</button>` : ''}
         <button class="btn btn-xs btn-ghost" onclick="libraryStartRename('${esc(item.id)}')" title="Rename">✏️</button>
         <button class="btn btn-xs btn-ghost" onclick="librarySendToChat('${esc(item.id)}')" title="Send to Chat">💬</button>
         <button class="btn btn-xs btn-ghost" onclick="libraryDelete('${esc(item.id)}')" title="Delete">✕</button>
@@ -3893,6 +4012,10 @@ function _libraryItemHtml(item) {
       <span class="lib-ai-chip">🤖 ${sug.label}</span>
       <span style="font-size:11px;color:var(--dim)">${sug.reason}</span>
     </div>
+    ${item.draftFields ? `<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin-top:4px;padding-top:4px;border-top:1px solid var(--border)">
+      ${Object.entries({Title:item.draftFields.title, Topic:item.draftFields.seed, Desc:item.draftFields.desc, Tags:item.draftFields.tags})
+        .map(([k,v]) => `<span style="color:${v ? '#3fb950' : '#f85149'}">${v ? '✓' : '✗'} ${k}</span>`).join('')}
+    </div>` : ''}
   </div>`;
 }
 
@@ -3989,6 +4112,7 @@ async function libraryHandleFile(file) {
   await dbPut('library', item);
   toast('Added to library', 2000);
   libraryRender();
+  populatePostSource();
   document.getElementById('libFileInput').value = '';
 }
 
@@ -4043,6 +4167,24 @@ async function libraryAddFromRecording(id) {
 async function libraryDelete(id) {
   await dbDel('library', id);
   libraryRender();
+}
+
+async function libraryTogglePosted(id) {
+  const item = await dbGet('library', id);
+  if (!item) return;
+  item.posted = !item.posted;
+  await dbPut('library', item);
+  libraryRender();
+}
+
+async function libraryLoadToPost(id) {
+  const item = await dbGet('library', id);
+  if (!item || !item.blob) { toast('No file data — re-upload the video', 3000); return; }
+  const mime = item.blob.type || (item.type === 'video' ? 'video/mp4' : 'audio/mp3');
+  const ext = mime.split('/')[1] || 'mp4';
+  const file = new File([item.blob], (item.title || 'file') + '.' + ext, { type: mime });
+  switchTab(2);
+  setTimeout(() => { editLoad(file); document.getElementById('postLayout')?.scrollIntoView({ behavior: 'smooth' }); }, 300);
 }
 
 function libraryStartRename(id) {
