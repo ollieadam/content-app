@@ -764,6 +764,46 @@ Since `settings.json` is `{}`, the server has no password hash. The app loads wi
 ### Current Known Warnings (expected)
 - **"Password fields on insecure HTTP"** — appears when accessing via `http://` (Tailscale IP). Goes away when using HTTPS (`https://<machine>.<tailnet>.ts.net`). Settings API key fields have `autocomplete="off"` to minimize warnings.
 
+## Session Update (2026-06-21 — Crypto API Fix + Server Merge)
+
+### Changes Made
+
+#### 1. 🐛 Crypto API `hashPw()` crash on HTTP
+- **File:** `index.html:1086-1093`
+- **Bug:** `crypto.subtle.digest()` throws a DOMException on insecure HTTP contexts, but the code only checked `if(window.crypto&&crypto.subtle)` which is truthy even on HTTP. The pure-JS SHA-256 fallback was never reached.
+- **Fix:** Wrapped `crypto.subtle.digest()` in try/catch — on error, falls through to the `sha256hex()` pure-JS implementation.
+
+#### 2. 🐛 Server full-replace wipes settings on partial save
+- **File:** `server.py:67-80`
+- **Bug:** `POST /api/settings` did `json.dump(data, f)` replacing the entire file. If the client sent incomplete data (e.g., browser autofill triggers `saveSettingsDebounced()` before `initSettings()` finished), all unmapped fields were silently deleted.
+- **Fix:** Server now merges incoming data into existing settings:
+  ```python
+  existing = self._load_settings()
+  existing.update(data)
+  existing = {k: v for k, v in existing.items() if v != ''}
+  ```
+  Empty-string values are stripped to handle deletions (e.g., `clearAppPassword()`).
+
+#### 3. 🐛 `clearAppPassword()` used `delete` — incompatible with merge
+- **File:** `index.html:1290-1296`
+- **Bug:** `delete _settings.appPassword` removed the key, so the merge wouldn't clear it.
+- **Fix:** Changed to `_settings.appPassword = ''` — server interprets empty string as deletion.
+
+#### 4. 🛡️ Guard: skip `saveSettingsDebounced()` if settings not loaded
+- **File:** `index.html:1206,1247`
+- **Added:** `_settingsLoaded` flag, set by `initSettings()`. `saveSettingsDebounced()` returns early if `!_settingsLoaded`, preventing autofill-triggered saves from wiping data during page load.
+
+### Current State
+- ✅ Content app general settings save/load working
+- ❌ "Crypto app" (password auth / Venice AI) — still not persisting after refresh
+  - User reports settings for crypto-related features still don't survive page refresh
+  - Likely needs server restart (Stop/Start in launcher) + hard browser refresh (Ctrl+Shift+R) to pick up new code
+  - If still broken after restart, investigate: saved `settings.json` content, browser console errors, and `POST /api/settings` response
+
+### Required Actions
+1. Restart server (Stop → Start in launcher) for `server.py` changes
+2. Hard refresh browser (Ctrl+Shift+R) for `index.html` changes
+
 ### Unfinished Items from Plan
 - [ ] `.gitignore` — add `settings.json`, `projects.json`, `*.pem`, `*.cert`
 - [ ] Fix `content-app-launcher.sh` stale path (still points to old directory)

@@ -36,7 +36,7 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:-apple-system,system-ui,'Segoe
 .header{height:var(--header-h);display:flex;align-items:center;padding:0 12px;gap:8px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
 .header h1{font-size:15px;font-weight:700;letter-spacing:-0.3px;flex:1;display:flex;align-items:center;gap:8px}
 .header h1 .dot{width:7px;height:7px;border-radius:50%;background:var(--red);display:inline-block}
-.header-btn{width:34px;height:34px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.header-btn{width:40px;height:40px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .header-btn:hover{background:var(--bg3)}
 .header-btn.settings-btn{font-size:17px}
 
@@ -85,7 +85,7 @@ body{background:#0a0a0a;color:#f0f0f0;font-family:-apple-system,system-ui,'Segoe
 .btn-ghost{background:transparent;border-color:transparent;color:var(--muted)}
 .btn-ghost:hover{color:var(--text)}
 .btn-sm{padding:6px 11px;font-size:12px}
-.btn-xs{padding:3px 8px;font-size:11px;border-radius:var(--radius-xs)}
+.btn-xs{padding:6px 8px;font-size:11px;border-radius:var(--radius-xs);min-height:32px}
 .btn-icon{width:32px;height:32px;padding:0}
 .btn-block{width:100%}
 .btn-danger{background:var(--red-bg);border-color:var(--red);color:var(--red)}
@@ -219,16 +219,27 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .gen-grid img{width:100%;border-radius:var(--radius-sm);border:1px solid var(--border);cursor:pointer;transition:all .12s}
 .gen-grid img:hover{border-color:var(--red)}
 
-/* ── Live posting toggle ── */
-.live-bar{display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;transition:border-color .2s,background .2s}
-.live-bar.active{border-color:var(--red);background:rgba(220,38,38,.08)}
-.live-toggle{width:52px;height:28px;border-radius:14px;background:var(--border2);border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
-.live-toggle::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.35)}
-.live-toggle.on{background:var(--red)}
-.live-toggle.on::after{transform:translateX(24px)}
-.pub-target{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer}
-.pub-target:last-child{border-bottom:none}
-.pub-target input{accent-color:var(--red);flex-shrink:0}
+/* ── Scripts collapsible (in Record tab) ── */
+.rec-scripts-details summary{list-style:none;cursor:pointer;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:10px 0;display:flex;align-items:center;gap:6px;user-select:none}
+.rec-scripts-details summary::-webkit-details-marker{display:none}
+.rec-scripts-details[open] summary{color:var(--text)}
+.rec-scripts-details summary::before{content:"▶";font-size:9px;transition:transform .15s;flex-shrink:0}
+.rec-scripts-details[open] summary::before{transform:rotate(90deg)}
+/* ── Library drawer (in Chat tab) ── */
+.lib-drawer-toggle{width:100%;background:none;border:none;border-top:1px solid var(--border);padding:10px 12px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px}
+.lib-drawer-toggle::before{content:"▶";font-size:9px;transition:transform .15s;flex-shrink:0}
+.lib-drawer-toggle.open{color:var(--text)}
+.lib-drawer-toggle.open::before{transform:rotate(90deg)}
+.lib-drawer{display:none;padding-bottom:8px}
+.lib-drawer.open{display:block}
+/* ── Status Bar ── */
+#hb{display:flex;gap:6px;align-items:center;background:#0d1117;border-top:1px solid #30363d;padding:4px 10px;font-size:11px;cursor:pointer;color:#8b949e;min-height:22px;flex-wrap:wrap;flex-shrink:0;user-select:none}
+#hb .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;flex-shrink:0}
+#hb .dot.green{background:#3fb950}
+#hb .dot.red{background:#f85149}
+#hb .dot.amber{background:#d29922}
+#hbpanel{display:none;position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom) + 26px);left:10px;right:10px;max-width:500px;z-index:51;background:#161b22;border:1px solid #30363d;border-radius:8px;padding:12px;font-size:11px;color:#8b949e;max-height:320px;overflow-y:auto;box-shadow:0 4px 12px #0008}
+#hbpanel.on{display:block}
 /* ── Settings tabs ── */
 .stab-bar{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto}
 .stab{padding:8px 14px;border:none;background:none;color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;border-radius:var(--radius-sm) var(--radius-sm) 0 0;white-space:nowrap;transition:all .12s;flex-shrink:0}
@@ -269,9 +280,21 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .toast.show{display:block}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
+/* ── Login Overlay ── */
+.login-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:none;align-items:center;justify-content:center}
+.login-overlay.show{display:flex}
+.login-card{background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:36px 28px 28px;width:min(340px,90vw);display:flex;flex-direction:column;align-items:center;gap:0;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.login-icon{font-size:44px;margin-bottom:12px}
+.login-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:20px;letter-spacing:.3px}
+.login-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:16px;padding:12px 14px;text-align:center;outline:none;margin-bottom:14px;box-sizing:border-box}
+.login-input:focus{border-color:var(--red)}
+.login-btn{width:100%;padding:14px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.login-btn:active{opacity:.8}
+.login-error{color:var(--red);font-size:12px;text-align:center;margin-top:10px;min-height:16px}
+
 /* ── Chat Tab ── */
-.content.chat-open{overflow:hidden;padding:0}
-#tabChat.active{display:flex;flex-direction:column;padding:0;height:100%;min-height:0}
+.content.chat-open{overflow:hidden;padding:0;display:flex;flex-direction:column}
+#tabChat.active{display:flex;flex-direction:column;padding:0;flex:1;min-height:0}
 .chat-top-bar{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg)}
 .chat-top-bar select{flex:1;font-size:13px;padding:6px 10px}
 .chat-messages{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
@@ -291,7 +314,20 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .chat-proj-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--border);font-size:13px}
 .chat-proj-name{flex:1;font-weight:500;truncate:hidden;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chat-proj-meta{font-size:11px;color:var(--muted);flex-shrink:0}
+.chat-body{display:flex;flex:1;min-height:0;position:relative}
+.chat-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.chat-trends-panel{width:220px;border-left:1px solid var(--border);overflow-y:auto;flex-shrink:0;background:var(--bg2);display:none}
+.chat-trends-panel.show{display:block}
+.chat-trends-head{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--muted);position:sticky;top:0;background:var(--bg2);z-index:1}
+.chat-trends-section{padding:6px 8px}
+.chat-trends-section:not(:empty){border-bottom:1px solid var(--border)}
+.chat-trends-label{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin:2px 0 4px}
+.trend-chip{display:inline-flex;align-items:center;gap:3px;padding:4px 9px;margin:3px 2px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;font-size:12px;cursor:pointer;transition:border-color .15s,color .15s}
+.trend-chip:hover{border-color:var(--red);color:var(--red)}
+.trend-chip .trend-gen{font-size:10px;opacity:.45;margin-left:2px;cursor:pointer}
+.trend-chip .trend-gen:hover{opacity:1}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes hb-pulse{0%,100%{opacity:.4}50%{opacity:1}}
 
 /* ── Silence Detection ── */
 .silence-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
@@ -325,7 +361,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .lib-confirm-bar-title{font-size:13px;font-weight:600}
 .lib-confirm-bar-reason{font-size:12px;color:var(--muted)}
 .lib-confirm-actions{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.lib-add-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:200}
+.lib-add-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:flex-end;z-index:250}
 .lib-add-overlay.show{display:flex}
 .lib-add-box{background:var(--bg2);border-radius:var(--radius) var(--radius) 0 0;width:100%;padding:20px 16px 32px;display:flex;flex-direction:column;gap:16px;max-width:960px;margin:0 auto}
 .lib-add-title{font-size:15px;font-weight:600;text-align:center;margin-bottom:4px}
@@ -429,6 +465,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
   .lib-add-options{grid-template-columns:1fr}
   .chat-bubble{font-size:14px;max-width:92%}
   .chat-input-area textarea{font-size:16px;min-height:40px}
+  .chat-trends-panel{position:absolute;right:0;top:0;bottom:0;width:200px;z-index:5;box-shadow:-2px 0 8px rgba(0,0,0,.3)}
   .btn{padding:8px 14px;font-size:12px}
   .btn-sm{padding:5px 10px;font-size:11px}
   .rec-btn{width:42px;height:42px}
@@ -464,129 +501,116 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 <div class="app" id="app">
   <!-- Header -->
   <header class="header">
-    <h1><span class="dot"></span> Content App</h1>
+    <h1>Content App</h1>
     <button class="header-btn" onclick="showSettings()" title="Settings">⚙</button>
   </header>
 
   <!-- Content -->
   <main class="content" id="content">
-    <div class="security-banner" id="securityBanner">🔓 Using HTTP — passwords are sent in plain text. Access via <a href="https://tailscale.com/kb/1242/tailscale-serve/" target="_blank">Tailscale HTTPS</a> for secure connections.</div>
 
     <!-- ═══════ HOME ═══════ -->
     <section class="tab-panel active" id="tabHome">
-      <div class="home-grid">
-        <div class="home-left">
-          <div class="hero-rec">
-            <button class="big-btn" onclick="switchTab(2)" title="Start Recording">🎙</button>
-            <div style="margin-top:8px;font-size:12px;color:var(--muted)">Tap to record</div>
-          </div>
-          <div class="section">
-            <div class="section-title">Recent Recordings</div>
-            <div class="card" id="recentList"><div class="empty"><span class="icon">🎙</span><span class="text">No recordings yet</span></div></div>
-          </div>
-        </div>
-        <div class="home-right">
-          <!-- Server Status Bar -->
-          <div class="section" id="serverStatusSection" style="display:none">
-            <div class="card card-pad" id="serverStatusCard">
-              <div class="row">
-                <div style="display:flex;align-items:center;gap:8px;flex:1">
-                  <span id="serverDot" style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block"></span>
-                  <span id="serverLabel" style="font-size:13px;font-weight:500">Running</span>
-                </div>
-                <span id="serverIP" style="font-size:11px;color:var(--muted);font-family:monospace"></span>
-                <button class="btn btn-sm btn-danger" onclick="stopServer()">⏹ Stop</button>
-              </div>
-              <div class="row mt-8" style="justify-content:center">
-                <canvas id="qrCanvas" style="border-radius:4px;background:#fff" width="0" height="0"></canvas>
-              </div>
-            </div>
-          </div>
-
-          <div class="section">
-            <div class="section-title">Brand</div>
-            <div class="brand-bar" id="brandBar"></div>
-          </div>
-          <div class="section" id="statsSection">
-            <div class="section-title">Platform Stats</div>
-            <div class="stat-grid" id="statGrid">
-              <div class="stat-card"><div class="stat-num" id="statVideos">-</div><div class="stat-label">YouTube</div></div>
-              <div class="stat-card"><div class="stat-num" id="statEpisodes">-</div><div class="stat-label">Buzzsprout</div></div>
-              <div class="stat-card"><div class="stat-num" id="statLocal">0</div><div class="stat-label">Local</div></div>
-            </div>
-            <div class="btn-group mt-8">
-              <button class="btn btn-sm btn-outline" onclick="fetchYouTubeStats()">↻ YouTube</button>
-              <button class="btn btn-sm btn-outline" onclick="fetchBuzzsproutStats()">↻ Buzzsprout</button>
-            </div>
-          </div>
-
-          <!-- API Config Status -->
-          <div class="section">
-            <div class="section-title">API Configuration</div>
-            <div class="api-status-list" id="apiStatusGrid">
-              <div class="api-status-row"><span class="api-status-label">Venice AI</span><span class="stat-num" id="apiVeniceStatus">❌</span></div>
-              <div class="api-status-row"><span class="api-status-label">OpenRouter</span><span class="stat-num" id="apiORStatus">❌</span></div>
-              <div class="api-status-row"><span class="api-status-label">YouTube</span><span class="stat-num" id="apiYTStatus">❌</span></div>
-              <div class="api-status-row"><span class="api-status-label">Meta</span><span class="stat-num" id="apiMetaStatus">❌</span></div>
-              <div class="api-status-row"><span class="api-status-label">Buzzsprout</span><span class="stat-num" id="apiBSStatus">❌</span></div>
-              <div class="api-status-row"><span class="api-status-label">Blog</span><span class="stat-num" id="apiBlogStatus">❌</span></div>
-            </div>
-            <button class="btn btn-sm btn-ghost mt-8" onclick="showSettings()" style="width:100%">⚙ Configure in Settings</button>
-          </div>
-        </div>
+      <!-- Refresh All -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+        <button class="btn btn-sm btn-outline" onclick="fetchYTAnalytics();fetchIGAnalytics();fetchBSAnalytics()">↻ Refresh All</button>
       </div>
-    </section>
-
-    <!-- ═══════ SCRIPTS ═══════ -->
-    <section class="tab-panel" id="tabScripts">
-      <div class="script-tabs" id="scriptTabs"></div>
-      <div class="scripts-layout">
-        <div class="scripts-left">
-          <div class="tele-stage" id="teleStage">
-            <div class="tele-fade-top"></div>
-            <div class="tele-marker"></div>
-            <div class="tele-text" id="teleText"></div>
-            <div class="tele-fade-bot"></div>
-          </div>
-          <div class="tele-progress"><div class="tele-progress-fill" id="teleProgress"></div></div>
-          <div class="tele-controls">
-            <button class="btn btn-sm btn-primary" id="telePlayBtn" onclick="teleTogglePlay()">▶</button>
-            <button class="btn btn-sm" onclick="teleReset()">↺</button>
-            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)">Speed
-              <input type="range" min="1" max="10" value="3" step="1" id="teleSpeed" oninput="teleSetSpeed(this.value)" style="width:60px">
-              <span id="teleSpeedVal" class="mono" style="font-size:11px;color:var(--text)">3</span>
-            </div>
-            <button class="btn btn-sm btn-ghost" onclick="teleToggleMirror()" title="Mirror">⇄</button>
-            <button class="btn btn-sm btn-ghost" onclick="teleSpeak()" title="Speak script aloud" id="teleSpeakBtn">🔊</button>
-            <button class="btn btn-sm btn-ghost" onclick="teleToggleFullscreen()" title="Fullscreen">⛶</button>
-            <button class="btn btn-sm btn-ghost" onclick="teleFontSize(-2)">A−</button>
-            <button class="btn btn-sm btn-ghost" onclick="teleFontSize(2)">A+</button>
-          </div>
-          <div class="tele-stats">
-            <span><span id="teleWords">0</span> words</span>
-            <span>≈ <span id="teleReadTime">0:00</span> read</span>
-            <span id="teleRemainWrap" style="display:none"><span id="teleRemain">0:00</span> left</span>
-          </div>
+      <!-- YouTube Analytics -->
+      <div class="section">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+          YouTube
+          <button class="btn btn-sm btn-ghost" onclick="fetchYTAnalytics()" id="ytRefreshBtn">↻</button>
         </div>
-        <div class="card script-editor">
-          <div class="card-pad">
-            <div class="row mb-8" style="gap:6px">
-              <input id="scriptName" type="text" placeholder="Script name" style="flex:1;font-size:13px;padding:6px 10px" oninput="teleRename(this.value)">
-              <button class="btn btn-sm btn-ghost" onclick="teleAdd()" title="New script">+</button>
-            </div>
-            <textarea id="scriptEditor" placeholder="Type or paste your script..." oninput="teleUpdate(this.value)" style="min-height:100px"></textarea>
-            <div class="btn-group mt-8">
-              <button class="btn btn-sm btn-outline" onclick="veniceGenerateScript()" title="Generate with Venice AI">✨ AI Script</button>
-              <button class="btn btn-sm btn-outline" onclick="scriptMicToggle()" id="scriptMicBtn" title="Dictate with mic">🎤</button>
-              <button class="btn btn-sm btn-danger" onclick="teleDelete()">✕ Delete</button>
-            </div>
-          </div>
-        </div>
+        <div id="ytAnalytics"><div class="empty text-sm">Configure YouTube API key in Settings to see analytics</div></div>
       </div>
+
+      <!-- Instagram Analytics -->
+      <div class="section">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+          Instagram
+          <button class="btn btn-sm btn-ghost" onclick="fetchIGAnalytics()" id="igRefreshBtn">↻</button>
+        </div>
+        <div id="igAnalytics"><div class="empty text-sm">Configure Meta token + IG account in Settings to see analytics</div></div>
+      </div>
+
+      <!-- Buzzsprout Analytics -->
+      <div class="section">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+          Buzzsprout
+          <button class="btn btn-sm btn-ghost" onclick="fetchBSAnalytics()" id="bsRefreshBtn">↻</button>
+        </div>
+        <div id="bsAnalytics"><div class="empty text-sm">Configure Buzzsprout API key in Settings to see analytics</div></div>
+      </div>
+
+      <!-- Hidden elements kept for JS compatibility -->
+      <span id="statLocal" style="display:none">0</span>
+      <span id="statVideos" style="display:none">-</span>
+      <span id="statEpisodes" style="display:none">-</span>
+      <div id="serverStatusSection" style="display:none">
+        <span id="serverDot"></span><span id="serverLabel"></span>
+        <span id="serverIP"></span>
+        <canvas id="qrCanvas" width="0" height="0"></canvas>
+      </div>
+      <span id="apiVeniceStatus" style="display:none"></span>
+      <span id="apiORStatus" style="display:none"></span>
+      <span id="apiGoogleStatus" style="display:none"></span>
+      <span id="apiYTStatus" style="display:none"></span>
+      <span id="apiMetaStatus" style="display:none"></span>
+      <span id="apiBSStatus" style="display:none"></span>
+      <span id="apiBlogStatus" style="display:none"></span>
     </section>
 
     <!-- ═══════ RECORD ═══════ -->
     <section class="tab-panel" id="tabRecord">
+      <!-- Teleprompter (collapsible) -->
+      <details class="rec-scripts-details section">
+        <summary>📝 Script / Teleprompter</summary>
+        <div class="script-tabs" id="scriptTabs"></div>
+        <div class="scripts-layout">
+          <div class="scripts-left">
+            <div class="tele-stage" id="teleStage">
+              <div class="tele-fade-top"></div>
+              <div class="tele-marker"></div>
+              <div class="tele-text" id="teleText"></div>
+              <div class="tele-fade-bot"></div>
+            </div>
+            <div class="tele-progress"><div class="tele-progress-fill" id="teleProgress"></div></div>
+            <div class="tele-controls">
+              <button class="btn btn-sm btn-primary" id="telePlayBtn" onclick="teleTogglePlay()">▶</button>
+              <button class="btn btn-sm" onclick="teleReset()">↺</button>
+              <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted)">Speed
+                <input type="range" min="1" max="10" value="3" step="1" id="teleSpeed" oninput="teleSetSpeed(this.value)" style="width:60px">
+                <span id="teleSpeedVal" class="mono" style="font-size:11px;color:var(--text)">3</span>
+              </div>
+              <button class="btn btn-sm btn-ghost" onclick="teleToggleMirror()" title="Mirror">⇄</button>
+              <button class="btn btn-sm btn-ghost" onclick="teleSpeak()" title="Speak script aloud" id="teleSpeakBtn">🔊</button>
+              <button class="btn btn-sm btn-ghost" onclick="teleToggleFullscreen()" title="Fullscreen">⛶</button>
+              <button class="btn btn-sm btn-ghost" onclick="teleFontSize(-2)">A−</button>
+              <button class="btn btn-sm btn-ghost" onclick="teleFontSize(2)">A+</button>
+            </div>
+            <div class="tele-stats">
+              <span><span id="teleWords">0</span> words</span>
+              <span>≈ <span id="teleReadTime">0:00</span> read</span>
+              <span id="teleRemainWrap" style="display:none"><span id="teleRemain">0:00</span> left</span>
+            </div>
+          </div>
+          <div class="card script-editor">
+            <div class="card-pad">
+              <div class="row mb-8" style="gap:6px">
+                <input id="scriptName" type="text" placeholder="Script name" style="flex:1;font-size:13px;padding:6px 10px" oninput="teleRename(this.value)">
+                <button class="btn btn-sm btn-ghost" onclick="teleAdd()" title="New script">+</button>
+              </div>
+              <textarea id="scriptEditor" placeholder="Type or paste your script..." oninput="teleUpdate(this.value)" style="min-height:100px"></textarea>
+              <div class="btn-group mt-8">
+                <button class="btn btn-sm btn-outline" onclick="veniceGenerateScript()" title="Generate with Venice AI">✨ AI Script</button>
+                <button class="btn btn-sm btn-outline" onclick="scriptMicToggle()" id="scriptMicBtn" title="Dictate with mic">🎤</button>
+                <button class="btn btn-sm btn-danger" onclick="teleDelete()">✕ Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <!-- Recording -->
       <div class="rec-mode-tabs" id="recModeTabs">
         <div class="rec-mode-tab active" data-mode="audio" onclick="recSetMode('audio')">🎧 Audio</div>
         <div class="rec-mode-tab" data-mode="video" onclick="recSetMode('video')">📷 Video</div>
@@ -630,19 +654,27 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
     </section>
 
     <!-- ═══════ EDIT ═══════ -->
-    <section class="tab-panel" id="tabEdit">
+    <!-- ═══════ CREATE (Edit + Thumbnail + Content) ═══════ -->
+    <section class="tab-panel" id="tabPost">
+      <!-- ── Edit ── -->
       <div class="section">
         <div class="section-title">Load Media</div>
         <div class="edit-load-zone" id="editDrop" onclick="document.getElementById('editFile').click()">
-          <span class="icon">🎬</span>
-          <div style="font-size:13px;font-weight:500">Drop video or audio</div>
-          <div style="font-size:11px;color:var(--muted)">or click to browse</div>
+          <span class="icon" id="editDropIcon">🎬</span>
+          <div style="font-size:13px;font-weight:500" id="editDropLabel">Drop video or audio</div>
+          <div style="font-size:11px;color:var(--muted)" id="editDropSub">or click to browse</div>
           <input type="file" id="editFile" accept="audio/*,video/*" style="display:none" onchange="editLoad(this.files[0])">
+          <div id="editLoadBar" style="display:none;width:100%;margin-top:10px;background:var(--border);border-radius:4px;height:4px;overflow:hidden">
+            <div id="editLoadBarFill" style="height:100%;background:#58a6ff;width:30%;border-radius:4px;animation:hb-pulse 1.2s ease-in-out infinite"></div>
+          </div>
         </div>
       </div>
       <div id="editEditor" style="display:none">
+        <div class="section" style="padding-bottom:0">
+          <video id="editPreview" style="display:none;width:100%;border-radius:8px;background:#000;max-height:300px;margin-bottom:8px" playsinline onclick="editTogglePlay()"></video>
+        </div>
         <div class="section">
-          <div class="edit-timeline" id="editTimeline">
+          <div class="edit-timeline" id="editTimeline" onclick="editSeek(event)">
             <div class="edit-tl-progress" id="editTlProgress"></div>
             <div class="edit-tl-sel" id="editTlSel" style="display:none"></div>
             <div class="edit-tl-head" id="editTlHead"></div>
@@ -661,6 +693,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
           </div>
           <div class="row row-wrap" style="gap:6px;margin-bottom:8px">
             <button class="btn btn-sm btn-outline" onclick="editAutoSilence()" title="Auto-detect silence">🔇 Auto Cut</button>
+            <button class="btn btn-sm btn-outline" onclick="editAIDetectClips()" id="editAIBtn">🤖 AI Detect Clips</button>
           </div>
         </div>
         <div class="section">
@@ -690,10 +723,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- ═══════ POST ═══════ -->
-    <section class="tab-panel" id="tabPost">
+      <hr style="border:none;border-top:1px solid var(--border);margin:4px 0 16px">
       <div class="post-layout">
         <!-- Left: aspect + canvas + export -->
         <div class="post-left">
@@ -760,27 +790,48 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
             </div>
             <div id="veniceResults" class="gen-grid"></div>
           </div>
-          <!-- ── Publish ── -->
+          <!-- ── Content Output ── -->
           <div class="section">
-            <div class="section-title">Publish</div>
-            <div class="live-bar" id="liveBar">
-              <div>
-                <div style="font-size:13px;font-weight:600;color:var(--text)">⚡ Live Posting</div>
-                <div style="font-size:11px;color:var(--muted);margin-top:2px">OFF by default — flip ON to post to real accounts</div>
-              </div>
-              <button class="live-toggle" id="liveToggle" onclick="toggleLivePosting()" aria-label="Toggle live posting"></button>
+            <div class="section-title">Content Output</div>
+            <div style="margin-bottom:10px">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Brand</div>
+              <div class="brand-bar" id="brandBar"></div>
             </div>
-            <div class="form-group mt-8">
-              <label>Caption / Post Text</label>
-              <textarea id="postCaption" placeholder="Write your caption..." style="min-height:80px"></textarea>
+            <div class="form-group">
+              <label>Topic / seed text</label>
+              <textarea id="contentSeed" placeholder="What's this post about?" style="min-height:60px"></textarea>
             </div>
-            <div class="section-title" style="margin-top:12px">Post to</div>
-            <div class="card card-pad" id="publishTargets" style="padding:8px 16px;min-height:48px"></div>
-            <button class="btn btn-block mt-8" id="publishBtn" onclick="publishToAll()" disabled style="opacity:.4">
-              🚫 Live Posting is OFF
-            </button>
+            <div class="form-group">
+              <label>Title <span style="font-size:10px;color:var(--muted);font-weight:400">(optional)</span></label>
+              <input id="contentTitle" type="text" placeholder="Post title…">
+            </div>
+            <div class="btn-group mt-8">
+              <button class="btn btn-sm btn-primary" onclick="genAll()">✨ Generate All</button>
+              <button class="btn btn-sm btn-outline" onclick="genDescription()">✍️ Description</button>
+              <button class="btn btn-sm btn-outline" onclick="genHashtags()">🏷 Hashtags</button>
+            </div>
+            <div class="form-group mt-8" id="contentDescWrap" style="display:none">
+              <label style="display:flex;align-items:center;justify-content:space-between">Description <button class="btn btn-sm btn-ghost" style="padding:2px 8px" onclick="copyText('contentDesc')">Copy</button></label>
+              <textarea id="contentDesc" style="min-height:80px"></textarea>
+            </div>
+            <div class="form-group mt-8" id="contentTagsWrap" style="display:none">
+              <label style="display:flex;align-items:center;justify-content:space-between">Hashtags <button class="btn btn-sm btn-ghost" style="padding:2px 8px" onclick="copyText('contentTags')">Copy</button></label>
+              <textarea id="contentTags" style="min-height:60px"></textarea>
+            </div>
+            <div class="form-group mt-8" id="contentTemplateWrap" style="display:none">
+              <label style="display:flex;align-items:center;justify-content:space-between">Full Template <button class="btn btn-sm btn-primary" style="padding:2px 10px" onclick="copyTemplate()">📋 Copy All</button></label>
+              <textarea id="contentTemplate" readonly style="min-height:120px;font-size:12px;font-family:monospace;color:var(--text)"></textarea>
+            </div>
           </div>
         </div>
+      </div>
+      <!-- Drafts -->
+      <div class="section" style="margin-top:8px">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+          Drafts
+          <button class="btn btn-sm btn-primary" onclick="draftSave()">💾 Save Draft</button>
+        </div>
+        <div id="draftList"><div class="empty text-sm">No drafts yet</div></div>
       </div>
     </section>
 
@@ -790,32 +841,43 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
         <select id="chatProviderSelect" onchange="chatSwitchProvider()">
           <option value="openrouter">OpenRouter</option>
           <option value="venice">Venice AI</option>
+          <option value="google">Google AI</option>
         </select>
         <select id="chatModelSelect" onchange="chatSaveModel()"></select>
+        <button class="btn btn-sm btn-ghost btn-icon" onclick="chatToggleTrends()" id="chatTrendsToggle" title="Show trending">🔥</button>
         <button class="btn btn-sm btn-ghost btn-icon" onclick="chatSaveProject()" title="Save project">💾</button>
         <button class="btn btn-sm btn-ghost btn-icon" onclick="chatClear()" title="Clear chat">✕</button>
       </div>
-      <div class="chat-messages" id="chatMessages">
-        <div class="chat-empty-state" id="chatEmptyState">
-          <span class="chat-empty-icon">💬</span>
-          <span class="text-sm">Ask anything — scripts, show notes, hooks, captions</span>
+      <div class="chat-body">
+        <div class="chat-main">
+          <div class="chat-messages" id="chatMessages">
+            <div class="chat-empty-state" id="chatEmptyState">
+              <span class="chat-empty-icon">💬</span>
+              <span class="text-sm">Ask anything — scripts, show notes, hooks, captions</span>
+            </div>
+          </div>
+          <div class="chat-projects" id="chatProjects" style="display:none">
+            <div class="section-title" style="padding:8px 12px 4px">Saved Projects</div>
+            <div id="chatProjectsList"></div>
+          </div>
+          <div class="chat-input-area">
+            <textarea id="chatInput" placeholder="Message..." rows="1"
+              onkeydown="chatKeyDown(event)" oninput="chatInputResize()"
+              autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true"></textarea>
+            <button class="btn btn-sm btn-ghost" onclick="chatMicToggle()" id="chatMicBtn" title="Voice input">🎤</button>
+            <button class="btn btn-primary" id="chatSendBtn" onclick="chatSendMessage()">Send</button>
+          </div>
         </div>
+        <aside class="chat-trends-panel" id="chatTrendsPanel">
+          <div class="chat-trends-head">
+            <span>Trending</span>
+            <button class="btn btn-sm btn-ghost btn-icon" onclick="refreshTrends()" id="chatTrendsRefresh" title="Refresh trends">🔄</button>
+          </div>
+          <div class="chat-trends-section" id="chatTrendsNiche"></div>
+          <div class="chat-trends-section" id="chatTrendsGeneral"></div>
+        </aside>
       </div>
-      <div class="chat-projects" id="chatProjects" style="display:none">
-        <div class="section-title" style="padding:8px 12px 4px">Saved Projects</div>
-        <div id="chatProjectsList"></div>
-      </div>
-      <div class="chat-input-area">
-        <textarea id="chatInput" placeholder="Message..." rows="1"
-          onkeydown="chatKeyDown(event)" oninput="chatInputResize()"
-          autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true"></textarea>
-        <button class="btn btn-sm btn-ghost" onclick="chatMicToggle()" id="chatMicBtn" title="Voice input">🎤</button>
-        <button class="btn btn-primary" id="chatSendBtn" onclick="chatSendMessage()">Send</button>
-      </div>
-    </section>
-
-    <!-- ═══════ LIBRARY ═══════ -->
-    <section class="tab-panel" id="tabLibrary">
+      <!-- Library drawer -->
       <div class="lib-confirm-bar" id="libConfirmBar">
         <div>
           <div class="lib-confirm-bar-title" id="libConfirmTitle">🤖 Sending to Chat</div>
@@ -827,39 +889,41 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
           <button class="btn btn-sm btn-ghost" onclick="libraryCancelSend()">Cancel</button>
         </div>
       </div>
-      <div class="lib-toolbar">
-        <div class="lib-filters">
-          <button class="lib-chip active" onclick="librarySetFilter('all',this)">All</button>
-          <button class="lib-chip" onclick="librarySetFilter('audio',this)">🎙 Audio</button>
-          <button class="lib-chip" onclick="librarySetFilter('video',this)">🎬 Video</button>
-          <button class="lib-chip" onclick="librarySetFilter('image',this)">🖼 Image</button>
-          <button class="lib-chip" onclick="librarySetFilter('doc',this)">📄 Doc</button>
-          <button class="lib-chip" onclick="librarySetFilter('link',this)">🔗 Link</button>
+      <button class="lib-drawer-toggle" onclick="libDrawerToggle(this)">📚 Library</button>
+      <div class="lib-drawer" id="libDrawer">
+        <div class="lib-toolbar">
+          <div class="lib-filters">
+            <button class="lib-chip active" onclick="librarySetFilter('all',this)">All</button>
+            <button class="lib-chip" onclick="librarySetFilter('chs',this)">🏋️ Strength Club</button>
+            <button class="lib-chip" onclick="librarySetFilter('barbie',this)">🐾 Barbie</button>
+            <button class="lib-chip" onclick="librarySetFilter('dsp',this)">🎙️ Podcast</button>
+          </div>
+          <select class="lib-sort" id="libSort" onchange="libraryRender()">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="name">A–Z</option>
+          </select>
+          <button class="btn btn-sm btn-primary" onclick="libraryShowAdd()">+ Add</button>
         </div>
-        <select class="lib-sort" id="libSort" onchange="libraryRender()">
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-          <option value="name">A–Z</option>
-        </select>
-        <button class="btn btn-sm btn-primary" onclick="libraryShowAdd()">+ Add</button>
+        <div class="lib-list" id="libList">
+          <div class="empty"><span class="icon">📚</span><span class="text">No items yet — add files or links</span></div>
+        </div>
+        <input type="file" id="libFileInput" accept="audio/*,video/*,image/*,.pdf,.txt,.doc,.docx" style="display:none" onchange="libraryHandleFile(this.files[0])">
       </div>
-      <div class="lib-list" id="libList">
-        <div class="empty"><span class="icon">📚</span><span class="text">No items yet — add files or links</span></div>
-      </div>
-      <input type="file" id="libFileInput" accept="audio/*,video/*,image/*,.pdf,.txt,.doc,.docx" style="display:none" onchange="libraryHandleFile(this.files[0])">
     </section>
 
   </main>
 
+  <!-- Status Bar -->
+  <div id="hb" onclick="hbtoggle()">♥</div>
+  <div id="hbpanel"></div>
+
   <!-- Nav -->
   <nav class="nav" id="nav">
     <button class="nav-btn active" data-tab="0" onclick="switchTab(0)"><span class="nav-icon">🏠</span>Home</button>
-    <button class="nav-btn" data-tab="1" onclick="switchTab(1)"><span class="nav-icon">📝</span>Scripts</button>
-    <button class="nav-btn" data-tab="2" onclick="switchTab(2)"><span class="nav-icon">🎙</span>Record</button>
-    <button class="nav-btn" data-tab="3" onclick="switchTab(3)"><span class="nav-icon">✂️</span>Edit</button>
-    <button class="nav-btn" data-tab="4" onclick="switchTab(4)"><span class="nav-icon">📱</span>Post</button>
-    <button class="nav-btn" data-tab="5" onclick="switchTab(5)"><span class="nav-icon">💬</span>Chat</button>
-    <button class="nav-btn" data-tab="6" onclick="switchTab(6)"><span class="nav-icon">📚</span>Library</button>
+    <button class="nav-btn" data-tab="1" onclick="switchTab(1)"><span class="nav-icon">🎙</span>Record</button>
+    <button class="nav-btn" data-tab="2" onclick="switchTab(2)"><span class="nav-icon">✨</span>Create</button>
+    <button class="nav-btn" data-tab="3" onclick="switchTab(3)"><span class="nav-icon">💬</span>Chat</button>
   </nav>
 </div>
 
@@ -912,6 +976,13 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
         </div>
       </div>
       <div class="section">
+        <div class="section-title">AssemblyAI — audio transcription &amp; clip detection</div>
+        <div class="api-field">
+          <label>API Key</label>
+          <input id="settingAssemblyAiKey" type="password" autocomplete="off" placeholder="your-assemblyai-key" oninput="saveSettingsDebounced()">
+        </div>
+      </div>
+      <div class="section">
         <div class="section-title">OpenRouter — multi-model AI chat</div>
         <div class="api-field">
           <label>API Key</label>
@@ -919,12 +990,23 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
         </div>
       </div>
       <div class="section">
+        <div class="section-title">Google AI — Gemini models</div>
+        <div class="api-field">
+          <label>API Key</label>
+          <input id="settingGoogleKey" type="password" autocomplete="off" placeholder="AIza..." oninput="saveSettingsDebounced()">
+        </div>
+      </div>
+      <div class="section">
         <div class="section-title">App Password</div>
         <div class="api-field">
-          <label>Password (leave blank to disable)</label>
-          <input id="settingAppPassword" type="password" autocomplete="off" placeholder="Set a password to protect this app" oninput="saveSettingsDebounced()">
-          <div class="api-status" id="appPasswordStatus"></div>
+          <label>New password</label>
+          <input id="settingAppPassword" type="password" autocomplete="new-password" placeholder="Type new password…">
         </div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn btn-sm btn-primary" onclick="saveAppPassword()">Set Password</button>
+          <button class="btn btn-sm btn-ghost" onclick="clearAppPassword()">Remove Password</button>
+        </div>
+        <div class="api-status" id="appPasswordStatus" style="margin-top:6px"></div>
       </div>
     </div>
 
@@ -1030,17 +1112,14 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 </div>
 
 <!-- ═══════ LOGIN OVERLAY ═══════ -->
-<div class="modal-overlay" id="loginOverlay">
-  <div class="modal" style="max-width:360px;border-radius:var(--radius);margin:auto">
-    <div class="modal-handle"></div>
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
     <form id="loginForm" onsubmit="event.preventDefault();loginSubmit()">
-      <div class="modal-title" style="text-align:center">🔒 App Locked</div>
-      <p style="font-size:13px;color:var(--muted);text-align:center;margin-bottom:16px">Enter the app password to continue</p>
-      <div class="form-group">
-        <input id="loginPassword" type="password" name="password" autocomplete="current-password" placeholder="Enter password" style="font-size:16px;text-align:center">
-      </div>
-      <button class="btn btn-block btn-primary" type="submit">Unlock</button>
-      <div id="loginError" style="color:var(--red);font-size:12px;text-align:center;margin-top:8px;display:none"></div>
+      <div class="login-icon">🔒</div>
+      <div class="login-title">Enter PIN</div>
+      <input id="loginPassword" class="login-input" type="password" name="password" autocomplete="current-password" placeholder="app password">
+      <button class="login-btn" type="submit">Unlock</button>
+      <div id="loginError" class="login-error"></div>
     </form>
   </div>
 </div>
@@ -1050,6 +1129,36 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 
 <script>
 'use strict';
+
+/* ── Pure-JS SHA-256 (works on HTTP where crypto.subtle is unavailable) ── */
+function sha256hex(str) {
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const rot=(v,a)=>(v>>>a)|(v<<(32-a));
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const bytes=new TextEncoder().encode(str);
+  const blen=bytes.length, plen=Math.ceil((blen+9)/64)*64;
+  const pad=new Uint8Array(plen); pad.set(bytes); pad[blen]=0x80;
+  const dv=new DataView(pad.buffer); dv.setUint32(plen-4,blen*8,false);
+  for(let i=0;i<plen;i+=64){
+    const w=Array(64);
+    for(let j=0;j<16;j++) w[j]=dv.getUint32(i+j*4,false);
+    for(let j=16;j<64;j++){const s0=rot(w[j-15],7)^rot(w[j-15],18)^(w[j-15]>>>3);const s1=rot(w[j-2],17)^rot(w[j-2],19)^(w[j-2]>>>10);w[j]=(w[j-16]+s0+w[j-7]+s1)>>>0;}
+    let [a,b,c,d,e,f,g,hh]=H;
+    for(let j=0;j<64;j++){const S1=rot(e,6)^rot(e,11)^rot(e,25);const ch=(e&f)^(~e&g);const t1=(hh+S1+ch+K[j]+w[j])>>>0;const S0=rot(a,2)^rot(a,13)^rot(a,22);const mj=(a&b)^(a&c)^(b&c);const t2=(S0+mj)>>>0;hh=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0;}
+    H=H.map((x,i)=>(x+[a,b,c,d,e,f,g,hh][i])>>>0);
+  }
+  return H.map(n=>n.toString(16).padStart(8,'0')).join('');
+}
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+async function hashPw(pw) {
+  if(window.crypto&&crypto.subtle) {
+    try {
+      const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pw));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    } catch(_) { /* insecure context — fall through to JS fallback */ }
+  }
+  return sha256hex(pw);
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    CONFIG & STATE
@@ -1067,16 +1176,29 @@ const VENICE_IMG_URL = VENICE_BASE + '/image/generate';
 const VENICE_CHAT_URL = VENICE_BASE + '/chat/completions';
 
 const OR_MODELS = [
-  { id:'google/gemini-2.0-flash-exp:free',       label:'Gemini 2.0 Flash (free)' },
-  { id:'meta-llama/llama-3.3-70b-instruct:free', label:'Llama 3.3 70B (free)' },
-  { id:'deepseek/deepseek-r1:free',              label:'DeepSeek R1 (free)' },
-  { id:'qwen/qwen3-235b-a22b:free',              label:'Qwen3 235B (free)' },
-  { id:'mistralai/mistral-7b-instruct:free',     label:'Mistral 7B (free)' },
+  { id:'openrouter/free',                          label:'🟢 Auto (best free)' },
+  { id:'google/gemma-4-31b-it:free',               label:'🟢 Gemma 4 31B' },
+  { id:'deepseek/deepseek-r1:free',                label:'🟢 DeepSeek R1' },
+  { id:'meta-llama/llama-3.3-70b-instruct:free',   label:'🟢 Llama 3.3 70B' },
+  { id:'nousresearch/hermes-3-llama-3.1-405b:free', label:'🟢 Hermes 3 405B' },
+  { id:'qwen/qwen3-coder:free',                    label:'🟢 Qwen3 Coder' },
+  { id:'qwen/qwen3-235b-a22b:free',                label:'🟢 Qwen3 235B' },
+  { id:'qwen/qwq-32b:free',                        label:'🟢 QwQ 32B' },
+  { id:'deepseek/deepseek-r1-distill-llama-70b:free', label:'🟢 DeepSeek R1 Distill' },
+  { id:'openai/gpt-4o',                            label:'💰 GPT-4o' },
+  { id:'anthropic/claude-sonnet-4-5',              label:'💰 Claude Sonnet 4.5' },
+  { id:'google/gemini-2.5-pro',                    label:'💰 Gemini 2.5 Pro' },
 ];
 const VENICE_CHAT_MODELS = [
-  { id:'qwen3-4b',       label:'Qwen3 4B' },
-  { id:'llama-3.3-70b',  label:'Llama 3.3 70B' },
-  { id:'mistral-31-24b', label:'Mistral 24B' },
+  { id:'qwen3-4b',       label:'🟢 Qwen 3.5 4B' },
+  { id:'llama-3.3-70b',  label:'🟢 Llama 3.3 70B' },
+  { id:'mistral-31-24b', label:'🟢 Mistral 24B' },
+];
+const GOOGLE_MODELS = [
+  { id:'gemini-2.5-pro-exp-03-25', label:'💰 Gemini 2.5 Pro Exp' },
+  { id:'gemini-2.0-flash',         label:'🟢 Gemini 2.0 Flash' },
+  { id:'gemini-2.0-flash-lite',    label:'🟢 Gemini 2.0 Flash Lite' },
+  { id:'gemini-1.5-flash',         label:'🟢 Gemini 1.5 Flash' },
 ];
 
 let _chatHistory = [];
@@ -1090,7 +1212,7 @@ let _libPending  = null;
 let DB = null;
 function dbOpen() {
   return new Promise((resolve, reject) => {
-    const r = indexedDB.open('ContentApp', 2);
+    const r = indexedDB.open('ContentApp', 3);
     r.onupgradeneeded = e => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('recordings')) db.createObjectStore('recordings', { keyPath: 'id' });
@@ -1098,6 +1220,7 @@ function dbOpen() {
       if (!db.objectStoreNames.contains('scripts')) db.createObjectStore('scripts', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('clips')) db.createObjectStore('clips', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('library')) db.createObjectStore('library', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('drafts')) db.createObjectStore('drafts', { keyPath: 'id' });
     };
     r.onsuccess = e => { DB = e.target.result; resolve(); };
     r.onerror = e => reject(e.target.error);
@@ -1154,20 +1277,29 @@ async function loadSettings() {
 }
 
 function saveSettings(s) {
+  if (!_settingsLoaded) return Promise.resolve(null);
   const h = { 'Content-Type': 'application/json', ..._authHeaders() };
   return fetch('/api/settings', {
     method: 'POST',
     headers: h,
     body: JSON.stringify(s)
+  }).then(r => {
+    if (r.status === 401) { showLogin(); return Promise.reject(new Error('unauthorized')); }
+    return r;
   });
 }
 
 let _settings = {};
+let _settingsLoaded = false;
+let _trends = null;
 async function initSettings() {
   _settings = await loadSettings();
-  // Venice
+  _settingsLoaded = true;
+  // Venice / AssemblyAI
   document.getElementById('settingVeniceKey').value = _settings.veniceKey || '';
+  document.getElementById('settingAssemblyAiKey').value = _settings.assemblyAiKey || '';
   document.getElementById('settingOpenrouterKey').value = _settings.openrouterKey || '';
+  document.getElementById('settingGoogleKey').value = _settings.googleKey || '';
   // YouTube
   document.getElementById('settingYTKey').value = _settings.ytKey || '';
   document.getElementById('settingYT1Label').value = _settings.yt1Label || '';
@@ -1196,16 +1328,20 @@ async function initSettings() {
   document.getElementById('settingGithubRepo').value = _settings.githubRepo || '';
   document.getElementById('settingBlogUrl').value = _settings.blogUrl || '';
   document.getElementById('settingAppPassword').value = '';
-  document.getElementById('appPasswordStatus').textContent = _settings.appPassword ? '✅ Password set' : '';
+  document.getElementById('appPasswordStatus').textContent = _settings.appPassword ? '✅ Password is set' : 'No password set';
   setupBrandSettings();
 }
 
 let _saveTimer = null;
+let _savePromise = Promise.resolve();
 function saveSettingsDebounced() {
+  if (!_settingsLoaded) return;
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(() => {
     _settings.veniceKey = document.getElementById('settingVeniceKey').value.trim();
+    _settings.assemblyAiKey = document.getElementById('settingAssemblyAiKey').value.trim();
     _settings.openrouterKey = document.getElementById('settingOpenrouterKey').value.trim();
+    _settings.googleKey = document.getElementById('settingGoogleKey').value.trim();
     _settings.ytKey = document.getElementById('settingYTKey').value.trim();
     _settings.yt1Label = document.getElementById('settingYT1Label').value.trim();
     _settings.ytChannel = document.getElementById('settingYTChannel').value.trim();
@@ -1229,26 +1365,29 @@ function saveSettingsDebounced() {
     _settings.githubToken = document.getElementById('settingGithubToken').value.trim();
     _settings.githubRepo = document.getElementById('settingGithubRepo').value.trim();
     _settings.blogUrl = document.getElementById('settingBlogUrl').value.trim();
-    const pwInput = document.getElementById('settingAppPassword').value.trim();
-    const doSave = () => {
-      saveSettings(_settings);
-      updateApiStatus();
-      loadBrandSettings();
-      updatePublishTargets();
-    };
-    if (pwInput) {
-      crypto.subtle.digest('SHA-256', new TextEncoder().encode(pwInput)).then(buf => {
-        const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-        _settings.appPassword = hash;
-        document.getElementById('appPasswordStatus').textContent = '✅ Password set';
-        doSave();
-      });
-    } else {
-      delete _settings.appPassword;
-      document.getElementById('appPasswordStatus').textContent = '';
-      doSave();
-    }
+    _savePromise = _savePromise.then(() => saveSettings(_settings));
+    updateApiStatus();
+    loadBrandSettings();
   }, 300);
+}
+
+async function saveAppPassword() {
+  const pw = document.getElementById('settingAppPassword').value.trim();
+  if (!pw) { document.getElementById('appPasswordStatus').textContent = '⚠️ Enter a password first'; return; }
+  const hash = await hashPw(pw);
+  _settings.appPassword = hash;
+  document.getElementById('settingAppPassword').value = '';
+  document.getElementById('appPasswordStatus').textContent = '⏳ Saving…';
+  const r = await saveSettings(_settings);
+  document.getElementById('appPasswordStatus').textContent = r && r.ok ? '✅ Password saved' : '❌ Save failed';
+}
+
+async function clearAppPassword() {
+  _settings.appPassword = '';
+  sessionStorage.removeItem('contentAppToken');
+  document.getElementById('appPasswordStatus').textContent = '⏳ Removing…';
+  const r = await saveSettings(_settings);
+  document.getElementById('appPasswordStatus').textContent = r && r.ok ? '✅ Password removed' : '❌ Save failed';
 }
 
 function showSettings() {
@@ -1416,16 +1555,18 @@ function showSettingsTab(btn, tab) {
    ═══════════════════════════════════════════════════════════════════ */
 let _authenticated = false;
 
-let _storedPasswordHash = '';
-
 async function checkAuth() {
   if (_authenticated) return true;
-  if (sessionStorage.getItem('contentAppAuth')) { _authenticated = true; return true; }
+  const token = sessionStorage.getItem('contentAppToken');
   try {
     const r = await fetch('/api/status');
     const d = await r.json();
-    _storedPasswordHash = d.passwordHash || '';
     if (!d.passwordSet) { _authenticated = true; return true; }
+    if (token) {
+      const test = await fetch('/api/settings', { headers: { 'X-App-Key': token } });
+      if (test.ok) { _authenticated = true; return true; }
+      sessionStorage.removeItem('contentAppToken');
+    }
   } catch(e) { return true; }
   showLogin();
   return false;
@@ -1434,33 +1575,40 @@ async function checkAuth() {
 function showLogin() {
   document.getElementById('loginOverlay').classList.add('show');
   document.getElementById('loginPassword').value = '';
-  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('loginError').textContent = '';
   setTimeout(() => document.getElementById('loginPassword').focus(), 100);
 }
 
 async function loginSubmit() {
   const pw = document.getElementById('loginPassword').value.trim();
   if (!pw) return;
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-  const hash = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  if (hash === _storedPasswordHash) {
-    _authenticated = true;
-    sessionStorage.setItem('contentAppAuth', hash);
-    document.getElementById('loginOverlay').classList.remove('show');
-    document.getElementById('loginError').style.display = 'none';
-    await bootstrapApp();
-  } else {
-    document.getElementById('loginError').textContent = 'Incorrect password';
-    document.getElementById('loginError').style.display = 'block';
-    document.getElementById('loginPassword').value = '';
-    document.getElementById('loginPassword').focus();
+  try {
+    const r = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    const d = await r.json();
+    if (d.ok && d.token) {
+      sessionStorage.setItem('contentAppToken', d.token);
+      _authenticated = true;
+      document.getElementById('loginOverlay').classList.remove('show');
+      document.getElementById('loginError').textContent = '';
+      await bootstrapApp();
+    } else {
+      document.getElementById('loginError').textContent = 'Incorrect password';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('loginPassword').focus();
+    }
+  } catch(e) {
+    document.getElementById('loginError').textContent = 'Connection error';
   }
 }
 
 function _authHeaders() {
   const h = {};
-  const stored = sessionStorage.getItem('contentAppAuth');
-  if (stored) h['X-App-Key'] = stored;
+  const token = sessionStorage.getItem('contentAppToken');
+  if (token) h['X-App-Key'] = token;
   return h;
 }
 
@@ -1509,7 +1657,6 @@ function setActiveBrand(id) {
   _settings.activeBrand = id;
   saveSettings(_settings);
   loadBrandSettings();
-  updatePublishTargets();
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1521,11 +1668,9 @@ function switchTab(idx) {
   currentTab = idx;
   document.querySelectorAll('.tab-panel').forEach((el, i) => el.classList.toggle('active', i === idx));
   document.querySelectorAll('.nav-btn').forEach((el, i) => el.classList.toggle('active', i === idx));
-  document.getElementById('content').classList.toggle('chat-open', idx === 5);
+  document.getElementById('content').classList.toggle('chat-open', idx === 3);
   if (idx === 0) refreshHome();
-  if (idx === 4) updatePublishTargets();
-  if (idx === 6) libraryRender();
-  if (idx !== 5) document.getElementById('content').scrollTop = 0;
+  if (idx !== 3) document.getElementById('content').scrollTop = 0;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1542,29 +1687,29 @@ function toast(msg, dur) {
 /* ═══════════════════════════════════════════════════════════════════
    HOME TAB
    ═══════════════════════════════════════════════════════════════════ */
+let _homeRecs = [];
+
 async function refreshHome() {
-  const recs = await dbGetAll('recordings');
-  const list = document.getElementById('recentList');
-  if (!recs.length) {
-    list.innerHTML = '<div class="empty"><span class="icon">🎙</span><span class="text">No recordings yet</span></div>';
-  } else {
-    list.innerHTML = recs.sort((a,b) => b.date - a.date).slice(0, 10).map(r => `
-      <div class="rec-item">
-        <div class="rec-icon">${r.type === 'video' ? '📷' : r.type === 'screen' ? '🖥' : '🎧'}</div>
-        <div class="rec-info">
-          <div class="rec-title truncate">${r.title}</div>
-          <div class="rec-meta"><span>${fmtTimeShort(r.date)}</span><span>${r.dur ? fmtTime(r.dur) : ''}</span><span class="tag">${(BRANDS.find(b=>b.id===r.brand)||{}).emoji||''} ${r.brand||''}</span></div>
-        </div>
-        <div style="display:flex;gap:4px">
-          <button class="btn btn-xs btn-ghost rec-action" onclick="loadRecordingToEdit('${r.id}')">✂️</button>
-          <button class="btn btn-xs btn-ghost rec-action" onclick="libraryAddFromRecording('${r.id}')" title="Save to Library">📚</button>
-        </div>
-      </div>
-    `).join('');
-  }
-  document.getElementById('statLocal').textContent = recs.length;
+  _homeRecs = await dbGetAll('recordings');
+  document.getElementById('statLocal').textContent = _homeRecs.length;
   checkServerStatus();
   updateApiStatus();
+  fetchYTAnalytics();
+  fetchIGAnalytics();
+  fetchBSAnalytics();
+}
+
+function renderHbRecordings() {
+  const recs = _homeRecs.sort((a,b) => b.date - a.date).slice(0, 5);
+  if (!recs.length) return '<div style="color:#8b949e;font-size:11px;padding:2px 0">No recordings yet</div>';
+  return recs.map(r =>
+    '<div style="display:flex;gap:8px;align-items:center;padding:3px 0">'
+    + `<span style="font-size:14px">${r.type==='video'?'📷':r.type==='screen'?'🖥':'🎧'}</span>`
+    + `<span style="flex:1;color:#e6edf3;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.title)}</span>`
+    + `<span style="color:#8b949e;font-size:10px;flex-shrink:0">${fmtTimeShort(r.date)}</span>`
+    + `<button onclick="loadRecordingToEdit('${r.id}');hbtoggle()" style="background:#161b22;color:#58a6ff;border:1px solid #30363d;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:10px;flex-shrink:0">✂️ Edit</button>`
+    + '</div>'
+  ).join('');
 }
 
 /* ── Server Status ── */
@@ -1574,6 +1719,7 @@ async function checkServerStatus() {
     const r = await fetch('/api/status');
     if (!r.ok) throw new Error('not running');
     const d = await r.json();
+    _serverAlive = true;
     section.style.display = 'block';
     document.getElementById('serverDot').style.background = 'var(--green)';
     document.getElementById('serverLabel').textContent = 'Running';
@@ -1582,12 +1728,13 @@ async function checkServerStatus() {
     const url = d.httpsUrl || httpUrl;
     document.getElementById('serverIP').textContent = url;
     document.getElementById('serverLabel').textContent = d.httpsUrl ? '🔒 HTTPS' : 'Running';
-    // Generate QR code
     const qrCanvas = document.getElementById('qrCanvas');
     if (qrCanvas && url) generateQR(url, qrCanvas);
   } catch(e) {
+    _serverAlive = false;
     section.style.display = 'none';
   }
+  renderHb();
 }
 
 async function stopServer() {
@@ -1608,6 +1755,135 @@ function updateApiStatus() {
   document.getElementById('apiBSStatus').textContent = (_settings.bsKey && _settings.bsPodcast) ? '✅' : '❌';
   document.getElementById('apiBlogStatus').textContent = (_settings.githubToken && _settings.githubRepo) ? '✅' : '❌';
   document.getElementById('apiORStatus').textContent = _settings.openrouterKey ? '✅' : '❌';
+  document.getElementById('apiGoogleStatus').textContent = _settings.googleKey ? '✅' : '❌';
+  renderHb();
+}
+
+/* ── Status bar ── */
+let _serverAlive = false;
+let _devicePerms = { camera: 'unknown', mic: 'unknown' };
+let _hbErrors = [];
+let _transferStatus = null;
+
+function setTransfer(label, pct) {
+  _transferStatus = { label, pct: pct ?? null };
+  _renderHbBar();
+}
+function clearTransfer() {
+  _transferStatus = null;
+  _renderHbBar();
+}
+
+async function checkDevicePermissions() {
+  try { _devicePerms.camera = (await navigator.permissions.query({name:'camera'})).state; } catch { _devicePerms.camera = 'unknown'; }
+  try { _devicePerms.mic    = (await navigator.permissions.query({name:'microphone'})).state; } catch { _devicePerms.mic = 'unknown'; }
+}
+
+function _permDot(state) {
+  return state === 'granted' ? 'green' : state === 'prompt' ? 'amber' : 'red';
+}
+
+function _permLabel(state) {
+  return state === 'granted' ? '✓ granted' : state === 'prompt' ? '⚠ not yet asked' : state === 'denied' ? '✗ denied' : '✗ unknown';
+}
+
+function _renderHbBar() {
+  const hb = document.getElementById('hb');
+  if (!hb) return;
+  const s = _settings || {};
+  const checks = [
+    { label: 'Server',     ok: _serverAlive },
+    { label: 'Venice',     ok: !!s.veniceKey },
+    { label: 'OpenRouter', ok: !!s.openrouterKey },
+    { label: 'Google',     ok: !!s.googleKey },
+    { label: 'YouTube',    ok: !!(s.ytChannel || s.yt2Channel) },
+    { label: 'Buzzsprout', ok: !!(s.bsKey && s.bsPodcast) },
+  ];
+  const apiErrors = checks.filter(c => !c.ok).length;
+  const runtimeErrors = _hbErrors.length;
+  const camDot = _permDot(_devicePerms.camera);
+  const micDot = _permDot(_devicePerms.mic);
+  let bar = checks.map(c =>
+    `<span class="dot ${c.ok ? 'green' : 'red'}"></span>${c.label}`
+  ).join(' · ')
+  + ` · 📷<span class="dot ${camDot}" style="margin-left:3px"></span>`
+  + ` · 🎤<span class="dot ${micDot}" style="margin-left:3px"></span>`
+  + (_isInsecure ? ' · <span style="color:#d29922">🔓 HTTP</span>' : '');
+  if (_transferStatus) {
+    const pctStr = _transferStatus.pct !== null ? ` ${_transferStatus.pct}%` : '';
+    bar += ` · <span style="color:#d29922">⏳ ${esc(_transferStatus.label)}${pctStr}</span>`;
+  } else {
+    bar += runtimeErrors > 0
+      ? ` · <span style="color:#f85149">⚠ ${runtimeErrors} error${runtimeErrors > 1 ? 's' : ''}</span>`
+      : ` · <span style="color:#3fb950">${apiErrors === 0 ? '✓ all ok' : '✓'}</span>`;
+  }
+  hb.innerHTML = bar;
+}
+
+function renderHb() {
+  const s = _settings || {};
+  const checks = [
+    { label: 'Server',     ok: _serverAlive },
+    { label: 'Venice',     ok: !!s.veniceKey },
+    { label: 'OpenRouter', ok: !!s.openrouterKey },
+    { label: 'Google',     ok: !!s.googleKey },
+    { label: 'YouTube',    ok: !!(s.ytChannel || s.yt2Channel) },
+    { label: 'Buzzsprout', ok: !!(s.bsKey && s.bsPodcast) },
+  ];
+  const runtimeErrors = _hbErrors.length;
+
+  checkDevicePermissions().then(() => { _renderHbBar(); });
+
+  const p = document.getElementById('hbpanel');
+  if (!p) return;
+
+  const errHtml = _hbErrors.length
+    ? _hbErrors.map(e => `<div style="display:flex;gap:8px;padding:3px 0;align-items:flex-start"><span class="dot red" style="flex-shrink:0;margin-top:3px"></span><span style="color:#f85149;word-break:break-word">${esc(e)}</span></div>`).join('')
+    : '<div style="color:#3fb950;padding:3px 0">✓ No errors</div>';
+
+  p.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+    + '<b style="color:#e6edf3">Status</b>'
+    + '<span onclick="hbtoggle()" style="cursor:pointer;color:#8b949e;padding:0 4px;font-size:13px">✕</span></div>'
+    + (_transferStatus
+        ? '<div style="background:#1c2128;border:1px solid #d29922;border-radius:6px;padding:8px 10px;margin-bottom:10px;display:flex;gap:10px;align-items:center">'
+          + '<span style="font-size:18px">⏳</span>'
+          + '<div style="flex:1">'
+          + `<div style="color:#d29922;font-weight:600;font-size:12px">${esc(_transferStatus.label)}</div>`
+          + (_transferStatus.pct !== null
+              ? `<div style="margin-top:5px;background:var(--border);border-radius:3px;height:4px"><div style="width:${_transferStatus.pct}%;height:100%;background:#d29922;border-radius:3px;transition:width .4s"></div></div>`
+              : '<div style="margin-top:5px;background:var(--border);border-radius:3px;height:4px;overflow:hidden"><div style="width:30%;height:100%;background:#d29922;border-radius:3px;animation:hb-pulse 1.2s ease-in-out infinite"></div></div>')
+          + '</div></div>'
+        : '')
+    + (_isInsecure
+        ? '<div style="background:#2d1b00;border:1px solid #d29922;border-radius:6px;padding:6px 8px;margin-bottom:10px;color:#d29922;font-size:11px">🔓 HTTP — passwords sent in plain text. Use Tailscale HTTPS for secure access.</div>'
+        : '')
+    + '<div style="color:#58a6ff;font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Devices</div>'
+    + '<div style="display:flex;gap:8px;padding:3px 0;align-items:center">'
+    + `<span class="dot ${_permDot(_devicePerms.camera)}" style="flex-shrink:0"></span>`
+    + '<span style="color:#e6edf3;min-width:90px">📷 Camera</span>'
+    + `<span style="color:#8b949e">${_permLabel(_devicePerms.camera)}</span>`
+    + '</div>'
+    + '<div style="display:flex;gap:8px;padding:3px 0;align-items:center">'
+    + `<span class="dot ${_permDot(_devicePerms.mic)}" style="flex-shrink:0"></span>`
+    + '<span style="color:#e6edf3;min-width:90px">🎤 Mic</span>'
+    + `<span style="color:#8b949e">${_permLabel(_devicePerms.mic)}</span>`
+    + '</div>'
+    + '<div style="color:#58a6ff;font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px">Connections</div>'
+    + checks.map(c =>
+        '<div style="display:flex;gap:8px;padding:3px 0;align-items:center">'
+        + `<span class="dot ${c.ok ? 'green' : 'red'}" style="flex-shrink:0"></span>`
+        + `<span style="color:#e6edf3;min-width:90px">${c.label}</span>`
+        + `<span style="color:${c.ok ? '#3fb950' : '#f85149'}">${c.ok ? '✓ connected' : '✗ not configured'}</span>`
+        + '</div>'
+      ).join('')
+    + '<div style="color:#58a6ff;font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin:10px 0 6px">Errors</div>'
+    + errHtml;
+}
+
+function hbtoggle() {
+  const p = document.getElementById('hbpanel');
+  if (p) p.classList.toggle('on');
 }
 
 function fmtTime(s) {
@@ -1629,87 +1905,259 @@ function fmtTimeShort(ts) {
 function loadRecordingToEdit(id) {
   // Store selected recording id for edit tab
   _editLoadId = id;
-  switchTab(3);
+  switchTab(2);
   setTimeout(() => editLoadRecording(id), 300);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   PUBLISH
+   ANALYTICS
    ═══════════════════════════════════════════════════════════════════ */
-let _livePosting = false;
 
-function toggleLivePosting() {
-  _livePosting = !_livePosting;
-  document.getElementById('liveToggle').classList.toggle('on', _livePosting);
-  document.getElementById('liveBar').classList.toggle('active', _livePosting);
-  const btn = document.getElementById('publishBtn');
-  btn.disabled = !_livePosting;
-  btn.style.opacity = _livePosting ? '1' : '.4';
-  btn.className = `btn btn-block mt-8${_livePosting ? ' btn-danger' : ''}`;
-  btn.textContent = _livePosting ? '🚀 Publish Now' : '🚫 Live Posting is OFF';
+function _analyticsCard(icon, title, metrics) {
+  return `<div class="card card-pad" style="margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">
+    <span style="font-size:20px;flex-shrink:0">${icon}</span>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)">${esc(title)}</div>
+      <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">${metrics}</div>
+    </div>
+  </div>`;
 }
 
-function updatePublishTargets() {
-  const el = document.getElementById('publishTargets');
+function _metricChip(label, val) {
+  return `<span style="font-size:11px;color:var(--muted)">${label} <b style="color:var(--text)">${esc(String(val ?? '–'))}</b></span>`;
+}
+
+async function fetchYTAnalytics() {
+  const el = document.getElementById('ytAnalytics');
   if (!el) return;
-  const targets = [];
-
-  for (let i = 1; i <= 3; i++) {
-    const label = _settings[`fbPage${i}Label`], id = _settings[`fbPage${i}Id`];
-    if (label && id) targets.push({ type:'fb', label, id, icon:'📘' });
+  const key = _settings.ytKey, ch = _settings.ytChannel || _settings.yt2Channel;
+  if (!key || !ch) { el.innerHTML = '<div class="empty text-sm">Configure YouTube API key + Channel ID in Settings</div>'; return; }
+  el.innerHTML = '<div class="empty text-sm">Loading…</div>';
+  try {
+    const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=id&channelId=${ch}&order=date&maxResults=5&type=video&key=${key}`;
+    const sr = await fetch(searchUrl);
+    const sd = await sr.json();
+    if (sd.error) throw new Error(sd.error.message);
+    const ids = (sd.items || []).map(i => i.id.videoId).filter(Boolean).join(',');
+    if (!ids) { el.innerHTML = '<div class="empty text-sm">No videos found</div>'; return; }
+    const vr = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet&id=${ids}&key=${key}`);
+    const vd = await vr.json();
+    el.innerHTML = (vd.items || []).map(v =>
+      _analyticsCard('📹', v.snippet.title,
+        _metricChip('👁', parseInt(v.statistics.viewCount||0).toLocaleString())
+        + _metricChip('👍', parseInt(v.statistics.likeCount||0).toLocaleString())
+        + _metricChip('💬', parseInt(v.statistics.commentCount||0).toLocaleString())
+      )
+    ).join('') || '<div class="empty text-sm">No data</div>';
+  } catch(e) {
+    const msg = 'YouTube: ' + e.message;
+    _hbErrors = [msg, ..._hbErrors.filter(x => !x.startsWith('YouTube:'))].slice(0, 10);
+    renderHb();
+    el.innerHTML = `<div class="empty text-sm" style="color:var(--red)">Error: ${esc(e.message)}</div>`;
   }
-  for (let i = 1; i <= 3; i++) {
-    const label = _settings[`igAcct${i}Label`], id = _settings[`igAcct${i}Id`];
-    if (label && id) targets.push({ type:'ig', label, id, icon:'📸' });
-  }
-  if (_settings.githubToken && _settings.githubRepo) {
-    targets.push({ type:'blog', label:'Blog ('+_settings.githubRepo+')', id:_settings.githubRepo, icon:'📝' });
-  }
-
-  el.innerHTML = targets.length
-    ? targets.map(t => `<label class="pub-target"><input type="checkbox" data-type="${t.type}" data-id="${t.id}" checked><span>${t.icon} ${t.label}</span></label>`).join('')
-    : '<div style="color:var(--muted);font-size:12px">No platforms configured — add accounts in Settings.</div>';
 }
 
-async function publishToAll() {
-  if (!_livePosting) return;
-  const caption = (document.getElementById('postCaption').value || '').trim();
-  if (!caption) { toast('Add a caption before publishing', 3000); return; }
-  const checked = [...document.querySelectorAll('#publishTargets input[type=checkbox]:checked')];
-  if (!checked.length) { toast('Select at least one platform', 3000); return; }
-
-  const canvas = document.getElementById('postCanvas');
-  let imageBlob = null;
-  if (canvas.width > 0) imageBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
-
-  let imageUrl = null;
-  const hasIG = checked.some(cb => cb.dataset.type === 'ig');
-  if (hasIG && imageBlob) {
-    try { imageUrl = await uploadImageToGitHub(imageBlob); }
-    catch(e) { toast('Could not host image for IG: ' + e.message, 4000); }
+async function fetchIGAnalytics() {
+  const el = document.getElementById('igAnalytics');
+  if (!el) return;
+  const token = _settings.metaToken;
+  const igId = _settings.igAcct1Id || _settings.igAcct2Id || _settings.igAcct3Id;
+  if (!token || !igId) {
+    el.innerHTML = '<div class="empty text-sm">'
+      + (!token ? 'No Meta token' : 'No Instagram Account ID')
+      + ' — add in Settings → Social</div>';
+    return;
   }
-
-  const btn = document.getElementById('publishBtn');
-  const origText = btn.textContent;
-  btn.textContent = '⏳ Publishing…'; btn.disabled = true;
-
-  let ok = 0, fail = 0;
-  for (const cb of checked) {
-    const { type, id } = cb.dataset;
-    try {
-      if      (type === 'fb')   await postToFBPage(id, caption, imageBlob);
-      else if (type === 'ig')   await postToIG(id, caption, imageUrl || '');
-      else if (type === 'blog') await postToGitHubBlog(caption);
-      ok++;
-    } catch(e) {
-      fail++;
-      toast(`${type.toUpperCase()} failed: ${e.message}`, 5000);
-    }
+  el.innerHTML = '<div class="empty text-sm">Loading…</div>';
+  try {
+    const d = await _proxy({
+      url: `https://graph.facebook.com/v21.0/${igId}/media?fields=caption,timestamp,like_count,comments_count,media_type&limit=5&access_token=${token}`,
+      method: 'GET'
+    });
+    el.innerHTML = (d.data || []).map(p => {
+      const caption = (p.caption || '').slice(0, 60);
+      const icon = p.media_type === 'VIDEO' ? '🎬' : p.media_type === 'CAROUSEL_ALBUM' ? '🖼' : '📸';
+      return _analyticsCard(icon, caption || p.media_type,
+        _metricChip('❤️', p.like_count)
+        + _metricChip('💬', p.comments_count)
+      );
+    }).join('') || '<div class="empty text-sm">No posts found</div>';
+  } catch(e) {
+    const msg = 'Instagram: ' + e.message;
+    _hbErrors = [msg, ..._hbErrors.filter(x => !x.startsWith('Instagram:'))].slice(0, 10);
+    renderHb();
+    el.innerHTML = `<div class="empty text-sm" style="color:var(--red)">Error: ${esc(e.message)}</div>`;
   }
+}
 
-  btn.textContent = origText; btn.disabled = false;
-  if (ok)   toast(`✅ Posted to ${ok} platform${ok > 1 ? 's' : ''}`, 4000);
-  if (fail) toast(`⚠️ ${fail} failed`, 4000);
+async function fetchBSAnalytics() {
+  const el = document.getElementById('bsAnalytics');
+  if (!el) return;
+  const key = _settings.bsKey, pod = _settings.bsPodcast;
+  if (!key || !pod) { el.innerHTML = '<div class="empty text-sm">Configure Buzzsprout API key + Podcast ID in Settings</div>'; return; }
+  el.innerHTML = '<div class="empty text-sm">Loading…</div>';
+  try {
+    const r = await fetch(`https://www.buzzsprout.com/api/${pod}/episodes.json`, {
+      headers: { 'Authorization': `Token ${key}` }
+    });
+    if (!r.ok) throw new Error('Status ' + r.status);
+    const eps = await r.json();
+    el.innerHTML = eps.slice(0, 5).map(ep =>
+      _analyticsCard('🎙', ep.title || 'Episode',
+        _metricChip('▶️', ep.total_plays ?? ep.plays)
+        + (ep.published_at ? _metricChip('📅', new Date(ep.published_at).toLocaleDateString()) : '')
+      )
+    ).join('') || '<div class="empty text-sm">No episodes found</div>';
+  } catch(e) {
+    const msg = 'Buzzsprout: ' + e.message;
+    _hbErrors = [msg, ..._hbErrors.filter(x => !x.startsWith('Buzzsprout:'))].slice(0, 10);
+    renderHb();
+    el.innerHTML = `<div class="empty text-sm" style="color:var(--red)">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DRAFTS
+   ═══════════════════════════════════════════════════════════════════ */
+
+async function draftSave() {
+  const draft = {
+    id:    'draft_' + Date.now(),
+    ts:    Date.now(),
+    title: document.getElementById('contentTitle')?.value || '',
+    seed:  document.getElementById('contentSeed')?.value  || '',
+    desc:  document.getElementById('contentDesc')?.value  || '',
+    tags:  document.getElementById('contentTags')?.value  || '',
+  };
+  if (!draft.title && !draft.seed && !draft.desc) { toast('Nothing to save', 2000); return; }
+  await dbPut('drafts', draft);
+  toast('Draft saved', 2000);
+  draftRender();
+}
+
+async function draftRender() {
+  const el = document.getElementById('draftList');
+  if (!el) return;
+  const drafts = (await dbGetAll('drafts')).sort((a, b) => b.ts - a.ts);
+  el.innerHTML = drafts.length ? drafts.map(d => `
+    <div class="edit-clip">
+      <div class="edit-clip-info">
+        <div class="edit-clip-name">${esc(d.title || d.seed.slice(0, 40) || 'Draft')}</div>
+        <div class="edit-clip-range">${fmtTimeShort(d.ts)}</div>
+      </div>
+      <button class="btn btn-xs btn-outline" onclick="draftLoad('${d.id}')">Load</button>
+      <button class="btn btn-xs btn-danger" onclick="draftDelete('${d.id}')">✕</button>
+    </div>`).join('') : '<div class="empty text-sm">No drafts yet</div>';
+}
+
+async function draftLoad(id) {
+  const drafts = await dbGetAll('drafts');
+  const d = drafts.find(x => x.id === id);
+  if (!d) return;
+  document.getElementById('contentTitle').value = d.title || '';
+  document.getElementById('contentSeed').value  = d.seed  || '';
+  if (d.desc) { document.getElementById('contentDesc').value = d.desc; document.getElementById('contentDescWrap').style.display = 'block'; }
+  if (d.tags) { document.getElementById('contentTags').value = d.tags; document.getElementById('contentTagsWrap').style.display = 'block'; }
+  buildTemplate();
+  toast('Draft loaded', 1500);
+}
+
+async function draftDelete(id) {
+  await dbDel('drafts', id);
+  draftRender();
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CONTENT OUTPUT — descriptions, hashtags
+   ═══════════════════════════════════════════════════════════════════ */
+
+async function aiOneShot(prompt) {
+  const provider = document.getElementById('chatProviderSelect')?.value || 'openrouter';
+  const model    = document.getElementById('chatModelSelect')?.value || '';
+  const resp = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ..._authHeaders() },
+    body: JSON.stringify({ provider, model, message: prompt, history: [], system: chatSystemPrompt() }),
+  });
+  const reader  = resp.body.getReader();
+  const decoder = new TextDecoder();
+  let text = '';
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    text += decoder.decode(value, { stream: true });
+  }
+  if (text.startsWith('[Error') || text.startsWith('[API Error')) throw new Error(text);
+  return text.trim();
+}
+
+async function genAll() {
+  const seed = (document.getElementById('contentSeed').value || '').trim();
+  if (!seed) { toast('Add topic text first', 2000); return; }
+  await Promise.all([genDescription(), genHashtags()]);
+  buildTemplate();
+}
+
+async function genDescription() {
+  const seed = (document.getElementById('contentSeed').value || '').trim();
+  if (!seed) { toast('Add topic text first', 2000); return; }
+  const wrap = document.getElementById('contentDescWrap');
+  const out  = document.getElementById('contentDesc');
+  wrap.style.display = 'block';
+  out.value = '⏳ Generating…';
+  try {
+    out.value = await aiOneShot(
+      `Write an engaging social media description (2–4 sentences) for this content:\n\n${seed}`
+    );
+    buildTemplate();
+  } catch(e) { out.value = 'Error: ' + e.message; }
+}
+
+async function genHashtags() {
+  const seed = (document.getElementById('contentSeed').value || '').trim();
+  if (!seed) { toast('Add topic text first', 2000); return; }
+  const wrap = document.getElementById('contentTagsWrap');
+  const out  = document.getElementById('contentTags');
+  wrap.style.display = 'block';
+  out.value = '⏳ Generating…';
+  try {
+    out.value = await aiOneShot(
+      `Generate 15–20 relevant hashtags for this content. Return only the hashtags space-separated, no explanation:\n\n${seed}`
+    );
+    buildTemplate();
+  } catch(e) { out.value = 'Error: ' + e.message; }
+}
+
+function buildTemplate() {
+  const title = (document.getElementById('contentTitle')?.value || '').trim();
+  const desc  = (document.getElementById('contentDesc')?.value  || '').trim();
+  const tags  = (document.getElementById('contentTags')?.value  || '').trim();
+  if (!desc && !tags) return;
+  let tpl = '';
+  if (title) tpl += title + '\n\n';
+  if (desc)  tpl += desc  + '\n\n';
+  if (tags)  tpl += tags;
+  document.getElementById('contentTemplate').value = tpl.trim();
+  document.getElementById('contentTemplateWrap').style.display = 'block';
+}
+
+function copyTemplate() {
+  const el = document.getElementById('contentTemplate');
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => toast('Template copied!', 2000));
+}
+
+function libDrawerToggle(btn) {
+  const drawer = document.getElementById('libDrawer');
+  const open = drawer.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  if (open) libraryRender();
+}
+
+function copyText(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => toast('Copied!', 1500));
 }
 
 async function _proxy(payload) {
@@ -1731,87 +2179,6 @@ function blobToBase64(blob) {
     reader.onerror = rej;
     reader.readAsDataURL(blob);
   });
-}
-
-async function postToFBPage(pageId, caption, imageBlob) {
-  if (!_settings.metaToken) throw new Error('No Meta token in Settings');
-  const token = _settings.metaToken;
-  if (imageBlob) {
-    const b64 = await blobToBase64(imageBlob);
-    return _proxy({ url: `https://graph.facebook.com/v21.0/${pageId}/photos`, method:'POST',
-      multipart: { caption, access_token: token, _image_b64: b64 } });
-  }
-  return _proxy({ url: `https://graph.facebook.com/v21.0/${pageId}/feed`, method:'POST',
-    json_body: { message: caption, access_token: token } });
-}
-
-async function postToIG(igId, caption, imageUrl) {
-  if (!_settings.metaToken) throw new Error('No Meta token in Settings');
-  if (!imageUrl) throw new Error('IG requires an image');
-  const token = _settings.metaToken;
-  const container = await _proxy({ url: `https://graph.facebook.com/v21.0/${igId}/media`, method:'POST',
-    json_body: { image_url: imageUrl, caption, access_token: token } });
-  return _proxy({ url: `https://graph.facebook.com/v21.0/${igId}/media_publish`, method:'POST',
-    json_body: { creation_id: container.id, access_token: token } });
-}
-
-async function uploadImageToGitHub(blob) {
-  if (!_settings.githubToken || !_settings.githubRepo) throw new Error('GitHub not configured in Settings');
-  const [owner, repo] = _settings.githubRepo.split('/');
-  if (!owner || !repo) throw new Error('GitHub repo must be owner/reponame format');
-  const filename = `assets/posts/${Date.now()}.png`;
-  const b64 = await blobToBase64(blob);
-  const result = await _proxy({ url: `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`,
-    method:'PUT', headers: { Authorization: `token ${_settings.githubToken}` },
-    json_body: { message: `post image ${Date.now()}`, content: b64 } });
-  return result.content.download_url;
-}
-
-async function postToGitHubBlog(content) {
-  if (!_settings.githubToken || !_settings.githubRepo) throw new Error('GitHub not configured in Settings');
-  const [owner, repo] = _settings.githubRepo.split('/');
-  const title = content.split('\n')[0].slice(0, 80);
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  const filename = `blog/${slug}-${Date.now()}.html`;
-  const html = buildBlogPostHTML(title, content);
-  const b64 = btoa(unescape(encodeURIComponent(html)));
-  return _proxy({ url: `https://api.github.com/repos/${owner}/${repo}/contents/${filename}`,
-    method:'PUT', headers: { Authorization: `token ${_settings.githubToken}` },
-    json_body: { message: `Add blog post: ${slug}`, content: b64 } });
-}
-
-function buildBlogPostHTML(title, body) {
-  const date = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-  const paragraphs = body.split('\n').filter(Boolean).map(p => `<p>${p}</p>`).join('\n    ');
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${title} | Charleston Strength Club</title>
-<meta name="description" content="${title}">
-<link rel="stylesheet" href="/global.css">
-</head>
-<body>
-<nav id="nav">
-  <a href="/" class="nav-logo">
-    <img src="/logo.png" alt="CHS Strength Club">
-    <span class="nav-logo-text">CHS Strength Club</span>
-  </a>
-</nav>
-<section style="max-width:780px;margin:6rem auto 4rem;padding:0 1.5rem">
-  <p style="font-family:'Oswald',sans-serif;font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:#c0170f;margin-bottom:1rem">${date}</p>
-  <h1 style="font-family:'Black Han Sans',sans-serif;font-size:clamp(2rem,5vw,3.5rem);text-transform:uppercase;color:#f0ece4;line-height:1;margin-bottom:2rem">${title}</h1>
-  <div style="font-size:1rem;line-height:1.85;color:rgba(240,236,228,0.6)">
-    ${paragraphs}
-  </div>
-  <div style="margin-top:3rem;padding-top:1.5rem;border-top:1px solid rgba(192,23,15,0.2)">
-    <a href="/blog/" style="font-family:'Oswald',sans-serif;font-size:0.7rem;letter-spacing:0.3em;text-transform:uppercase;color:#c0170f;text-decoration:none">← Back to Blog</a>
-  </div>
-</section>
-<script src="/script.js"><\/script>
-</body>
-</html>`;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1836,7 +2203,7 @@ async function fetchYouTubeStats() {
 async function fetchBuzzsproutStats() {
   if (!_settings.bsKey || !_settings.bsPodcast) { toast('Set Buzzsprout API key + podcast ID in Settings', 4000); return; }
   try {
-    const r = await fetch(`https://api.buzzsprout.com/${_settings.bsPodcast}/episodes.json`, {
+    const r = await fetch(`https://www.buzzsprout.com/api/${_settings.bsPodcast}/episodes.json`, {
       headers: { 'Authorization': `Token ${_settings.bsKey}` }
     });
     if (!r.ok) { toast('Buzzsprout error: ' + r.status, 4000); return; }
@@ -1876,7 +2243,7 @@ function saveScripts() {
 function renderScripts() {
   const tabs = document.getElementById('scriptTabs');
   tabs.innerHTML = _scripts.map((s, i) =>
-    `<span class="script-tab ${i === _currentScript ? 'active' : ''}" onclick="switchScript(${i})">${s.name}</span>`
+    `<span class="script-tab ${i === _currentScript ? 'active' : ''}" onclick="switchScript(${i})">${esc(s.name)}</span>`
   ).join('');
   tabs.innerHTML += '<span class="script-tab script-tab-add" onclick="teleAdd()">+ New</span>';
   renderScriptStage();
@@ -1893,7 +2260,7 @@ function renderScriptStage() {
   const el = document.getElementById('teleText');
   const s = _scripts[_currentScript];
   if (!s) return;
-  el.innerHTML = s.text.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+  el.innerHTML = esc(s.text).split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
   el.style.fontSize = _teleFontSize + 'px';
   _teleScroll = 0;
   el.style.transform = 'translateY(0)';
@@ -2130,10 +2497,17 @@ async function recStart() {
   const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus'
     : MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus') ? 'video/webm;codecs=vp8,opus'
     : MediaRecorder.isTypeSupported('video/webm') ? 'video/webm'
-    : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+    : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+    : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
 
   _recChunks = [];
-  _recorder = new MediaRecorder(_recStream, mime ? { mimeType: mime } : {});
+  try {
+    _recorder = new MediaRecorder(_recStream, mime ? { mimeType: mime } : {});
+  } catch {
+    toast('Recording not supported in this browser', 3000);
+    recCancel();
+    return;
+  }
   _recorder.ondataavailable = e => { if (e.data.size > 0) _recChunks.push(e.data); };
   _recorder.onstop = recFinalize;
   _recorder.start();
@@ -2250,7 +2624,7 @@ async function recListMics() {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const mics = devices.filter(d => d.kind === 'audioinput');
     const sel = document.getElementById('recMic');
-    sel.innerHTML = mics.map((d,i) => `<option value="${d.deviceId}">${d.label || 'Mic '+(i+1)}</option>`).join('');
+    sel.innerHTML = mics.map((d,i) => `<option value="${esc(d.deviceId)}">${esc(d.label || 'Mic '+(i+1))}</option>`).join('');
     if (!sel.value && mics.length) sel.value = mics[0].deviceId;
   } catch(e) {}
 }
@@ -2277,14 +2651,21 @@ function editLoad(file) {
   const isAudio = file.type.startsWith('audio');
   const ed = document.getElementById('editEditor');
   ed.style.display = 'block';
+  setTransfer('Loading ' + file.name + '…');
+  document.getElementById('editDropIcon').textContent = '⏳';
+  document.getElementById('editDropLabel').textContent = 'Loading…';
+  document.getElementById('editDropSub').textContent = file.name;
+  document.getElementById('editLoadBar').style.display = 'block';
+  const preview = document.getElementById('editPreview');
   if (isAudio) {
+    preview.style.display = 'none';
     _editMedia = document.createElement('audio');
     _editMedia.style.display = 'none';
     document.body.appendChild(_editMedia);
   } else {
-    _editMedia = document.createElement('video');
-    _editMedia.style.display = 'none';
-    document.body.appendChild(_editMedia);
+    preview.src = '';
+    preview.style.display = 'block';
+    _editMedia = preview;
   }
   _editMedia.src = url;
   _editMedia.addEventListener('loadedmetadata', () => {
@@ -2292,6 +2673,12 @@ function editLoad(file) {
     document.getElementById('editTimeEnd').textContent = fmtTime(_editDur);
     document.getElementById('editTimeStart').textContent = '0:00';
     updateEditTimeline();
+    setTransfer('Ready — ' + file.name.replace(/\.[^.]+$/, '') + ' (' + fmtTime(_editDur) + ')');
+    document.getElementById('editDropIcon').textContent = '✅';
+    document.getElementById('editDropLabel').textContent = file.name.replace(/\.[^.]+$/, '');
+    document.getElementById('editDropSub').textContent = fmtTime(_editDur) + ' · click to replace';
+    document.getElementById('editLoadBar').style.display = 'none';
+    setTimeout(clearTransfer, 3000);
     toast('Loaded: ' + file.name, 2000);
   });
   _editMedia.addEventListener('timeupdate', updateEditTimeline);
@@ -2394,7 +2781,13 @@ function editDeleteClip(id) {
 function editExportClip(id) {
   const c = _editClips.find(x => x.id === id);
   if (!c || !_editFile) return;
-  toast('Exporting ' + c.name + '...', 2000);
+  const clipDur = c.end - c.start;
+  const exportStart = Date.now();
+  setTransfer('Exporting "' + c.name + '"…', 0);
+  const _progressInterval = setInterval(() => {
+    const pct = Math.min(99, Math.round(((Date.now() - exportStart) / 1000) / clipDur * 100));
+    setTransfer('Exporting "' + c.name + '"…', pct);
+  }, 500);
   const fr = new FileReader();
   fr.onload = function(e) {
     const blob = new Blob([e.target.result], { type: _editFile.type });
@@ -2405,14 +2798,18 @@ function editExportClip(id) {
     scratch.addEventListener('loadedmetadata', () => {
       let stream;
       try { stream = scratch.captureStream ? scratch.captureStream() : scratch.mozCaptureStream(); }
-      catch { toast('Export not supported in this browser', 3000); scratch.remove(); return; }
+      catch { clearInterval(_progressInterval); clearTransfer(); toast('Export not supported in this browser', 3000); scratch.remove(); return; }
       const mimes = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','audio/webm'];
       const mime = mimes.find(m => MediaRecorder.isTypeSupported(m));
-      if (!mime) { toast('MediaRecorder not supported', 3000); scratch.remove(); return; }
-      const rec = new MediaRecorder(stream, { mimeType: mime });
+      if (!mime) { clearInterval(_progressInterval); clearTransfer(); toast('MediaRecorder not supported', 3000); scratch.remove(); return; }
+      let rec;
+      try { rec = new MediaRecorder(stream, { mimeType: mime }); }
+      catch { clearInterval(_progressInterval); clearTransfer(); toast('Recording not supported', 3000); scratch.remove(); return; }
       const chunks = [];
       rec.ondataavailable = ev => { if (ev.data.size > 0) chunks.push(ev.data); };
       rec.onstop = () => {
+        clearInterval(_progressInterval);
+        clearTransfer();
         const out = new Blob(chunks, { type: mime });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(out);
@@ -2530,6 +2927,14 @@ function editExportSegment(idx) {
   return new Promise((resolve) => {
     const s = _editSegments[idx];
     if (!s || !_editFile) { resolve(); return; }
+    const segDur = s.end - s.start;
+    const exportStart = Date.now();
+    const label = 'Exporting segment ' + (idx + 1) + '…';
+    setTransfer(label, 0);
+    const _progressInterval = setInterval(() => {
+      const pct = Math.min(99, Math.round(((Date.now() - exportStart) / 1000) / segDur * 100));
+      setTransfer(label, pct);
+    }, 500);
     const fr = new FileReader();
     fr.onload = function(e) {
       const blob = new Blob([e.target.result], { type: _editFile.type });
@@ -2540,14 +2945,18 @@ function editExportSegment(idx) {
       scratch.addEventListener('loadedmetadata', () => {
         let stream;
         try { stream = scratch.captureStream ? scratch.captureStream() : scratch.mozCaptureStream(); }
-        catch { scratch.remove(); resolve(); return; }
+        catch { clearInterval(_progressInterval); clearTransfer(); scratch.remove(); resolve(); return; }
         const mimes = ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm','audio/webm'];
         const mime = mimes.find(m => MediaRecorder.isTypeSupported(m));
-        if (!mime) { scratch.remove(); resolve(); return; }
-        const rec = new MediaRecorder(stream, { mimeType: mime });
+        if (!mime) { clearInterval(_progressInterval); clearTransfer(); scratch.remove(); resolve(); return; }
+        let rec;
+        try { rec = new MediaRecorder(stream, { mimeType: mime }); }
+        catch { clearInterval(_progressInterval); clearTransfer(); scratch.remove(); resolve(); return; }
         const chunks = [];
         rec.ondataavailable = ev => { if (ev.data.size > 0) chunks.push(ev.data); };
         rec.onstop = () => {
+          clearInterval(_progressInterval);
+          clearTransfer();
           const out = new Blob(chunks, { type: mime });
           const a = document.createElement('a');
           a.href = URL.createObjectURL(out);
@@ -2571,6 +2980,102 @@ function editExportSegment(idx) {
     };
     fr.readAsArrayBuffer(_editFile);
   });
+}
+
+/* ── Seek on timeline click ── */
+function editSeek(e) {
+  if (!_editMedia || !_editDur) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  _editMedia.currentTime = ((e.clientX - rect.left) / rect.width) * _editDur;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   AI CLIP DETECTION
+   ══════════════════════════════════════════════════════════════════ */
+
+async function _transcribeAssemblyAI(file) {
+  const key = _settings.assemblyAiKey;
+  if (!key) throw new Error('AssemblyAI API key not set in Settings');
+
+  setTransfer('Uploading to AssemblyAI…');
+  const upResp = await fetch('https://api.assemblyai.com/v2/upload', {
+    method: 'POST',
+    headers: { 'authorization': key, 'content-type': 'application/octet-stream' },
+    body: file
+  });
+  if (!upResp.ok) throw new Error('AssemblyAI upload failed: ' + upResp.status);
+  const { upload_url } = await upResp.json();
+
+  const txResp = await fetch('https://api.assemblyai.com/v2/transcript', {
+    method: 'POST',
+    headers: { 'authorization': key, 'content-type': 'application/json' },
+    body: JSON.stringify({ audio_url: upload_url, auto_chapters: true })
+  });
+  if (!txResp.ok) throw new Error('AssemblyAI request failed: ' + txResp.status);
+  const { id } = await txResp.json();
+
+  const startTime = Date.now();
+  while (true) {
+    await new Promise(r => setTimeout(r, 4000));
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const mm = String(Math.floor(elapsed / 60)).padStart(1,'0');
+    const ss = String(elapsed % 60).padStart(2,'0');
+    setTransfer(`Transcribing… ${mm}:${ss}`);
+    const poll = await fetch(`https://api.assemblyai.com/v2/transcript/${id}`, {
+      headers: { 'authorization': key }
+    });
+    const data = await poll.json();
+    if (data.status === 'completed') return data;
+    if (data.status === 'error') throw new Error('AssemblyAI: ' + data.error);
+  }
+}
+
+async function editAIDetectClips() {
+  if (!_editFile) { toast('Load a file first', 2000); return; }
+  if (!_settings.assemblyAiKey) { toast('AssemblyAI API key required in Settings → Creative', 3500); return; }
+  document.getElementById('editAIBtn').disabled = true;
+  try {
+    const data = await _transcribeAssemblyAI(_editFile);
+    const chapters = data.chapters || [];
+    if (!chapters.length) throw new Error('No chapters detected — try a longer file or check AssemblyAI dashboard');
+
+    _editClips = chapters.map((c, i) => ({
+      id: ++_editClipCount,
+      name: c.headline || c.gist || ('Clip ' + (i + 1)),
+      start: c.start / 1000,
+      end: c.end / 1000
+    }));
+    renderEditClips();
+
+    const srcName = _editFile.name.replace(/\.[^.]+$/, '');
+    for (let i = 0; i < _editClips.length; i++) {
+      const c = _editClips[i];
+      await dbPut('library', {
+        id: 'lib_ai_' + Date.now() + '_' + c.id,
+        title: c.name,
+        type: 'clip',
+        subtype: 'ai-detected',
+        brand: _settings.activeBrand || '',
+        date: Date.now(),
+        sourceFile: srcName,
+        start: c.start,
+        end: c.end,
+        notes: chapters[i]?.summary || '',
+        blob: null
+      });
+    }
+
+    clearTransfer();
+    toast(`✓ ${chapters.length} clips detected and saved to Library`, 3500);
+  } catch(e) {
+    clearTransfer();
+    const msg = 'AI detection: ' + e.message;
+    _hbErrors = [msg, ..._hbErrors.filter(x => !x.startsWith('AI detection:'))].slice(0, 10);
+    renderHb();
+    toast('Error: ' + e.message, 4000);
+  } finally {
+    document.getElementById('editAIBtn').disabled = false;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -2765,7 +3270,7 @@ async function veniceGenerateImage() {
     if (d.data && d.data.images) {
       results.innerHTML = d.data.images.map(img => {
         const src = img.b64_json ? 'data:image/png;base64,' + img.b64_json : img.url;
-        return `<img src="${src}" onclick="postUseGenerated('${src}')" title="Click to use in post">`;
+        return `<img src="${esc(src)}" onclick="postUseGenerated('${src.replace(/'/g, "\\\\'")}')" title="Click to use in post">`;
       }).join('');
       toast('Generated! Click image to use in post', 3000);
     } else {
@@ -2831,7 +3336,7 @@ async function veniceLoadStyles() {
     if (d.data) {
       _veniceStyles = d.data;
       const sel = document.getElementById('veniceStyle');
-      sel.innerHTML = '<option value="">No style</option>' + d.data.map(s => `<option value="${s}">${s}</option>`).join('');
+      sel.innerHTML = '<option value="">No style</option>' + d.data.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
     }
   } catch(e) {}
 }
@@ -2855,10 +3360,11 @@ function defer(fn) {
   }
 }
 
+let _isInsecure = false;
 function checkSecurity() {
   const isHttp = location.protocol === 'http:';
   const isLocal = ['localhost', '127.0.0.1', '::1'].includes(location.hostname);
-  document.getElementById('securityBanner').style.display = (isHttp && !isLocal) ? 'block' : 'none';
+  _isInsecure = isHttp && !isLocal;
 }
 
 async function bootstrapApp() {
@@ -2895,7 +3401,7 @@ async function bootstrapApp() {
     function updateRecScripts() {
       const sel = document.getElementById('recScript');
       sel.innerHTML = '<option value="">None (no teleprompter)</option>' +
-        _scripts.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        _scripts.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
     }
     updateRecScripts();
 
@@ -2915,6 +3421,19 @@ async function bootstrapApp() {
     // Init chat provider/model dropdowns and load saved projects
     chatSwitchProvider();
     chatLoadProjects();
+
+    // Load drafts
+    draftRender();
+
+    // Fetch Google Trends for chat context (non-critical)
+    async function fetchTrends() {
+      try {
+        const r = await fetch('/api/trends', { headers: _authHeaders() });
+        if (r.ok) { _trends = await r.json(); renderTrendsSidebar(); }
+      } catch(_) {}
+    }
+    fetchTrends();
+    setInterval(fetchTrends, 30 * 60 * 1000);  // refresh every 30 min
 
     console.log('Content App initialized');
   });
@@ -2936,7 +3455,7 @@ async function bootstrapApp() {
 
 function chatModels() {
   const provider = document.getElementById('chatProviderSelect').value;
-  return provider === 'venice' ? VENICE_CHAT_MODELS : OR_MODELS;
+  return provider === 'venice' ? VENICE_CHAT_MODELS : provider === 'google' ? GOOGLE_MODELS : OR_MODELS;
 }
 
 function chatSwitchProvider() {
@@ -2955,7 +3474,78 @@ function chatSaveModel() {
 
 function chatSystemPrompt() {
   const brand = BRANDS.find(b => b.id === _settings.activeBrand) || BRANDS[0];
-  return `You are a helpful AI assistant for ${brand.label}. Help with podcast scripts, show notes, social media captions, titles, hooks, and content creation tasks. Be concise and direct.`;
+  let prompt = `You are a helpful AI assistant for ${brand.label}. Help with podcast scripts, show notes, social media captions, titles, hooks, and content creation tasks. Be concise and direct.`;
+  const t = _trends;
+  if (t && t.fetched_at) {
+    const brandTrends = t.brands?.[brand.id];
+    const parts = [];
+    if (brandTrends?.length) parts.push('Trending in your niche: ' + brandTrends.join(', '));
+    if (brand.id === 'personal' && t.general?.length) parts.push('Trending now: ' + t.general.slice(0, 5).join(', '));
+    else if (brand.id !== 'personal' && t.general?.length) parts.push('General trending: ' + t.general.slice(0, 3).join(', '));
+    if (parts.length) prompt += '\n\n' + parts.join('\n');
+  }
+  return prompt;
+}
+
+function renderTrendsSidebar() {
+  const t = _trends;
+  const nicheEl  = document.getElementById('chatTrendsNiche');
+  const genEl    = document.getElementById('chatTrendsGeneral');
+  if (!nicheEl || !genEl) return;
+  if (!t || !t.fetched_at) {
+    nicheEl.innerHTML = '<div class="chat-trends-label">No trends loaded yet</div>';
+    genEl.innerHTML = '';
+    return;
+  }
+  const brand = BRANDS.find(b => b.id === _settings.activeBrand) || BRANDS[0];
+  const niche = (t.brands?.[brand.id] || []).slice(0, 12);
+  const general = (t.general || []).slice(0, 10);
+  const chip = (term) => {
+    const safe = term.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    return `<span class="trend-chip" onclick="trendInsert('${safe}')">${term}<span class="trend-gen" onclick="event.stopPropagation();trendGenScript('${safe}')" title="Generate script">✍</span></span>`;
+  };
+  nicheEl.innerHTML  = niche.length
+    ? `<div class="chat-trends-label">In your niche (${brand.label})</div>` + niche.map(chip).join('')
+    : `<div class="chat-trends-label">No niche matches today</div>`;
+  genEl.innerHTML    = general.length
+    ? `<div class="chat-trends-label">General trending</div>` + general.map(chip).join('')
+    : '';
+}
+
+function trendInsert(term) {
+  const input = document.getElementById('chatInput');
+  const cur = input.value.trim();
+  input.value = cur ? cur + ' ' + term : term;
+  chatInputResize();
+  input.focus();
+}
+
+function trendGenScript(term) {
+  const brand = BRANDS.find(b => b.id === _settings.activeBrand) || BRANDS[0];
+  const input = document.getElementById('chatInput');
+  input.value = `Write a short ${brand.label} script about ${term}`;
+  chatInputResize();
+  chatSendMessage();
+}
+
+function chatToggleTrends() {
+  const panel = document.getElementById('chatTrendsPanel');
+  const btn = document.getElementById('chatTrendsToggle');
+  const show = !panel.classList.contains('show');
+  panel.classList.toggle('show', show);
+  btn.style.color = show ? 'var(--red)' : '';
+}
+
+async function refreshTrends() {
+  const btn = document.getElementById('chatTrendsRefresh');
+  if (btn) { btn.disabled = true; btn.style.opacity = '.5'; }
+  try {
+    const r = await fetch('/api/trends/refresh', {
+      method: 'POST', headers: { ..._authHeaders(), 'Content-Type': 'application/json' }, body: '{}'
+    });
+    if (r.ok) { _trends = await r.json(); renderTrendsSidebar(); }
+  } catch(_) {}
+  if (btn) { btn.disabled = false; btn.style.opacity = ''; }
 }
 
 function chatRenderUser(text) {
@@ -3010,8 +3600,8 @@ async function chatSendMessage() {
   const text     = input.value.trim();
   const provider = document.getElementById('chatProviderSelect').value;
   if (!text || _chatBusy) return;
-  const key = provider === 'venice' ? _settings.veniceKey : _settings.openrouterKey;
-  if (!key) { toast('Set ' + (provider === 'venice' ? 'Venice' : 'OpenRouter') + ' API key in Settings', 3000); return; }
+  const key = provider === 'venice' ? _settings.veniceKey : provider === 'google' ? _settings.googleKey : _settings.openrouterKey;
+  if (!key) { toast('Set ' + (provider === 'venice' ? 'Venice' : provider === 'google' ? 'Google AI' : 'OpenRouter') + ' API key in Settings', 3000); return; }
 
   input.value = '';
   chatInputResize();
@@ -3037,7 +3627,7 @@ async function chatStream(provider) {
   try {
     const resp = await fetch('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ..._authHeaders() },
       body: JSON.stringify({
         message:  _chatHistory.at(-1).content,
         history:  _chatHistory.slice(0, -1),
@@ -3174,7 +3764,7 @@ async function chatSaveProject() {
   try {
     await fetch('/api/projects', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ..._authHeaders() },
       body: JSON.stringify(proj),
     });
     toast('Project saved', 2000);
@@ -3187,17 +3777,17 @@ async function chatLoadProjects() {
   const panel = document.getElementById('chatProjects');
   const list  = document.getElementById('chatProjectsList');
   try {
-    const projects = await fetch('/api/projects').then(r => r.json());
+    const projects = await fetch('/api/projects', { headers: _authHeaders() }).then(r => r.json());
     if (!projects.length) { panel.style.display = 'none'; return; }
     panel.style.display = '';
     list.innerHTML = projects.map(p => {
       const brand = BRANDS.find(b => b.id === p.brand) || BRANDS[0];
       const date  = new Date(p.createdAt).toLocaleDateString();
       return `<div class="chat-proj-row">
-        <span class="chat-proj-name">${brand.emoji} ${p.name}</span>
+        <span class="chat-proj-name">${brand.emoji} ${esc(p.name)}</span>
         <span class="chat-proj-meta">${date}</span>
         <button class="btn btn-xs btn-outline" onclick='chatLoadProject(${JSON.stringify(p)})'>Load</button>
-        <button class="btn btn-xs btn-ghost" onclick="chatDeleteProject('${p.id}')">🗑</button>
+        <button class="btn btn-xs btn-ghost" onclick="chatDeleteProject('${esc(p.id)}')">🗑</button>
       </div>`;
     }).join('');
   } catch(e) {
@@ -3234,7 +3824,7 @@ function chatRedrawHistory() {
 
 async function chatDeleteProject(id) {
   try {
-    await fetch('/api/projects/delete/' + id, { method: 'POST' });
+    await fetch('/api/projects/delete/' + id, { method: 'POST', headers: _authHeaders() });
     chatLoadProjects();
   } catch(e) {
     toast('Delete failed', 2000);
@@ -3263,10 +3853,10 @@ function libraryRelTime(ts) {
 
 function librarySuggestModel(item) {
   if (item.type === 'image') {
-    return { provider:'openrouter', model:'google/gemini-2.0-flash-exp:free', label:'Gemini 2.0 Flash', reason:'Gemini has vision — can analyse images directly' };
+    return { provider:'openrouter', model:'meta-llama/llama-3.3-70b-instruct:free', label:'Llama 3.3 70B', reason:'Strong general model for image analysis' };
   }
   if (item.subtype === 'youtube') {
-    return { provider:'openrouter', model:'google/gemini-2.0-flash-exp:free', label:'Gemini 2.0 Flash', reason:'Gemini can analyse YouTube videos via URL' };
+    return { provider:'openrouter', model:'meta-llama/llama-3.3-70b-instruct:free', label:'Llama 3.3 70B', reason:'Strong general model for video analysis' };
   }
   if (item.type === 'audio' || item.type === 'video') {
     return { provider:'venice', model:'llama-3.3-70b', label:'Llama 3.3 70B', reason:'Paste a transcript for analysis — Llama 3.3 70B handles long audio text well' };
@@ -3277,10 +3867,39 @@ function librarySuggestModel(item) {
   return { provider:'openrouter', model:'qwen/qwen3-235b-a22b:free', label:'Qwen3 235B', reason:'Qwen3 235B is strong for web content and article analysis' };
 }
 
+function _libraryItemHtml(item) {
+  const sug = librarySuggestModel(item);
+  const meta = item.type === 'link' ? (item.url || '') : (item.size ? (item.size > 1048576 ? (item.size/1048576).toFixed(1)+'MB' : Math.round(item.size/1024)+'KB') : '');
+  const timeInfo = item.start != null ? `${fmtTime(item.start)}–${fmtTime(item.end)}` : '';
+  return `<div class="lib-row" id="librow-${esc(item.id)}">
+    <div class="lib-row-main">
+      <div class="lib-row-icon">${libraryTypeIcon(item.type)}</div>
+      <div class="lib-row-info">
+        <div class="lib-row-title" id="libtitle-${esc(item.id)}">${esc(item.title)}</div>
+        <div class="lib-row-meta">
+          <span class="lib-type-badge">${esc(item.subtype || item.type)}</span>
+          <span>${libraryRelTime(item.date)}</span>
+          ${timeInfo ? `<span style="color:var(--muted)">${timeInfo}</span>` : ''}
+          ${meta ? `<span class="truncate" style="max-width:160px">${esc(meta)}</span>` : ''}
+        </div>
+      </div>
+      <div class="lib-row-actions">
+        <button class="btn btn-xs btn-ghost" onclick="libraryStartRename('${esc(item.id)}')" title="Rename">✏️</button>
+        <button class="btn btn-xs btn-ghost" onclick="librarySendToChat('${esc(item.id)}')" title="Send to Chat">💬</button>
+        <button class="btn btn-xs btn-ghost" onclick="libraryDelete('${esc(item.id)}')" title="Delete">✕</button>
+      </div>
+    </div>
+    <div class="lib-ai-row">
+      <span class="lib-ai-chip">🤖 ${sug.label}</span>
+      <span style="font-size:11px;color:var(--dim)">${sug.reason}</span>
+    </div>
+  </div>`;
+}
+
 async function libraryRender() {
   const all = await dbGetAll('library');
   const sort = document.getElementById('libSort')?.value || 'newest';
-  let items = _libFilter === 'all' ? all : all.filter(i => i.type === _libFilter);
+  let items = _libFilter === 'all' ? all : all.filter(i => i.brand === _libFilter);
   if (sort === 'newest') items.sort((a,b) => b.date - a.date);
   else if (sort === 'oldest') items.sort((a,b) => a.date - b.date);
   else items.sort((a,b) => a.title.localeCompare(b.title));
@@ -3291,31 +3910,29 @@ async function libraryRender() {
     return;
   }
 
-  list.innerHTML = items.map(item => {
-    const sug = librarySuggestModel(item);
-    const meta = item.type === 'link' ? (item.url || '') : (item.size ? (item.size > 1048576 ? (item.size/1048576).toFixed(1)+'MB' : Math.round(item.size/1024)+'KB') : '');
-    return `<div class="lib-row">
-      <div class="lib-row-main">
-        <div class="lib-row-icon">${libraryTypeIcon(item.type)}</div>
-        <div class="lib-row-info">
-          <div class="lib-row-title">${item.title}</div>
-          <div class="lib-row-meta">
-            <span class="lib-type-badge">${item.subtype || item.type}</span>
-            <span>${libraryRelTime(item.date)}</span>
-            ${meta ? `<span class="truncate" style="max-width:180px">${meta}</span>` : ''}
-          </div>
-        </div>
-        <div class="lib-row-actions">
-          <button class="btn btn-xs btn-ghost" onclick="librarySendToChat('${item.id}')" title="Send to Chat">💬</button>
-          <button class="btn btn-xs btn-ghost" onclick="libraryDelete('${item.id}')" title="Delete">✕</button>
-        </div>
-      </div>
-      <div class="lib-ai-row">
-        <span class="lib-ai-chip">🤖 ${sug.label}</span>
-        <span style="font-size:11px;color:var(--dim)">${sug.reason}</span>
-      </div>
-    </div>`;
-  }).join('');
+  // Group by sourceFile
+  const groups = {};
+  const standalone = [];
+  for (const item of items) {
+    if (item.sourceFile) {
+      if (!groups[item.sourceFile]) groups[item.sourceFile] = [];
+      groups[item.sourceFile].push(item);
+    } else {
+      standalone.push(item);
+    }
+  }
+
+  let html = '';
+  for (const [src, clips] of Object.entries(groups)) {
+    html += `<details open style="margin-bottom:4px">
+      <summary style="cursor:pointer;font-size:12px;font-weight:600;color:var(--text);padding:6px 4px;list-style:none;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)">
+        🎬 ${esc(src)} <span style="color:var(--muted);font-weight:400">(${clips.length} clips)</span>
+      </summary>
+      ${clips.map(item => _libraryItemHtml(item)).join('')}
+    </details>`;
+  }
+  html += standalone.map(item => _libraryItemHtml(item)).join('');
+  list.innerHTML = html;
 }
 
 function librarySetFilter(f, btn) {
@@ -3362,6 +3979,7 @@ async function libraryHandleFile(file) {
     title: file.name.replace(/\.[^.]+$/, ''),
     type,
     subtype: 'upload',
+    brand: _settings.activeBrand || '',
     date: Date.now(),
     size: file.size,
     url: null,
@@ -3388,6 +4006,7 @@ async function libraryAddLink() {
     title,
     type: 'link',
     subtype,
+    brand: _settings.activeBrand || '',
     date: Date.now(),
     size: 0,
     url,
@@ -3410,6 +4029,7 @@ async function libraryAddFromRecording(id) {
     title: rec.title || 'Recording',
     type: rec.type === 'screen' ? 'video' : rec.type,
     subtype: 'recording',
+    brand: _settings.activeBrand || '',
     date: rec.date,
     size: rec.blob?.size || 0,
     url: null,
@@ -3425,6 +4045,34 @@ async function libraryDelete(id) {
   libraryRender();
 }
 
+function libraryStartRename(id) {
+  const titleEl = document.getElementById('libtitle-' + id);
+  if (!titleEl) return;
+  const current = titleEl.textContent;
+  const input = document.createElement('input');
+  input.value = current;
+  input.style.cssText = 'width:100%;font-size:13px;font-weight:500;background:var(--input-bg,var(--surface));color:var(--text);border:1px solid var(--accent);border-radius:4px;padding:2px 6px';
+  titleEl.replaceWith(input);
+  input.focus();
+  input.select();
+  const save = async () => {
+    const newTitle = input.value.trim() || current;
+    await libraryRename(id, newTitle);
+  };
+  input.onblur = save;
+  input.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } else if (e.key === 'Escape') { input.value = current; input.blur(); } };
+}
+
+async function libraryRename(id, newTitle) {
+  newTitle = newTitle.trim();
+  if (!newTitle) return;
+  const item = await dbGet('library', id);
+  if (!item) return;
+  item.title = newTitle;
+  await dbPut('library', item);
+  libraryRender();
+}
+
 async function librarySendToChat(id) {
   const item = await dbGet('library', id);
   if (!item) return;
@@ -3437,7 +4085,7 @@ async function librarySendToChat(id) {
   const sel = document.getElementById('libConfirmModelSel');
   sel.innerHTML = '';
   const allModels = [
-    { provider:'openrouter', model:'google/gemini-2.0-flash-exp:free', label:'Gemini 2.0 Flash (OR)' },
+    { provider:'openrouter', model:'meta-llama/llama-3.3-70b-instruct:free', label:'Llama 3.3 70B (OR)' },
     { provider:'openrouter', model:'qwen/qwen3-235b-a22b:free', label:'Qwen3 235B (OR)' },
     { provider:'openrouter', model:'meta-llama/llama-3.3-70b-instruct:free', label:'Llama 3.3 70B (OR)' },
     { provider:'openrouter', model:'deepseek/deepseek-r1:free', label:'DeepSeek R1 (OR)' },
@@ -3469,7 +4117,7 @@ async function libraryChatGo() {
   _libPending = null;
   document.getElementById('libConfirmBar').classList.remove('show');
 
-  switchTab(5);
+  switchTab(3);
 
   const provSel = document.getElementById('chatProviderSelect');
   provSel.value = chosen.provider;
