@@ -226,12 +226,11 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
 .rec-scripts-details summary::before{content:"▶";font-size:9px;transition:transform .15s;flex-shrink:0}
 .rec-scripts-details[open] summary::before{transform:rotate(90deg)}
 /* ── Library drawer (in Chat tab) ── */
-.lib-drawer-toggle{width:100%;background:none;border:none;border-top:1px solid var(--border);padding:10px 12px;text-align:left;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px}
-.lib-drawer-toggle::before{content:"▶";font-size:9px;transition:transform .15s;flex-shrink:0}
-.lib-drawer-toggle.open{color:var(--text)}
-.lib-drawer-toggle.open::before{transform:rotate(90deg)}
-.lib-drawer{display:none;padding-bottom:8px}
+.lib-drawer{display:none;position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom));left:0;right:0;max-height:65vh;overflow-y:auto;background:var(--surface);border-top:2px solid var(--border);border-radius:12px 12px 0 0;z-index:50;padding:12px 12px 16px;box-shadow:0 -4px 24px rgba(0,0,0,.4)}
 .lib-drawer.open{display:block}
+.lib-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:49}
+.lib-backdrop.open{display:block}
+#libToggleBtn.open{color:var(--accent)}
 /* ── Status Bar ── */
 #hb{display:flex;gap:6px;align-items:center;background:#0d1117;border-top:1px solid #30363d;padding:4px 10px;font-size:11px;cursor:pointer;color:#8b949e;min-height:22px;flex-wrap:wrap;flex-shrink:0;user-select:none}
 #hb .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;flex-shrink:0}
@@ -839,6 +838,7 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
         <select id="chatModelSelect" onchange="chatSaveModel()"></select>
         <button class="btn btn-sm btn-ghost btn-icon" onclick="chatToggleTrends()" id="chatTrendsToggle" title="Show trending">🔥</button>
         <button class="btn btn-sm btn-ghost btn-icon" onclick="chatSaveProject()" title="Save project">💾</button>
+        <button class="btn btn-sm btn-ghost btn-icon" id="libToggleBtn" onclick="libDrawerToggle()" title="Library">📚</button>
         <button class="btn btn-sm btn-ghost btn-icon" onclick="chatClear()" title="Clear chat">✕</button>
       </div>
       <div class="chat-body">
@@ -881,27 +881,6 @@ input[type=checkbox]{accent-color:var(--red);width:16px;height:16px;cursor:point
           <select class="lib-sort" id="libConfirmModelSel" style="font-size:12px;width:auto"></select>
           <button class="btn btn-sm btn-ghost" onclick="libraryCancelSend()">Cancel</button>
         </div>
-      </div>
-      <button class="lib-drawer-toggle" onclick="libDrawerToggle(this)">📚 Library</button>
-      <div class="lib-drawer" id="libDrawer">
-        <div class="lib-toolbar">
-          <div class="lib-filters">
-            <button class="lib-chip active" onclick="librarySetFilter('all',this)">All</button>
-            <button class="lib-chip" onclick="librarySetFilter('chs',this)">🏋️ Strength Club</button>
-            <button class="lib-chip" onclick="librarySetFilter('barbie',this)">🐾 Barbie</button>
-            <button class="lib-chip" onclick="librarySetFilter('dsp',this)">🎙️ Podcast</button>
-          </div>
-          <select class="lib-sort" id="libSort" onchange="libraryRender()">
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="name">A–Z</option>
-          </select>
-          <button class="btn btn-sm btn-primary" onclick="libraryShowAdd()">+ Add</button>
-        </div>
-        <div class="lib-list" id="libList">
-          <div class="empty"><span class="icon">📚</span><span class="text">No items yet — add files or links</span></div>
-        </div>
-        <input type="file" id="libFileInput" accept="audio/*,video/*,image/*,.pdf,.txt,.doc,.docx" style="display:none" onchange="libraryHandleFile(this.files[0])">
       </div>
     </section>
 
@@ -2182,11 +2161,19 @@ function copyTemplate() {
   navigator.clipboard.writeText(el.value).then(() => toast('Template copied!', 2000));
 }
 
-function libDrawerToggle(btn) {
+function libDrawerToggle() {
   const drawer = document.getElementById('libDrawer');
+  const backdrop = document.getElementById('libBackdrop');
+  const btn = document.getElementById('libToggleBtn');
   const open = drawer.classList.toggle('open');
-  btn.classList.toggle('open', open);
+  backdrop?.classList.toggle('open', open);
+  btn?.classList.toggle('open', open);
   if (open) libraryRender();
+}
+
+function libDrawerClose() {
+  ['libDrawer','libBackdrop'].forEach(id => document.getElementById(id)?.classList.remove('open'));
+  document.getElementById('libToggleBtn')?.classList.remove('open');
 }
 
 function copyText(id) {
@@ -4308,5 +4295,28 @@ async function libraryChatGo() {
   }
 }
 </script>
+
+<!-- Library bottom-sheet (fixed-position, outside tab panels) -->
+<div class="lib-backdrop" id="libBackdrop" onclick="libDrawerClose()"></div>
+<div class="lib-drawer" id="libDrawer">
+  <div class="lib-toolbar">
+    <div class="lib-filters">
+      <button class="lib-chip active" onclick="librarySetFilter('all',this)">All</button>
+      <button class="lib-chip" onclick="librarySetFilter('chs',this)">🏋️ Strength Club</button>
+      <button class="lib-chip" onclick="librarySetFilter('barbie',this)">🐾 Barbie</button>
+      <button class="lib-chip" onclick="librarySetFilter('dsp',this)">🎙️ Podcast</button>
+    </div>
+    <select class="lib-sort" id="libSort" onchange="libraryRender()">
+      <option value="newest">Newest</option>
+      <option value="oldest">Oldest</option>
+      <option value="name">A–Z</option>
+    </select>
+    <button class="btn btn-sm btn-primary" onclick="libraryShowAdd()">+ Add</button>
+  </div>
+  <div class="lib-list" id="libList">
+    <div class="empty"><span class="icon">📚</span><span class="text">No items yet — add files or links</span></div>
+  </div>
+  <input type="file" id="libFileInput" accept="audio/*,video/*,image/*,.pdf,.txt,.doc,.docx" style="display:none" onchange="libraryHandleFile(this.files[0])">
+</div>
 </body>
 </html>
